@@ -1,0 +1,59 @@
+{
+    "id": "",
+    "national_code": "",
+    "life_event": [
+        ""
+    ],
+    "target_audience": [
+        ""
+    ],
+    "domain": "",
+    "procedure_type": "",
+    "procedure": {
+        "name": "",
+        "eligibility": "",
+        "documents": [
+            {
+                "ten_giay_to": "",
+                "so_luong": ""
+            }
+        ],
+        "steps": [
+            ""
+        ],
+        "notes": [
+            ""
+        ],
+        "authority": "",
+        "execution_methods": [
+            {
+                "method": "",
+                "processing_time": "",
+                "fee": "",
+                "description": ""
+            }
+        ],
+        "online_portal_url": ""
+    },
+    "relations": {
+        "prerequisites": [
+            ""
+        ],
+        "next_steps": [
+            ""
+        ],
+        "related_benefits": [
+            ""
+        ]
+    },
+    "jurisdiction": {
+        "level": "",
+        "location": ""
+    },
+    "source": {
+        "name": "",
+        "url": "",
+        "effective_date": "",
+        "last_updated": ""
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "id": "PROC_1_003116",
+    "national_code": "1.003116",
+    "life_event": [
+        "bao_hiem_y_te"
+    ],
+    "target_audience": [
+        "Tổ chức (không bao gồm doanh nghiệp, HTX)",
+        "Công dân Việt Nam",
+        "Cán bộ",
+        "công chức",
+        "viên chức"
+    ],
+    "domain": "Chính sách",
+    "procedure_type": "TTHC được luật giao quy định chi tiết",
+    "procedure": {
+        "name": "Cấp thẻ bảo hiểm y tế (thực hiện tại cấp trung ương)",
+        "eligibility": "Đảm bảo đúng đối tượng tham gia bảo hiểm y tế theo quy định tại Điều 3 Thông tư liên tịch số 09/2015/TTLT-BCA-BYT-BTC, ngày 28/12/2015 của Bộ Công an, Bộ Y tế, Bộ Tài chính hướng dẫn thực hiện bảo hiểm y tế đối với người lao động, học sinh, sinh viên và thân nhân sĩ quan, hạ sĩ quan, chiến sĩ trong Công an nhân dân; cụ thể là:\n\na) Đối tượng do người lao động, Công an đơn vị, địa phương đóng bảo hiểm y tế:\n\n+ Công dân được tạm tuyển trước khi chính thức được tuyển chọn vào Công an nhân dân;\n\n+ Công nhân Công an;\n\n+ Người lao động làm việc theo hợp đồng không xác định thời hạn, hợp đồng có thời hạn từ đủ 3 tháng trở lên.\n\nb) Đối tượng do ngân sách nhà nước đóng bảo hiểm y tế\n\nThân nhân sĩ quan, hạ sĩ quan đang công tác, hạ sĩ quan, chiến sĩ nghĩa vụ, học viên Công an nhân dân đang học tập tại các trường trong và ngoài Công an nhân dân hưởng sinh hoạt phí từ ngân sách nhà nước.",
+        "documents": [
+            {
+                "ten_giay_to": "Văn bản đề nghị cấp thẻ bảo hiểm y tế của Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Danh sách người lao động, học sinh, sinh viên và thân nhân sĩ quan, hạ sĩ quan, chiến sĩ trong Công an nhân dân tham gia bảo hiểm y tế;",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Danh sách người lao động đang tham gia bảo hiểm xã hội trong Công an nhân dân (nếu có);",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Tờ khai tham gia bảo hiểm y tế;",
+                "so_luong": "1 bản chính"
+            }
+        ],
+        "steps": [
+            "Bước 1: Sĩ quan, hạ sĩ quan, chiến sĩ nghĩa vụ đại diện cho thân nhân; người lao động làm việc theo hợp đồng lao động, công nhân Công an, công dân tạm tuyển trước khi chính thức được tuyển chọn vào Công an nhân dân có trách nhiệm lập tờ khai tham gia bảo hiểm y tế (mẫu 01-BK, mẫu 02-BK) nộp cho đơn vị quản lý trực tiếp. Đơn vị quản lý trực tiếp tập hợp nộp cho cơ quan tổ chức cán bộ thuộc các Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ. Bước 2: sau khi tiếp nhận bản kê khai cấp thẻ bảo hiểm y tế do đơn vị trực tiếp quản lý chuyển đến, cơ quan tổ chức cán bộ thuộc các Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ có trách nhiệm lập:",
+            "- Danh sách người lao động, học sinh, sinh viên và thân nhân sĩ quan, hạ sĩ quan, chiến sĩ tham gia bảo hiểm y tế (Mẫu 01-DS);",
+            "- Danh sách người lao động đang tham gia bảo hiểm xã hội trong Công an nhân dân có xác nhận của Bảo hiểm xã hội Công an nhân dân (Mẫu 02-DS), nếu có. Bước 3: cơ quan tổ chức cán bộ thuộc các Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ có trách nhiệm lập hồ sơ đề nghị Bảo hiểm xã hội tỉnh nơi đơn vị đóng quân cấp thẻ bảo hiểm y tế. Bước 4: Bảo hiểm xã hội tỉnh có trách nhiệm cấp và chuyển thẻ bảo hiểm y tế về các Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ để chuyển thẻ cho các đối tượng được cấp."
+        ],
+        "notes": [],
+        "authority": "Cục tổ chức cán bộ",
+        "execution_methods": [
+            {
+                "method": "Trực tiếp",
+                "processing_time": "10 Ngày",
+                "fee": "Không có thông tin",
+                "description": "tại đơn vị Công an nơi quản lý trực tiếp sĩ quan, hạ sĩ quan, chiến sĩ nghĩa vụ đại diện cho thân nhân; người lao động làm việc theo hợp đồng lao động, công nhân Công an, công dân tạm tuyển trước khi chính thức được tuyển chọn vào Công an nhân dân. Thời gian: trong thời hạn 10 ngày làm việc, kể từ ngày nhận được hồ sơ đề nghị cấp thẻ bảo hiểm y tế, Bảo hiểm xã hội tỉnh có trách nhiệm cấp thẻ bảo hiểm y tế và chuyển thẻ bảo hiểm y tế về các Tổng cục, Bộ Tư lệnh, đơn vị trực thuộc Bộ."
+            }
+        ],
+        "online_portal_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bf7-679c-7519-883c-c7013e4ab84f"
+    },
+    "relations": {
+        "prerequisites": [],
+        "next_steps": [],
+        "related_benefits": []
+    },
+    "jurisdiction": {
+        "level": "Cấp bộ",
+        "location": "Toàn quốc"
+    },
+    "source": {
+        "name": "Cổng Dịch vụ công Quốc gia",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bf7-679c-7519-883c-c7013e4ab84f",
+        "effective_date": "",
+        "last_updated": "2026-09-12"
+    }
+}

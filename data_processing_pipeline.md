@@ -69,12 +69,10 @@ Trích dẫn nguồn và quản lý vòng đời dữ liệu để tránh thông
     "documents": [
       {
         "ten_giay_to": "Tờ khai đăng ký khai sinh",
-        "mau_don": "Mẫu số 04",
         "so_luong": "01 Bản chính"
       },
       {
         "ten_giay_to": "Giấy chứng sinh do cơ sở y tế cấp",
-        "mau_don": "Không có",
         "so_luong": "01 Bản chính"
       }
     ],
