@@ -1,0 +1,83 @@
+{
+    "id": "PROC_1_014137",
+    "national_code": "1.014137",
+    "life_event": [
+        "sinh_con"
+    ],
+    "target_audience": [
+        "Công dân Việt Nam",
+        "Doanh nghiệp",
+        "Người nước ngoài",
+        "Tổ chức nước ngoài",
+        "Hợp tác xã",
+        "Cán bộ",
+        "công chức",
+        "viên chức",
+        "Tổ chức (không bao gồm doanh nghiệp, HTX)",
+        "Người Việt Nam định cư ở nước ngoài",
+        "Doanh nghiệp có vốn đầu tư nước ngoài"
+    ],
+    "domain": "Bảo hiểm y tế",
+    "procedure_type": "TTHC được luật giao quy định chi tiết",
+    "procedure": {
+        "name": "Thủ tục cấp thẻ bảo hiểm y tế",
+        "eligibility": "Không có thông tin",
+        "documents": [
+            {
+                "ten_giay_to": "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2 Phụ lục ban hành kèm theo Nghị định số 188/2025/NĐ-CP",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Bản scan các văn bản, tài liệu liên quan (nếu có) trong trường hợp thay đổi thông tin thân nhân hoặc thay đổi thông tin quyền lợi được hưởng.",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Danh sách đối tượng tham gia bảo hiểm y tế theo Mẫu số 3 Phụ lục ban hành kèm theo Nghị định số 188/2025/NĐ-CP (đối với cơ quan, tổ chức quản lý đối tượng tham gia bảo hiểm y tế).",
+                "so_luong": "1 bản chính"
+            }
+        ],
+        "steps": [
+            "Bước 1: Người tham gia bảo hiểm y tế kê khai đầy đủ thông tin theo Mẫu số 2 Phụ lục ban hành kèm theo Nghị định số 188/2025/NĐ-CP hoặc cơ quan, tổ chức quản lý đối tượng kê khai đầy đủ thông tin theo Mẫu số 3 Phụ lục ban hành kèm theo Nghị định số 188/2025/NĐ-CP trên Cổng dịch vụ công quốc gia hoặc qua ứng dụng của cơ quan bảo hiểm xã hội hoặc nộp trực tiếp tại bộ phận một cửa của cơ quan bảo hiểm xã hội hoặc gửi qua dịch vụ bưu chính công ích đến cơ quan bảo hiểm xã hội được giao nhiệm vụ tiếp nhận.\n  + Người tham gia bảo hiểm y tế hoặc cơ quan, tổ chức quản lý đối tượng tích chọn cấp thẻ bảo hiểm y tế bản điện tử hoặc cấp thẻ bảo hiểm y tế bản giấy trên Tờ khai tham gia hoặc danh sách đối tượng tham gia\n  + Trường hợp thay đổi thông tin thân nhân hoặc thay đổi thông tin quyền lợi được hưởng thì người tham gia bảo hiểm y tế phải cung cấp bản chụp (scan) các văn bản, tài liệu liên quan để nộp cùng Tờ khai trên.",
+            "Bước 2: Cổng dịch vụ công quốc gia hoặc ứng dụng của cơ quan bảo hiểm xã hội hoặc cán bộ tiếp nhận hồ sơ trả Giấy tiếp nhận hồ sơ và hẹn trả kết quả cấp thẻ bảo hiểm y tế cho người tham gia bảo hiểm y tế hoặc cho cơ quan, tổ chức quản lý đối tượng.",
+            "Bước 3: Trong thời hạn 05 ngày làm việc, kể từ ngày nhận đủ hồ sơ theo quy định, cơ quan bảo hiểm xã hội trả thẻ bảo hiểm y tế, cụ thể như sau:\n  + Trường hợp cấp thẻ bảo hiểm y tế bản điện tử, cơ quan bảo hiểm xã hội trả kết quả thẻ bảo hiểm y tế bản điện tử vào ứng dụng bảo hiểm xã hội số (VssID), hòm thư điện tử cá nhân (email), liên kết với tài khoản định danh điện tử (VNeID) mức độ 2.\n  + Trường hợp cấp thẻ bảo hiểm y tế bản giấy, cơ quan bảo hiểm xã hội chuyển thẻ bảo hiểm y tế bản giấy cho người tham gia bảo hiểm y tế hoặc tổ chức quản lý đối tượng."
+        ],
+        "notes": ["Đối với trẻ em dưới 6 tuổi, việc cấp thẻ bảo hiểm y tế thực hiện liên thông cùng với thủ tục đăng ký khai sinh, đăng ký thường trú theo quy định tại Nghị định số 63/2024/NĐ-CP ngày 10 tháng 6 năm 2024 của Chính phủ quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi; đăng ký khai tử, xóa đăng ký thường trú, giải quyết mai táng phí, tử tuất."],
+        "authority": "Bảo hiểm xã hội tỉnh",
+        "execution_methods": [
+            {
+                "method": "Trực tuyến",
+                "processing_time": "5 Ngày làm việc",
+                "fee": "Không có thông tin",
+                "description": "05 ngày làm việc kể từ ngày nhận đủ hồ sơ."
+            },
+            {
+                "method": "Dịch vụ bưu chính",
+                "processing_time": "5 Ngày làm việc",
+                "fee": "Không có thông tin",
+                "description": "05 ngày làm việc kể từ ngày nhận đủ hồ sơ."
+            },
+            {
+                "method": "Trực tiếp",
+                "processing_time": "5 Ngày làm việc",
+                "fee": "Không có thông tin",
+                "description": "05 ngày làm việc kể từ ngày nhận đủ hồ sơ."
+            }
+        ],
+        "online_portal_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bff-3d08-7599-80c7-c185678b6753"
+    },
+    "relations": {
+        "prerequisites": [],
+        "next_steps": [],
+        "related_benefits": []
+    },
+    "jurisdiction": {
+        "level": "Cấp tỉnh, Cơ quan khác",
+        "location": "Toàn quốc"
+    },
+    "source": {
+        "name": "Cổng Dịch vụ công Quốc gia",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bff-3d08-7599-80c7-c185678b6753",
+        "effective_date": "",
+        "last_updated": "2026-09-12"
+    }
+}
