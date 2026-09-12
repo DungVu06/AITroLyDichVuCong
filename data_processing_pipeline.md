@@ -17,15 +17,11 @@ Chứa nội dung cốt lõi của thủ tục, là context chính để LLM sin
 | Tên biến con | Định dạng | Ý nghĩa & Ví dụ |
 | :--- | :--- | :--- |
 | `name` | `String` | Tên chính thức của thủ tục (VD: `Đăng ký khai sinh`). |
-| `description` | `String` | Tóm tắt mục đích của thủ tục hành chính. |
-| `eligibility` | `String` | Điều kiện/tiêu chuẩn để thực hiện (VD: `Người có hộ khẩu thường trú...`). |
-| `documents` | `Array of Strings` | Danh sách các loại giấy tờ cần chuẩn bị. |
-| `forms` | `Array of Objects` | Chứa `name` và `url` của các biểu mẫu đi kèm (hỗ trợ tải file). |
+| `eligibility` | `String` | Yêu cầu, điều kiện thực hiện (VD: `Người có hộ khẩu thường trú...`). |
+| `documents` | `Array of Dict` | Danh sách các loại giấy tờ cần chuẩn bị. |
 | `steps` | `Array of Strings` | Trình tự các bước thực hiện. Giữ thứ tự 1-2-3 để tránh LLM sinh text lộn xộn. |
 | `authority` | `String` | Cơ quan tiếp nhận và giải quyết (VD: `UBND cấp phường/xã`). |
-| `processing_time` | `String` | Thời gian giải quyết hồ sơ (VD: `3 ngày làm việc`). |
-| `fee` | `String` | Mức lệ phí phải nộp (VD: `Miễn phí` hoặc `100.000 VNĐ`). |
-| `online_supported`| `Boolean` | Cờ đánh dấu thủ tục có hỗ trợ nộp trực tuyến hay không (`true`/`false`). |
+| `execution_methods` | `Array of Dict` | Cách thức thực hiện
 | `online_portal_url`| `String` (Nullable)| Link dẫn thẳng đến trang nộp hồ sơ trực tuyến. |
 
 ## 3. Object `relations` (Mối quan hệ Knowledge Graph)
@@ -55,25 +51,31 @@ Trích dẫn nguồn và quản lý vòng đời dữ liệu để tránh thông
 | `effective_date` | `String` (Date) | Ngày thủ tục/văn bản bắt đầu có hiệu lực (Định dạng: `YYYY-MM-DD`). |
 | `last_updated` | `String` (Date) | Ngày hệ thống cập nhật/crawl cuối cùng, dùng để trigger update. |
 
+## Note
+`effective_date` và `relations` lấy ở vbpl
+
 ## Ví dụ
 ```bash
 {
-  "id": "PROC_001",
-  "life_event": ["sinh_con", "nhan_con_nuoi"],
-  "target_audience": ["ca_nhan", "cong_dan_viet_nam"],
-  
+  "id": "PROC_1_001193",
+  "national_code": "1.001193"
+  "life_event": ["Sinh con"],
+  "target_audience": ["Công dân Việt Nam"],
+  "domain": "Hộ tịch",
+  "procedure_type": "TTHC được luật giao quy định chi tiết",
   "procedure": {
-    "name": "Đăng ký khai sinh",
-    "description": "Thủ tục cấp giấy khai sinh cho trẻ em mới sinh ra tại Việt Nam...",
+    "name": "Thủ tục đăng ký khai sinh",
     "eligibility": "Cha, mẹ, ông bà hoặc người thân thích...",
     "documents": [
-      "Tờ khai đăng ký khai sinh (theo mẫu)",
-      "Giấy chứng sinh do cơ sở y tế cấp"
-    ],
-    "forms": [
       {
-        "name": "Tờ khai đăng ký khai sinh",
-        "url": "https://dichvucong.gov.vn/.../to-khai-khai-sinh.docx"
+        "ten_giay_to": "Tờ khai đăng ký khai sinh",
+        "mau_don": "Mẫu số 04",
+        "so_luong": "01 Bản chính"
+      },
+      {
+        "ten_giay_to": "Giấy chứng sinh do cơ sở y tế cấp",
+        "mau_don": "Không có",
+        "so_luong": "01 Bản chính"
       }
     ],
     "steps": [
@@ -81,9 +83,14 @@ Trích dẫn nguồn và quản lý vòng đời dữ liệu để tránh thông
       "Bước 2: Nộp tại bộ phận Một cửa..."
     ],
     "authority": "UBND cấp xã/phường nơi cư trú của cha hoặc mẹ",
-    "processing_time": "1 ngày làm việc (ngay trong ngày tiếp nhận)",
-    "fee": "Miễn phí",
-    "online_supported": true,
+    execution_methods: [
+      {
+          "method": "Trực tuyến",
+          "processing_time": "1",
+          "fee": "Miễn phí",
+          "description": ""
+      }
+    ],
     "online_portal_url": "https://dichvucong.gov.vn/..."
   },
 
