@@ -1,7 +1,9 @@
 import json
 import os
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
-def chunk_procedure_json_v2(filepath):
+def chunk_procedure_json(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
@@ -65,21 +67,44 @@ def chunk_procedure_json_v2(filepath):
 
 # ==========================================
 if __name__ == "__main__":
-    procedure_dir = r"d:\Study\ML-DL\DL\MiniProject\AITroLyDichVuCong\data\procedure"
+    procedure_dir = "data/procedure"
     all_chunks = []
 
     if os.path.exists(procedure_dir):
         for filename in os.listdir(procedure_dir):
-            if filename.endswith(".json"):
+            if filename.endswith(".json") and filename.startswith("PROC_"):
                 filepath = os.path.join(procedure_dir, filename)
-                file_chunks = chunk_procedure_json_v2(filepath)
+                file_chunks = chunk_procedure_json(filepath)
                 all_chunks.extend(file_chunks)
                 
-        print(f"Tổng cộng đã tạo ra: {len(all_chunks)} chunks đê đưa vào Vector DB.")
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
         
-        output_file = r"d:\Study\ML-DL\DL\MiniProject\AITroLyDichVuCong\data\procedure_chunks_v2.jsonl"
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, 
+            chunk_overlap=100,
+            length_function=len,
+            separators=["\n\n", "\n", ".", " ", ""]
+        )
+        
+        safe_chunks_for_sbert = []
+        for doc_idx, chunk in enumerate(all_chunks):
+            text = chunk["page_content"]
+            split_texts = text_splitter.split_text(text)
+            for split_idx, split_txt in enumerate(split_texts):
+                new_metadata = chunk["metadata"].copy()
+                # Tạo ID duy nhất: [Mã văn bản]_[Thứ tự chunk gốc]_[Thứ tự cắt đệ quy]
+                new_metadata["chunk_id"] = f"{new_metadata['doc_id']}_c{doc_idx}_s{split_idx}"
+                
+                safe_chunks_for_sbert.append({
+                    "page_content": split_txt,
+                    "metadata": new_metadata
+                })
+                
+        print(f"Từ {len(all_chunks)} chunks gốc, đã chia thành {len(safe_chunks_for_sbert)} chunks an toàn cho SBERT.")
+        
+        output_file = "data/procedure_chunks.jsonl"
         with open(output_file, 'w', encoding='utf-8') as out_f:
-            for chunk in all_chunks:
+            for chunk in safe_chunks_for_sbert:
                 out_f.write(json.dumps(chunk, ensure_ascii=False) + '\n')
                 
         print(f"Đã lưu vào file: {output_file}")
