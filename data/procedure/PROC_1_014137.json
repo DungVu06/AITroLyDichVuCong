@@ -66,9 +66,11 @@
         "online_portal_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bff-3d08-7599-80c7-c185678b6753"
     },
     "relations": {
-        "prerequisites": [],
+        "prerequisites": ["PROC_1_001193"],
         "next_steps": [],
-        "related_benefits": []
+        "part_of": [
+            "PROC_3_000722"
+        ]
     },
     "jurisdiction": {
         "level": "Cấp tỉnh, Cơ quan khác",

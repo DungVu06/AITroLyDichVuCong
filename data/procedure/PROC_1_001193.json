@@ -196,8 +196,10 @@
     },
     "relations": {
         "prerequisites": [],
-        "next_steps": [],
-        "related_benefits": []
+        "next_steps": ["PROC_1_004222", "PROC_1_014137"],
+        "part_of": [
+            "PROC_3_000722"
+        ]
     },
     "jurisdiction": {
         "level": "Cấp xã",

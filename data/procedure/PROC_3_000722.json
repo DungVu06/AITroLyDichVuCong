@@ -52,7 +52,12 @@
     "relations": {
         "prerequisites": [],
         "next_steps": [],
-        "related_benefits": []
+        "sub_procedures": [
+            "PROC_1_001193",
+            "PROC_1_004222",
+            "PROC_1_014137",
+            "PROC_1_116410" 
+        ]
     },
     "jurisdiction": {
         "level": "Cấp xã",
