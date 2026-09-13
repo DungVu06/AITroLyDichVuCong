@@ -11,10 +11,11 @@
   "source": {
     "name": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
     "url": "https://vbpl.vn/van-ban/chi-tiet/thong-tu-so-18-2019-tt-bldtbxh-huong-dan-thuc-hien-tien-luong-tien-ho-tro-tap-huan-thi-dau-bao-hiem-xa-hoi-bao-hiem-that-nghiep-bao-hiem-tai-nan-lao-dong-benh-nghe-nghiep-che-do-khi-om-dau-thai-san-bi-tai-nan-lao-dong-doi-voi-huan-luyen-vien-van-dong-vien-the-thao-trong-thoi-gian-tap-trung-tap-huan-thi-dau--138863",
-    "crawled_at": "2026-09-12T11:45:44.698333+00:00"
+    "crawled_at": "2026-09-13T03:48:20.622919+00:00"
   },
   "relations": {
-    "related_laws": ["LAW_VBPL_56f94e74bd2946fd"]
+    "related_laws": [],
+    "related_procedures": []
   },
   "content": {
     "title": "Thông tư số 18/2019/TT-BLĐTBXH Hướng dẫn thực hiện tiền lương, tiền hỗ trợ tập huấn, thi đấu, bảo hiểm xã hội, bảo hiểm thất nghiệp, bảo hiểm tai nạn lao động, bệnh nghề nghiệp, chế độ khi ốm đau, thai sản, bị tai nạn lao động đối với huấn luyện viên, vận động viên thể thao trong thời gian tập trung tập huấn, thi đấu",
@@ -35,7 +36,8 @@
             "document_type": "Nghị định",
             "document_number": "152/2018/NĐ-CP",
             "issued_date_raw": "07 tháng 11 năm 2018",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "dẫn_chiếu",
+            "referenced_location": "Điều 3, Điều 4, Điều 5 và Điều 6"
           },
           {
             "document_type": "Nghị định",
@@ -114,7 +116,8 @@
             "document_type": "Nghị định",
             "document_number": "152/2018/NĐ-CP",
             "issued_date_raw": "",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "dẫn_chiếu",
+            "referenced_location": "điểm b Khoản 2 Điều 3"
           }
         ]
       },
@@ -217,7 +220,8 @@
             "document_type": "Nghị định",
             "document_number": "152/2018/NĐ-CP",
             "issued_date_raw": "",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "dẫn_chiếu",
+            "referenced_location": "Điều 3"
           }
         ]
       },

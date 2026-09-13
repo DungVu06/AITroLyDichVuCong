@@ -11,10 +11,11 @@
   "source": {
     "name": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
     "url": "https://vbpl.vn/van-ban/chi-tiet/thong-tu-so-34-tt-lb-huong-da-viec-thi-hanh-cac-che-do-tro-cap-bao-hiem-xa-hoi-ve-om-dau-thai-san-tai-nan-lao-dong-benh-nghe-nghiep-doi-voi-nguoi-lao-dong-do-to-chuc-cong-doan-quan-ly--10089",
-    "crawled_at": "2026-09-12T11:45:15.697812+00:00"
+    "crawled_at": "2026-09-13T03:47:52.036952+00:00"
   },
   "relations": {
-    "related_laws": []
+    "related_laws": [],
+    "related_procedures": []
   },
   "content": {
     "title": "Thông tư số 34/TT-LB Hướng dẫ việc thi hành các chế độ trợ cấp bảo hiểm xã hội về ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp đối với người lao động do tổ chức công đoàn quản lý",
@@ -35,7 +36,8 @@
             "document_type": "Thông tư",
             "document_number": "21/TT-LB",
             "issued_date_raw": "18 tháng 6 năm 1994",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "dẫn_chiếu",
+            "referenced_location": "mục A"
           }
         ]
       },

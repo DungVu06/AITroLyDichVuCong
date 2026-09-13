@@ -1,8 +1,8 @@
-"""Thu thap van ban phap luat tu vbpl.vn.
+"""Thu thap metadata va noi dung van ban phap luat tu vbpl.vn.
 
-Khuyen nghi: dung file nay de thu thap va luu raw/metadata; khong dung no de
-tu dong ket luan van ban con hieu luc. Hieu luc va quan he thay the/phap ly
-can duoc kiem tra lai tu trang van ban.
+Chi luu JSON da chuan hoa vao thu muc records; khong luu HTML raw.
+Khong dung crawler de tu dong ket luan van ban con hieu luc. Hieu luc va
+quan he thay the/phap ly can duoc kiem tra lai tu trang van ban.
 
 Vi du:
   python crawl_law.py --url 'https://vbpl.vn/...' --out data/law
@@ -144,6 +144,27 @@ def split_legal_sections(text: str) -> list[dict]:
     return sections
 
 
+def normalize_for_comparison(text: str) -> str:
+    """Chuan hoa de so sanh noi dung, khong bi anh huong boi whitespace."""
+    return re.sub(r"\s+", "", unicodedata.normalize("NFC", text or "")).casefold()
+
+
+def validate_section_split(full_text: str, sections: list[dict]) -> dict:
+    """Kiem tra viec tach section co lam mat ky tu/noi dung hay khong."""
+    reconstructed = "\n".join(
+        "\n".join(item for item in (section.get("heading", ""), section.get("text", "")) if item)
+        for section in sections
+    )
+    original_normalized = normalize_for_comparison(full_text)
+    reconstructed_normalized = normalize_for_comparison(reconstructed)
+    return {
+        "is_lossless": original_normalized == reconstructed_normalized,
+        "full_text_length": len(full_text),
+        "reconstructed_length": len(reconstructed),
+        "section_count": len(sections),
+    }
+
+
 def extract_related_laws(text: str) -> list[dict]:
     """Phat hien van ban duoc dan chieu trong pham vi mot section."""
     pattern = re.compile(
@@ -165,7 +186,9 @@ def extract_related_laws(text: str) -> list[dict]:
         if key in seen:
             continue
         seen.add(key)
-        context = text[max(0, match.start() - 80):match.start()].casefold()
+        context_raw = text[max(0, match.start() - 160):match.start()]
+        context = context_raw.casefold()
+        referenced_location = extract_reference_location(context_raw)
         if "sửa đổi" in context or "bổ sung" in context:
             relation_type = "sửa_đổi_bổ_sung"
         # "... quy dinh trai voi Thong tu X ... deu bai bo" khong co nghia
@@ -180,13 +203,34 @@ def extract_related_laws(text: str) -> list[dict]:
             relation_type = "thay_thế"
         else:
             relation_type = "dẫn_chiếu"
-        relations.append({
+        relation = {
             "document_type": normalize_document_type(kind),
             "document_number": number,
             "issued_date_raw": date,
             "relation_type": relation_type,
-        })
+        }
+        if referenced_location:
+            relation["referenced_location"] = referenced_location
+        relations.append(relation)
     return relations
+
+
+def extract_reference_location(context: str) -> str:
+    """Lay pham vi duoc dan chieu, vi du 'muc A' hay 'khoan 1 Dieu 2'."""
+    unit = (
+        r"(?:điểm\s+[a-zđ]|khoản\s+\d+|mục\s+(?:[a-zđ]|\d+)|"
+        r"chương\s+[ivxlcdm0-9]+|điều\s+\d+)"
+    )
+    location_pattern = re.compile(
+        rf"(?P<location>{unit}(?:\s*(?:,|và)?\s*{unit}){{0,5}})"
+        r"(?:\s+của)?\s*$",
+        re.I,
+    )
+    matches = list(location_pattern.finditer(context))
+    if not matches:
+        return ""
+    location = clean(matches[-1].group("location"))
+    return location
 
 
 def slug_id(url: str, title: str) -> str:
@@ -270,7 +314,7 @@ def active_panel_text(page) -> str:
                        for line in raw.splitlines())
 
 
-def extract(page, url: str, raw_html: str) -> dict:
+def extract(page, url: str) -> dict:
     # Trang chi tiet la Next.js: HTML ban dau chi co skeleton, noi dung den tu API.
     try:
         page.wait_for_function(
@@ -311,6 +355,14 @@ def extract(page, url: str, raw_html: str) -> dict:
     # Mở trực tiếp tab Nội dung bằng query tabs=toan-van.
     open_tab(page, url, "toan-van")
     content_text = clean_legal_text(active_panel_text(page))
+    sections = split_legal_sections(content_text)
+    section_validation = validate_section_split(content_text, sections)
+    if not section_validation["is_lossless"]:
+        print(
+            f"WARNING {url}: sections khong khop full_text "
+            f"({section_validation['full_text_length']} -> "
+            f"{section_validation['reconstructed_length']} ky tu)"
+        )
     links = []
     for a in page.locator("a").all():
         href = a.get_attribute("href")
@@ -339,7 +391,7 @@ def extract(page, url: str, raw_html: str) -> dict:
             "effective_date_raw": effective_date,
             "validity_raw": status,
             "full_text": content_text,
-            "sections": split_legal_sections(content_text),
+            "sections": sections,
             "attachments": sorted(set(links)),
         },
     }
@@ -403,7 +455,6 @@ def discover_urls(page, query: str, max_pages: int = 3) -> list[str]:
 
 
 def crawl(urls: list[str], out: Path, headed: bool, delay: float) -> None:
-    out.joinpath("raw").mkdir(parents=True, exist_ok=True)
     out.joinpath("records").mkdir(parents=True, exist_ok=True)
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=not headed)
@@ -416,10 +467,8 @@ def crawl(urls: list[str], out: Path, headed: bool, delay: float) -> None:
                 page.goto(url, wait_until="domcontentloaded", timeout=0)
                 # Cho API cua trang co thoi gian tai toan van.
                 page.wait_for_timeout(8000)
-                html = page.content()
-                record = extract(page, page.url, html)
+                record = extract(page, page.url)
                 stem = record["id"]
-                out.joinpath("raw", stem + ".html").write_text(html, encoding="utf-8")
                 out.joinpath("records", stem + ".json").write_text(
                     json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
                 print(f"OK {record['id']} | {record['content']['title'][:100]}")

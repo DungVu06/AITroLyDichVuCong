@@ -11,10 +11,11 @@
   "source": {
     "name": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
     "url": "https://vbpl.vn/van-ban/chi-tiet/thong-tu-lien-tich-so-21-lb-tt-thong-tu-huong-dan-thuc-hien-cac-che-do-bao-hiem-xa-hoi-theo-hinh-thuc-bat-buoc--10263",
-    "crawled_at": "2026-09-12T11:45:30.374333+00:00"
+    "crawled_at": "2026-09-13T03:48:06.401981+00:00"
   },
   "relations": {
-    "related_laws": []
+    "related_laws": [],
+    "related_procedures": []
   },
   "content": {
     "title": "Thông tư liên tịch số 21-LB/TT Thông tư hướng dẫn thực hiện các chế độ bảo hiểm xã hội theo hình thức bắt buộc",
@@ -35,7 +36,8 @@
             "document_type": "Nghị định",
             "document_number": "43-CP",
             "issued_date_raw": "22-6-1993",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "dẫn_chiếu",
+            "referenced_location": "Điều 2"
           }
         ]
       },
@@ -183,7 +185,7 @@
             "document_type": "Thông tư",
             "document_number": "15-LĐTBXH",
             "issued_date_raw": "2-6-1993",
-            "relation_type": "dẫn_chiếu"
+            "relation_type": "sửa_đổi_bổ_sung"
           },
           {
             "document_type": "Quyết định",
