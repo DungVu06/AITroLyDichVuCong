@@ -1,5 +1,5 @@
 # Pipeline data
-Official sources -> Crawl/Download -> Parse -> Clean -> Structured Data + Raw Documents -> Normalize -> Add Metadata -> Procedure Relations -> Chunk -> Embedding -> VectorDB + Knowledge Graph
+Official sources -> Crawl/Download -> Parse -> Clean -> Structured Data + Raw Documents -> Normalize -> Add Metadata -> *Procedure Relations -> Chunk -> Embedding -> VectorDB + Knowledge Graph
 
 # Metadata
 ## 1. Metadata Root (Thông tin định danh & Phân loại)
@@ -31,7 +31,8 @@ Phục vụ việc thiết lập đồ thị tri thức, giúp AI chủ động 
 | :--- | :--- | :--- |
 | `prerequisites` | `Array of Strings` | Các `id` thủ tục bắt buộc phải hoàn thành trước (VD: `PROC_000_CCCD`). |
 | `next_steps` | `Array of Strings` | Các `id` thủ tục nên làm tiếp theo (VD: `PROC_002_NHAP_KHAU`). |
-| `related_benefits`| `Array of Strings` | Các `id` chính sách/quyền lợi liên quan (VD: `BEN_001_THAI_SAN`). |
+| `sub_procedures`| `Array of Strings` | Các `id` thủ tục con |
+| `part_of`| `Array of Strings` | Các `id` thủ tục cha |
 
 ## 4. Object `jurisdiction` (Phạm vi áp dụng)
 Quản lý phạm vi hiệu lực của thủ tục (phân biệt giữa các địa phương).

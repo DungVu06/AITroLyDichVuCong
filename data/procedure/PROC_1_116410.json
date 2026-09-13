@@ -1,0 +1,68 @@
+{
+    "id": "PROC_1_116410",
+    "national_code": "1.116410",
+    "life_event": [
+        "sinh_con"
+    ],
+    "target_audience": [
+        "Công dân Việt Nam"
+    ],
+    "domain": "Cấp, quản lý căn cước",
+    "procedure_type": "TTHC được luật giao quy định chi tiết",
+    "procedure": {
+        "name": "Cấp thẻ căn cước cho người dưới 06 tuổi",
+        "eligibility": "Không có thông tin",
+        "documents": [
+            {
+                "ten_giay_to": "Phiếu thu nhận thông tin căn cước (Mẫu CC01 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an). Phiếu được tạo lập khi trích xuất thông tin của công dân trong Cơ sở dữ liệu quốc gia về dân cư và in trong quá trình thu nhận hồ sơ căn cước để công dân kiểm tra và ký xác nhận",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Phiếu đề nghị giải quyết thủ tục về căn cước (Mẫu DC02 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an) trong đó nêu rõ mục đích, nội dung, phạm vi thông tin cần khai thác trong Cơ sở dữ liệu quốc gia về dân cư và cam đoan về việc chịu trách nhiệm trong sử dụng thông tin khi được khai thác và ý kiến đồng ý của chủ thể thông tin cần khai thác",
+                "so_luong": "1 bản chính"
+            },
+            {
+                "ten_giay_to": "Trường hợp công dân chưa có thông tin trong cơ sở dữ liệu quốc gia về dân cư thì hồ sơ còn có Phiếu thu thập thông tin dân cư (Mẫu DC01 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an); Giấy tờ pháp lý chứa thông tin công dân.",
+                "so_luong": "1 bản chính"
+            }
+        ],
+        "steps": [
+           "Bước 1: Nộp hồ sơ thủ tục hành chính: \n Nộp hồ sơ trực tuyến toàn trình:  Đối với người dưới 06 tuổi thì người đại diện hợp pháp thực hiện thủ tục cấp thẻ căn cước cho người dưới 06 tuổi, nộp hồ sơ trực tuyến toàn trình qua Cổng dịch vụ công quốc gia, Ứng dụng định danh quốc gia (VNeID) thì lựa chọn thủ tục, kiểm tra thông tin của người dưới 06 tuổi trong Cơ sở dữ liệu quốc gia về dân cư. Trường hợp thông tin chính xác thì người đại diện hợp pháp xác nhận chuyển hồ sơ đề nghị đến Công an cấp xã nơi người dưới 06 tuổi cư trú xem xét, giải quyết việc cấp thẻ căn cước cho người dưới 06 tuổi.",
+           "Bước 2: Giải quyết và trả kết quả thủ tục hành chính: Cán bộ thu nhận thông tin người dưới 14 tuổi tìm kiếm thông tin trong Cơ sở dữ liệu quốc gia về dân cư để lập hồ sơ cấp thẻ căn cước. \n + Trường hợp thông tin người dưới 14 tuổi chưa có trong Cơ sở dữ liệu quốc gia về dân cư thì cán bộ thu nhận đề nghị người đại diện hợp pháp xuất trình một trong các loại giấy tờ pháp lý chứng minh nội dung thông tin nhân thân và hướng dẫn thu thập, cập nhật thông tin vào Cơ sở dữ liệu quốc gia về dân cư trước khi thực hiện thủ tục cấp thẻ căn cước. \n + Trường hợp thông tin người dưới 14 tuổi có sự thay đổi, điều chỉnh thì cán bộ thu nhận hướng dẫn người đại diện hợp pháp thực hiện thủ tục điều chỉnh thông tin cho người dưới 14 tuổi trong Cơ sở dữ liệu quốc gia về dân cư trước khi thực hiện thủ tục cấp thẻ căn cước. \n + Trường hợp thông tin người dưới 14 tuổi không có sự thay đổi, điều chỉnh thì sử dụng thông tin của công dân trong cơ sở dữ liệu quốc gia về dân cư để lập hồ sơ cấp thẻ căn cước. \n + Trường hợp người dưới 14 tuổi không đủ điều kiện cấp thẻ căn cước thì từ chối tiếp nhận và nêu rõ lý do, thông báo về việc giải quyết thủ tục về căn cước (Mẫu CC03 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an). \n Thông tin người đại diện hợp pháp được khai thác trong Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu căn cước. Trường hợp không khai thác được thông tin thì hướng dẫn người đại diện hợp pháp thu thập, cập nhật thông tin vào Cơ sở dữ liệu quốc gia về dân cư. \n In Phiếu thu nhận thông tin căn cước (Mẫu CC01 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an); Phiếu thu thập thông tin dân cư (nếu có) cho người đại diện hợp pháp kiểm tra, ký xác nhận (đối với hồ sơ nộp trực tiếp). \n Thu lệ phí (nếu có) và cấp giấy hẹn trả kết quả giải quyết thủ tục về căn cước (Mẫu CC02 ban hành kèm theo Thông tư số 118/2026/TT-BCA ngày 29/6/2026 của Bộ Công an). \n Nhận kết quả trực tiếp tại Công an cấp xã hoặc trả qua dịch vụ bưu chính đến địa chỉ theo yêu cầu"
+        ],
+        "notes": [],
+        "authority": "Công an cấp Xã",
+        "execution_methods": [
+            {
+                "method": "Trực tiếp",
+                "processing_time": "7 Ngày làm việc",
+                "fee": "Miễn phí",
+                "description": "(Cấp thẻ căn cước và cấp đổi thẻ căn cước do thay đổi địa giới hành chính)"
+            },
+            {
+                "method": "Trực tuyến",
+                "processing_time": "7 Ngày làm việc",
+                "fee": "Miễn phí",
+                "description": "(Cấp thẻ căn cước và cấp đổi thẻ căn cước do thay đổi địa giới hành chính)"
+            }
+        ],
+        "online_portal_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/01a022c0-03f3-74cd-b280-7fd6ad6d2f80"
+    },
+    "relations": {
+        "prerequisites": ["PROC_1_001193"],
+        "next_steps": [],
+        "part_of": [
+            "PROC_3_000722"
+        ]
+    },
+    "jurisdiction": {
+        "level": "Cấp xã",
+        "location": "Toàn quốc"
+    },
+    "source": {
+        "name": "Cổng Dịch vụ công Quốc gia",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/01a022c0-03f3-74cd-b280-7fd6ad6d2f80",
+        "effective_date": "",
+        "last_updated": "2026-09-12"
+    }
+}

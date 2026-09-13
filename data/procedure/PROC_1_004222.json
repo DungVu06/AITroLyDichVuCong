@@ -67,13 +67,11 @@
     },
     "relations": {
         "prerequisites": [
-            
+            "PROC_1_001193"
         ],
-        "next_steps": [
-            
-        ],
-        "related_benefits": [
-            
+        "next_steps": [],
+        "part_of": [
+            "PROC_3_000722"
         ]
     },
     "jurisdiction": {
