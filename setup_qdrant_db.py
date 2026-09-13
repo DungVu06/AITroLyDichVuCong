@@ -31,14 +31,13 @@ with open(jsonl_file, "r", encoding="utf-8") as f:
         metadata = chunk["metadata"]
         
         vector = model.encode(text).tolist()
-        
-        # Đóng gói thành Point của Qdrant
+
         points.append(
             PointStruct(
-                id=i,           # ID tự tăng
-                vector=vector,  # Dãy số vector
-                payload={       # Chèn toàn bộ metadata vào Payload
-                    "text": text, # Lưu luôn cả text gốc vào DB để tiện trả về cho LLM
+                id=i, 
+                vector=vector, 
+                payload={   
+                    "text": text,
                     **metadata
                 } 
             )

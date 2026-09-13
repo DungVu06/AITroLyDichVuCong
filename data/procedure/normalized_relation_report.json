@@ -1,0 +1,80 @@
+[
+  {
+    "source_id": "PROC_1_001193",
+    "target_id": "PROC_1_004222",
+    "relation_type": "next_steps",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_001193",
+    "target_id": "PROC_1_014137",
+    "relation_type": "next_steps",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_001193",
+    "target_id": "PROC_3_000722",
+    "relation_type": "part_of",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_004222",
+    "target_id": "PROC_1_001193",
+    "relation_type": "prerequisites",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_004222",
+    "target_id": "PROC_3_000722",
+    "relation_type": "part_of",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_014137",
+    "target_id": "PROC_1_001193",
+    "relation_type": "prerequisites",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_014137",
+    "target_id": "PROC_3_000722",
+    "relation_type": "part_of",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_116410",
+    "target_id": "PROC_1_001193",
+    "relation_type": "prerequisites",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_116410",
+    "target_id": "PROC_3_000722",
+    "relation_type": "part_of",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_id": "PROC_1_001193",
+    "relation_type": "sub_procedures",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_id": "PROC_1_004222",
+    "relation_type": "sub_procedures",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_id": "PROC_1_014137",
+    "relation_type": "sub_procedures",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_id": "PROC_1_116410",
+    "relation_type": "sub_procedures",
+    "resolution_status": "resolved"
+  }
+]

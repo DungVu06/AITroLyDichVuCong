@@ -1,0 +1,73 @@
+{
+  "id": "PROC_3_000722",
+  "national_code": "3.000722",
+  "life_event": [
+    "sinh_con"
+  ],
+  "target_audience": [
+    "Công dân Việt Nam"
+  ],
+  "domain": "thủ tục hành chính liên thông",
+  "procedure_type": "Loại khác",
+  "procedure": {
+    "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+    "eligibility": "Không",
+    "documents": [
+      {
+        "ten_giay_to": "Tờ khai điện tử (Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP)",
+        "so_luong": "1 bản chính,\n1 bản sao"
+      },
+      {
+        "ten_giay_to": "Dữ liệu điện tử có ký số của Giấy chứng sinh được liên thông từ cơ sở khám bệnh, chữa bệnh với Cổng Dịch vụ công quốc gia hoặc bản điện tử Giấy chứng sinh do người yêu cầu đăng ký khai sinh đính kèm trên Cổng Dịch vụ công quốc gia. Trường hợp không có giấy chứng sinh thì người yêu cầu đăng ký khai sinh có thể đính kèm bản chụp hoặc bản điện tử giấy tờ thay giấy chứng sinh theo quy định pháp luật về hộ tịch",
+        "so_luong": "1 bản chính,\n1 bản sao"
+      },
+      {
+        "ten_giay_to": "Trường hợp đăng ký thường trú cho trẻ em khác nơi thường trú của cha, mẹ (nếu được cha, mẹ đồng ý) thì đính kèm các thành phần hồ sơ theo quy định pháp luật về cư trú.",
+        "so_luong": "1 bản chính,\n1 bản sao"
+      },
+      {
+        "ten_giay_to": "Các thành phần hồ sơ trên là bản giấy thì phải thực hiện số hóa theo quy định tại Nghị định số 118/2025/NĐ-CP, được sửa đổi, bổ sung bởi Nghị định số 367/2025/NĐ-CP ngày 31 tháng 12 năm 2025",
+        "so_luong": "0 bản chính"
+      }
+    ],
+    "steps": [
+      "Bước 1: Người yêu cầu truy cập vào Cổng Dịch vụ công quốc gia (tại địa chỉ dichvucong.gov.vn) hoặc trên ứng dụng VNeID, lựa chọn dịch vụ công liên thông Đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi để thực hiện nộp hồ sơ trực tuyến và lệ phí theo quy định. Các thông tin trong tờ khai điện tử được điền tự động đối với các thông tin đã có trong Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu hộ tịch, Cơ sở dữ liệu quốc gia về Bảo hiểm và cơ sở dữ liệu, hệ thống thông tin có liên quan khác. Cá nhân đăng nhập Cổng Dịch vụ công quốc gia hoặc Ứng dụng định danh quốc gia (VNeID) đề nghị giải quyết thủ tục hành chính thì không phải thực hiện ký số biểu mẫu điện tử tương tác. Thông báo hẹn trả kết quả giải quyết từng thủ tục hành chính trong quy trình liên thông được gửi cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia",
+      "Bước 2. Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công từ nền tảng thanh toán và tiến hành bóc tách thành phần hồ sơ, thực hiện chuyển hồ sơ (bao gồm biểu mẫu điện tử tương tác, các giấy tờ đính kèm) sang Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp qua Nền tảng chia sẻ và điều phối dữ liệu. Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp đồng bộ hồ sơ về Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp. Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp tiếp nhận hồ sơ và phản hồi trạng thái cho Cổng Dịch vụ công quốc gia qua Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp",
+      "Bước 3. Giải quyết hồ sơ đăng ký khai sinh và hỗ trợ kinh phí khi sinh con (nếu có) Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện nghiệp vụ đăng ký khai sinh trong 24 giờ kể từ khi Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp nhận đủ hồ sơ hợp lệ. Trường hợp hồ sơ chưa đầy đủ hoặc không đủ điều kiện giải quyết: Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để gửi thông tin trạng thái hồ sơ đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp, sau đó Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia, trong đó nêu rõ lý do đối với các trường hợp hồ sơ bị từ chối giải quyết hoặc nêu rõ loại giấy tờ, nội dung cần bổ sung trong thời gian không qua 24 giờ kể từ thời điểm nhận được hồ sơ điện tử trên hệ thống. Trường hợp cần bổ sung thành phần hồ sơ thì người yêu cầu có trách nhiệm hoàn thiện hồ sơ trong 07 ngày làm việc, nếu quá thời hạn này không bổ sung thì người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để dừng xử lý do không bổ sung theo quy định. Thông tin về việc dừng xử lý được gửi đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia. Sau khi tiếp nhận hồ sơ đăng ký khai sinh, Chủ tịch Ủy ban nhân dân xã, phường, đặc khu đồng thời xem xét, quyết định việc hỗ trợ tài chính khi sinh con và thực hiện chi trả cho phụ nữ sinh con theo quy định pháp luật dân số",
+      "Bước 4. Giải quyết hồ sơ đăng ký thường trú và cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi Sau khi Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp chuyển bản điện tử Giấy khai sinh sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (bao gồm biểu mẫu, tờ khai người yêu cầu đã kê khai, bản điện tử Giấy khai sinh) đến Hệ thống thông tin quản lý cư trú để thực hiện đăng ký thường trú và Hệ thống thông tin ngành Bảo hiểm xã hội để thực hiện cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi theo quy định pháp luật liên quan. Thời gian giải quyết đăng ký thường trú không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử đối với trường hợp: con về với cha, mẹ và cha, mẹ là chủ hộ, đồng thời là chủ sở hữu chỗ ở hợp pháp; con về với cha, mẹ nhưng cha, mẹ không phải là chủ sở hữu chỗ ở hợp pháp. Đối với các trường hợp khác yêu cầu phải xác minh theo quy định của Luật Cư trú thì thời hạn giải quyết không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử, thông tin xác nhận qua ứng dụng VNeID. Thời gian giải quyết cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi không quá 02 ngày làm việc, kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông",
+      "Bước 5. Giải quyết hồ sơ cấp thẻ căn cước cho trẻ em dưới 6 tuổi (khi người đại diện hợp pháp có đề nghị cấp thẻ căn cước cho trẻ tại bước nộp hồ sơ trực tuyến) Sau khi Hệ thống thông tin quản lý cư trú của Bộ Công an chuyển bản điện tử Thông báo kết quả giải quyết đăng ký thường trú sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (biểu mẫu, tờ khai người yêu cầu đã kê khai) đến Hệ thống sản xuất, cấp và quản lý căn cước của Bộ Công an để thực hiện cấp thẻ căn cước theo quy định của Luật Căn cước số 26/2023/QH15. Thời gian giải quyết cấp thẻ căn cước không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử trên hệ thống"
+    ],
+    "notes": [],
+    "authority": "Công an cấp Xã",
+    "execution_methods": [
+      {
+        "method": "Trực tuyến",
+        "processing_time": "Xem phần mô tả",
+        "fee": "Không có thông tin",
+        "description": "Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền giải quyết nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc. Nếu tiếp nhận hồ sơ sau 15 giờ thì thời gian được tính bắt đầu từ ngày làm việc tiếp theo. Phí, lệ phí: Theo quy định của các TTHC tương ứng"
+      }
+    ],
+    "online_portal_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+  },
+  "relations": {
+    "prerequisites": [],
+    "next_steps": [],
+    "sub_procedures": [
+      "PROC_1_001193",
+      "PROC_1_004222",
+      "PROC_1_014137",
+      "PROC_1_116410"
+    ]
+  },
+  "jurisdiction": {
+    "level": "Cấp xã",
+    "location": "Toàn quốc"
+  },
+  "source": {
+    "name": "Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+    "effective_date": "",
+    "last_updated": "2026-09-12"
+  },
+  "normalization_version": "procedure-normalize-v1"
+}

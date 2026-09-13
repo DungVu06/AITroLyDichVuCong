@@ -1,0 +1,88 @@
+{
+  "id": "PROC_1_004222",
+  "national_code": "1.004222",
+  "life_event": [
+    "thuong_tru",
+    "dang_ky_thuong_tru",
+    "thay_doi_noi_cu_tru"
+  ],
+  "target_audience": [
+    "Công dân Việt Nam",
+    "Người Việt Nam định cư ở nước ngoài về Việt Nam sinh sống"
+  ],
+  "domain": "Đăng ký, quản lý cư trú",
+  "procedure_type": "Dịch vụ công trực tuyến một phần",
+  "procedure": {
+    "name": "Đăng ký thường trú",
+    "eligibility": "Công dân có chỗ ở hợp pháp thuộc quyền sở hữu của mình; hoặc được chủ hộ, chủ sở hữu chỗ ở hợp pháp đồng ý cho đăng ký thường trú khi về ở với người thân (vợ/chồng, con, cha/mẹ, người giám hộ, người cao tuổi/khuyết tật nương tựa); hoặc thuê, mượn, ở nhờ và bảo đảm điều kiện về diện tích nhà ở tối thiểu theo quy định; hoặc sinh sống trên phương tiện lưu động, cơ sở tín ngưỡng/tôn giáo, cơ sở trợ giúp xã hội theo quy định của Luật Cư trú",
+    "documents": [
+      {
+        "ten_giay_to": "Tờ khai thay đổi thông tin cư trú (ghi rõ ý kiến đồng ý cho đăng ký thường trú của chủ hộ, chủ sở hữu chỗ ở hợp pháp hoặc người được ủy quyền, trừ trường hợp đã có ý kiến đồng ý bằng văn bản)",
+        "so_luong": "Bản chính: 1, Bản sao: 0"
+      },
+      {
+        "ten_giay_to": "Giấy tờ, tài liệu chứng minh chỗ ở hợp pháp (Giấy chứng nhận quyền sử dụng đất/quyền sở hữu nhà ở, hợp đồng thuê/cho mượn/cho ở nhờ, hoặc văn bản xác nhận của UBND cấp xã...)",
+        "so_luong": "Bản chính: 1 hoặc Bản sao có chứng thực: 1"
+      },
+      {
+        "ten_giay_to": "Giấy tờ, tài liệu chứng minh quan hệ nhân thân (nếu đăng ký vào hộ người thân: giấy khai sinh, đăng ký kết hôn,... trừ trường hợp thông tin đã có trên CSDLQG về dân cư)",
+        "so_luong": "Bản chính: 1 hoặc Bản sao: 1"
+      },
+      {
+        "ten_giay_to": "Giấy tờ chứng minh đối với phương tiện lưu động (Giấy chứng nhận đăng ký, an toàn kỹ thuật phương tiện; xác nhận bến bãi đỗ thường xuyên của UBND cấp xã)",
+        "so_luong": "Bản sao: 1 (đối với trường hợp chỗ ở hợp pháp là phương tiện)"
+      },
+      {
+        "ten_giay_to": "Văn bản đồng ý cho đăng ký thường trú của người đại diện cơ sở trợ giúp xã hội / người đứng đầu cơ sở tôn giáo, tín ngưỡng (áp dụng riêng cho trường hợp cơ sở bảo trợ hoặc tín ngưỡng)",
+        "so_luong": "Bản chính: 1"
+      }
+    ],
+    "steps": [
+      "Bước 1: Cá nhân, tổ chức chuẩn bị hồ sơ theo quy định của pháp luật",
+      "Bước 2: Cá nhân, tổ chức nộp hồ sơ tại Công an cấp xã",
+      "Bước 3: Khi tiếp nhận hồ sơ đăng ký thường trú, cơ quan đăng ký cư trú kiểm tra tính pháp lý và nội dung hồ sơ: Trường hợp hồ sơ đã đầy đủ, hợp lệ thì tiếp nhận hồ sơ và cấp Phiếu tiếp nhận hồ sơ và hẹn trả kết quả (Mẫu CT04 ban hành kèm theo Thông tư số 66/2023/TT- BCA) cho người đăng ký. Trường hợp người Việt Nam định cư ở nước ngoài về Việt Nam sinh sống nhập cảnh vào Việt Nam lần gần nhất bằng hộ chiếu do nước ngoài cấp hoặc giấy tờ thay thế hộ chiếu do nước ngoài cấp hoặc giấy tờ khác do cơ quan có thẩm quyền của Việt Nam cấp hoặc sử dụng hộ chiếu Việt Nam nhưng bị mất, hết hạn sử dụng thực hiện thủ tục đăng ký thường trú thì sau khi tiếp nhận hồ sơ đăng ký thường trú Cơ quan đăng ký cư trú có trách nhiệm chuyển đề nghị cấp văn bản đồng ý cho giải quyết thường trú đến cơ quan quản lý xuất, nhập cảnh Công an tỉnh, thành phố trực thuộc Trung ương nơi công dân đề nghị đăng ký thường trú (kèm hồ sơ đề nghị đăng ký thường trú) để kiểm tra, xác minh và đề nghị cơ quan quản lý xuất, nhập cảnh Bộ Công an xem xét cấp văn bản đồng ý cho giải quyết thường trú; Trường hợp hồ sơ đủ điều kiện nhưng chưa đủ hồ sơ thì hướng dẫn bổ sung, hoàn thiện và cấp Phiếu hướng dẫn bổ sung, hoàn thiện hồ sơ (Mẫu CT05 ban hành kèm theo Thông tư số 66/2023/TT- BCA) cho người đăng ký; Trường hợp hồ sơ không đủ điều kiện thì từ chối và cấp Phiếu từ chối tiếp nhận, giải quyết hồ sơ (Mẫu CT06 ban hành kèm theo Thông tư số 66/2023/TT- BCA) cho người đăng ký",
+      "Bước 4: Cá nhân, tổ chức nộp lệ phí đăng ký cư trú theo quy định",
+      "Bước 5: Căn cứ theo ngày hẹn trên Phiếu tiếp nhận hồ sơ và hẹn trả kết quả để nhận thông báo kết quả giải quyết thủ tục đăng ký cư trú (nếu có)"
+    ],
+    "notes": [
+      "Trường hợp thông tin, giấy tờ chứng minh điều kiện đăng ký cư trú đã có và được chia sẻ, khai thác từ Cơ sở dữ liệu quốc gia về dân cư hoặc cơ sở dữ liệu chuyên ngành thì cơ quan tiếp nhận không được yêu cầu công dân nộp hay xuất trình lại.",
+      "Người chưa thành niên nếu đăng ký thường trú không cùng cha mẹ cần có sự đồng ý của cha mẹ hoặc người giám hộ, trừ khi có thỏa thuận khác bằng văn bản."
+    ],
+    "authority": "Công an cấp xã (Công an xã, phường, thị trấn)",
+    "execution_methods": [
+      {
+        "method": "Trực tiếp",
+        "processing_time": "07 ngày làm việc kể từ ngày nhận đủ hồ sơ hợp lệ",
+        "fee": "20.000 VNĐ/lần",
+        "description": "Nộp hồ sơ trực tiếp tại trụ sở Công an cấp xã nơi công dân đăng ký thường trú."
+      },
+      {
+        "method": "Trực tuyến",
+        "processing_time": "07 ngày làm việc kể từ ngày nhận đủ hồ sơ hợp lệ",
+        "fee": "10.000 VNĐ/lần (hoặc miễn theo chính sách khuyến khích dịch vụ công từng thời kỳ)",
+        "description": "Nộp hồ sơ trực tuyến qua Cổng Dịch vụ công Bộ Công an, Cổng Dịch vụ công Quốc gia hoặc ứng dụng định danh điện tử VNeID."
+      }
+    ],
+    "online_portal_url": "https://dichvucong.bocongan.gov.vn/bocongan/bothutuc/tthc?matt=26360"
+  },
+  "relations": {
+    "prerequisites": [
+      "PROC_1_001193"
+    ],
+    "next_steps": [],
+    "part_of": [
+      "PROC_3_000722"
+    ]
+  },
+  "jurisdiction": {
+    "level": "Cấp xã / phường / thị trấn",
+    "location": "Công an xã, phường, thị trấn nơi công dân đề nghị đăng ký thường trú"
+  },
+  "source": {
+    "name": "Cổng Dịch vụ công Bộ Công an",
+    "url": "https://dichvucong.bocongan.gov.vn/bocongan/bothutuc/tthc?matt=26360",
+    "effective_date": "",
+    "last_updated": "2026-09-12"
+  },
+  "normalization_version": "procedure-normalize-v1"
+}
