@@ -96,8 +96,9 @@ def split_legal_sections(text: str) -> list[dict]:
     # "Dieu 2", "A."... vi cac mau nay co the nam ben trong cau dan chieu.
     heading_re = re.compile(
         r"^(?P<heading>(?:CHƯƠNG\s+[IVXLCDM0-9]+.*|MỤC\s+[IVXLCDM0-9]+.*|"
-        r"[A-ZĐ][\.\)]\s+.+|(?:Điều|ĐIỀU)\s+\d+.*|"
-        r"\d+[\.\)]\s+.+))$",
+        r"[IVXL]+[\.\)]\s+.+|[A-HĐ][\.\)]\s+.+|"
+        r"(?:Điều|ĐIỀU)\s+\d+.*|\d+[\.\)]\s+.+|"
+        r"[a-zđ][\.\)]\s+.+))$",
         re.I,
     )
     sections = []
@@ -121,7 +122,7 @@ def split_legal_sections(text: str) -> list[dict]:
                 level = "section"
             elif re.match(r"^(ĐIỀU|Điều)\s+", heading):
                 level = "article"
-            elif re.match(r"^[IVXLCDM]+[\.\)]\s+", heading, re.I):
+            elif re.match(r"^[IVXL]+[\.\)]\s+", heading, re.I):
                 level = "section"
             elif re.match(r"^[A-HĐ][\.\)]\s+", heading, re.I):
                 level = "part"
