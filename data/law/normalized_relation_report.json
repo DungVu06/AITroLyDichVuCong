@@ -32,7 +32,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:I/subsection:1",
     "relation_index": 0
   },
   {
@@ -50,7 +50,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II/subsection:1",
     "relation_index": 0
   },
   {
@@ -68,7 +68,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~3",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:III/subsection:2/point:a",
     "relation_index": 0
   },
   {
@@ -86,7 +86,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 0
   },
   {
@@ -104,7 +104,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 1
   },
   {
@@ -122,7 +122,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 2
   },
   {
@@ -140,7 +140,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 3
   },
   {
@@ -158,7 +158,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 4
   },
   {
@@ -176,7 +176,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:a~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:a/subpoint:a.2",
     "relation_index": 5
   },
   {
@@ -194,7 +194,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 0
   },
   {
@@ -212,7 +212,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 1
   },
   {
@@ -230,7 +230,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 2
   },
   {
@@ -248,7 +248,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 3
   },
   {
@@ -266,7 +266,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 4
   },
   {
@@ -284,7 +284,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 5
   },
   {
@@ -302,7 +302,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 6
   },
   {
@@ -320,7 +320,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 7
   },
   {
@@ -338,7 +338,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 8
   },
   {
@@ -356,7 +356,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 9
   },
   {
@@ -374,7 +374,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 10
   },
   {
@@ -392,7 +392,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:1~2/point:b~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:IV/subsection:1/point:b/subpoint:b.2",
     "relation_index": 11
   },
   {
@@ -410,25 +410,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~2/subsection:3/point:b",
-    "relation_index": 0
-  },
-  {
-    "document_type": "Nghị định",
-    "document_number": "43-CP",
-    "relation_type": "dẫn_chiếu",
-    "normalized_document_number": "43-CP",
-    "document_number_key": "43|CP",
-    "normalized_issued_date": null,
-    "referenced_location": "",
-    "reference_key": "nghị định|43|CP",
-    "reference_id": "LAWREF_6b0d952ecbfd3b44",
-    "target_document_id": null,
-    "target_document_number": null,
-    "target_section_ids": [],
-    "resolution_status": "unresolved_document",
-    "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~3",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:C/section:IV",
     "relation_index": 0
   },
   {
@@ -446,7 +428,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:A/section:I~3/point:c~4",
+    "source_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:C/section:IV/subsection:1~5",
     "relation_index": 0
   },
   {
@@ -691,7 +673,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:1~2",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:1",
     "relation_index": 0
   },
   {
@@ -709,7 +691,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:2~2",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:2",
     "relation_index": 0
   },
   {
@@ -727,7 +709,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:4",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:4",
     "relation_index": 0
   },
   {
@@ -745,7 +727,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:5",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:5",
     "relation_index": 0
   },
   {
@@ -763,7 +745,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:5",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:5",
     "relation_index": 1
   },
   {
@@ -781,7 +763,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:6",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:6",
     "relation_index": 0
   },
   {
@@ -799,7 +781,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:6",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:6",
     "relation_index": 1
   },
   {
@@ -817,7 +799,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:6",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II/subsection:6",
     "relation_index": 2
   },
   {
@@ -835,7 +817,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:1~3",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:III/subsection:1",
     "relation_index": 0
   },
   {
@@ -853,7 +835,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:1~3",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:III/subsection:1",
     "relation_index": 1
   },
   {
@@ -871,7 +853,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:3~3/point:b",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:III/subsection:3/point:b",
     "relation_index": 0
   },
   {
@@ -889,7 +871,7 @@
     "target_section_ids": [],
     "resolution_status": "unresolved_document",
     "resolution_method": null,
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:6~2/point:b",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:IV",
     "relation_index": 0
   },
   {
@@ -907,7 +889,7 @@
     "target_section_ids": [],
     "resolution_status": "document_resolved_location_missing",
     "resolution_method": "document_number",
-    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:I/subsection:6~2/point:b",
+    "source_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:IV",
     "relation_index": 1
   },
   {

@@ -30,7 +30,7 @@ Phục vụ việc thiết lập đồ thị tri thức, giúp AI chủ động 
 | `next_steps` | `Array of Strings` | Các `id` thủ tục nên làm tiếp theo (VD: `PROC_002_NHAP_KHAU`). |
 | `sub_procedures`| `Array of Strings` | Các `id` thủ tục con |
 | `part_of`| `Array of Strings` | Các `id` thủ tục cha |
-| `related_benefits_laws`| `Array of Strings` | Các luật cho quyền lợi |
+| `related_benefit`| `Array of Objects` | Các section trong văn bản pháp luật mô tả quyền lợi liên quan. Mỗi object có `law_section_id`, `scope` (`self` hoặc `subtree`) và có thể có `note`. |
 
 ## 4. Object `jurisdiction` (Phạm vi áp dụng)
 Quản lý phạm vi hiệu lực của thủ tục (phân biệt giữa các địa phương).
@@ -97,8 +97,12 @@ Trích dẫn nguồn và quản lý vòng đời dữ liệu để tránh thông
       "PROC_002_NHAP_KHAU",
       "PROC_003_BHYT_TRE_EM"
     ],
-    "related_benefits": [
-      "BEN_001_THAI_SAN"
+    "related_benefit": [
+      {
+        "law_section_id": "LAW_VBPL_xxx/part:B/section:I",
+        "scope": "subtree",
+        "note": "Chế độ trợ cấp liên quan"
+      }
     ]
   },
 

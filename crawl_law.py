@@ -62,7 +62,7 @@ def clean_legal_text(text: str) -> str:
     body_start = None
     for index, line in enumerate(lines):
         if re.match(
-            r"^(?:[A-ZĐ][\.\)]\s+|CHƯƠNG\s+[IVXLCDM0-9]+|MỤC\s+[IVXLCDM0-9]+|Điều\s+\d+)\b",
+            r"^(?:[A-ZĐ][\.\)\-–]\s+|CHƯƠNG\s+[IVXLCDM0-9]+|MỤC\s+[IVXLCDM0-9]+|Điều\s+\d+)\b",
             line,
             re.I,
         ):
@@ -90,49 +90,60 @@ def clean_legal_text(text: str) -> str:
     return "\n".join(result).strip()
 
 
+CHAPTER_HEADING_RE = re.compile(r"^CHƯƠNG\s+[IVXLCDM0-9]+(?:\s|$)", re.I)
+NAMED_SECTION_HEADING_RE = re.compile(r"^MỤC\s+[IVXLCDM0-9]+(?:\s|$)", re.I)
+# Không dùng re.I và chỉ nhận I/V/X/L: nếu dùng re.I thì `c.`/`d.` bị
+# hiểu nhầm là số La Mã; nếu nhận C/D thì `C.`/`D.` (phần lớn là part)
+# cũng bị nhầm thành section.
+ROMAN_SECTION_HEADING_RE = re.compile(r"^[IVXL]+[\.\)\-–]\s+.+")
+ARTICLE_HEADING_RE = re.compile(r"^ĐIỀU\s+\d+(?:\s|[.:]|$)", re.I)
+SUBSECTION_HEADING_RE = re.compile(r"^\d+[\.\)\-–]\s+.+")
+SUBPOINT_HEADING_RE = re.compile(r"^(?:[a-zđ]|\d+)\.\d+[\.\)]\s+.+")
+# Không dùng re.I: `a.`/`b.` là point, còn `A.`/`B.` mới là part.
+PART_HEADING_RE = re.compile(r"^[A-HĐ][\.\)\-–]\s+.+")
+POINT_HEADING_RE = re.compile(r"^[a-zđ][\.\)\-–]\s+.+")
+
+
+def classify_legal_heading(line: str) -> str | None:
+    """Trả về cấp đề mục nếu cả dòng là một heading pháp lý.
+
+    Heading chỉ được nhận ở đầu dòng. Cách này tránh tách nhầm `Điều 2`,
+    `a)`... xuất hiện trong một câu dẫn chiếu ở phần nội dung.
+    """
+    line = (line or "").strip()
+    if CHAPTER_HEADING_RE.match(line):
+        return "chapter"
+    if NAMED_SECTION_HEADING_RE.match(line) or ROMAN_SECTION_HEADING_RE.match(line):
+        return "section"
+    if ARTICLE_HEADING_RE.match(line):
+        return "article"
+    if SUBPOINT_HEADING_RE.match(line):
+        return "subpoint"
+    if SUBSECTION_HEADING_RE.match(line):
+        return "subsection"
+    if PART_HEADING_RE.match(line):
+        return "part"
+    if POINT_HEADING_RE.match(line):
+        return "point"
+    return None
+
+
 def split_legal_sections(text: str) -> list[dict]:
-    """Tach van ban theo cac heading pho bien cua van ban phap luat."""
-    # Chi nhan heading khi no nam o dau dong. Khong tu chen newline truoc
-    # "Dieu 2", "A."... vi cac mau nay co the nam ben trong cau dan chieu.
-    heading_re = re.compile(
-        r"^(?P<heading>(?:CHƯƠNG\s+[IVXLCDM0-9]+.*|MỤC\s+[IVXLCDM0-9]+.*|"
-        r"[IVXL]+[\.\)]\s+.+|[A-HĐ][\.\)]\s+.+|"
-        r"(?:Điều|ĐIỀU)\s+\d+.*|\d+[\.\)]\s+.+|"
-        r"[a-zđ][\.\)]\s+.+))$",
-        re.I,
-    )
+    """Tách văn bản theo các heading phổ biến của văn bản pháp luật."""
     sections = []
     current = None
     for line in text.splitlines():
         line = line.strip()
         if not line:
             continue
-        match = heading_re.match(line)
-        if match:
+        level = classify_legal_heading(line)
+        if level:
             if current:
                 current["text"] = "\n".join(current["_lines"]).strip()
                 current["related_laws"] = extract_related_laws(current["text"])
                 del current["_lines"]
                 sections.append(current)
-            heading = match.group("heading").strip()
-            upper = heading.upper()
-            if upper.startswith("CHƯƠNG"):
-                level = "chapter"
-            elif upper.startswith("MỤC"):
-                level = "section"
-            elif re.match(r"^(ĐIỀU|Điều)\s+", heading):
-                level = "article"
-            elif re.match(r"^[IVXL]+[\.\)]\s+", heading, re.I):
-                level = "section"
-            elif re.match(r"^[A-HĐ][\.\)]\s+", heading, re.I):
-                level = "part"
-            elif re.match(r"^\d+[\.\)]\s+", heading):
-                level = "subsection"
-            elif re.match(r"^[a-zđ][\.\)]\s+", heading):
-                level = "point"
-            else:
-                level = "subsection"
-            current = {"heading": heading, "level": level, "_lines": []}
+            current = {"heading": line, "level": level, "_lines": []}
         elif current:
             current["_lines"].append(line)
     if current:

@@ -110,6 +110,7 @@ LEVEL_RANK = {
     "article": 4,
     "subsection": 5,
     "point": 6,
+    "subpoint": 7,
 }
 
 
@@ -123,15 +124,17 @@ def infer_section_level(heading: Any, fallback_level: Any) -> str:
     text = clean_text(heading)
     if re.match(r"^CHƯƠNG\s+[IVXLCDM0-9]+", text, re.IGNORECASE):
         return "chapter"
-    if re.match(r"^(?:MỤC\s+)?[IVXL]+[.)](?:\s|$)", text, re.IGNORECASE):
+    if re.match(r"^(?:MỤC\s+)?[IVXL]+[.)\-–](?:\s|$)", text, re.IGNORECASE):
         return "section"
     if re.match(r"^Điều\s+\d+", text, re.IGNORECASE):
         return "article"
-    if re.match(r"^[A-HĐ][.)](?:\s|$)", text):
+    if re.match(r"^(?:[a-zđ]|\d+)\.\d+[.)](?:\s|$)", text, re.IGNORECASE):
+        return "subpoint"
+    if re.match(r"^[A-HĐ][.)\-–](?:\s|$)", text):
         return "part"
-    if re.match(r"^\d+[.)](?:\s|$)", text):
+    if re.match(r"^\d+[.)\-–](?:\s|$)", text):
         return "subsection"
-    if re.match(r"^[a-zđ][.)](?:\s|$)", text, re.IGNORECASE):
+    if re.match(r"^[a-zđ][.)\-–](?:\s|$)", text, re.IGNORECASE):
         return "point"
     return clean_text(fallback_level) or "unknown"
 
@@ -142,11 +145,12 @@ def section_marker(heading: Any, level: Any, fallback_order: int) -> str:
     level = clean_text(level)
     patterns = {
         "chapter": r"^CHƯƠNG\s+([IVXLCDM0-9]+)",
-        "section": r"^(?:MỤC\s+)?([IVXL]+)[.)]?(?:\s|$)",
+        "section": r"^(?:MỤC\s+)?([IVXL]+)[.)\-–]?(?:\s|$)",
         "article": r"^Điều\s+(\d+)",
-        "part": r"^([A-HĐ])[.)](?:\s|$)",
-        "subsection": r"^(\d+)[.)](?:\s|$)",
-        "point": r"^([a-zđ])[.)](?:\s|$)",
+        "part": r"^([A-HĐ])[.)\-–](?:\s|$)",
+        "subsection": r"^(\d+)[.)\-–](?:\s|$)",
+        "point": r"^([a-zđ])[.)\-–](?:\s|$)",
+        "subpoint": r"^((?:[a-zđ]|\d+)\.\d+)[.)](?:\s|$)",
     }
     match = re.search(patterns.get(level, r"$^"), text, re.IGNORECASE)
     marker = match.group(1) if match else str(fallback_order + 1)
@@ -436,6 +440,9 @@ def normalize_record(
     hierarchy: list[dict[str, Any]],
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     normalized = copy.deepcopy(record)
+    # Quan hệ pháp luật được lưu tại từng section trong ``content.sections``.
+    # Không giữ block relations ở cấp văn bản vì block này không còn được dùng.
+    normalized.pop("relations", None)
     content = normalized.setdefault("content", {})
     source = normalized.setdefault("source", {})
     jurisdiction = normalized.setdefault("jurisdiction", {})

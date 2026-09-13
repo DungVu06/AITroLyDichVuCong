@@ -47,25 +47,25 @@
       },
       {
         "heading": "a) Huấn luyện viên, vận động viên đội tuyển, đội tuyển trẻ quốc gia; đội tuyển, đội tuyển trẻ, đội tuyển năng khiếu ngành, tỉnh, thành phố trực thuộc trung ương đang hưởng lương từ ngân sách nhà nước;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Huấn luyện viên đội tuyển, đội tuyển trẻ quốc gia; đội tuyển, đội tuyển trẻ, đội tuyển năng khiếu ngành, tỉnh, thành phố trực thuộc trung ương không hưởng lương từ ngân sách nhà nước;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Vận động viên đội tuyển, đội tuyển trẻ quốc gia; đội tuyển ngành, tỉnh, thành phố trực thuộc trung ương không hưởng lương từ ngân sách nhà nước;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "d) Vận động viên đội tuyển trẻ, đội tuyển năng khiếu ngành, tỉnh, thành phố trực thuộc trung ương không hưởng lương từ ngân sách nhà nước.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -101,13 +101,13 @@
       },
       {
         "heading": "a) Được hưởng nguyên tiền lương đang được hưởng (bao gồm mức lương, phụ cấp lương nếu có) do cơ quan quản lý huấn luyện viên, vận động viên chi trả;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Được hưởng khoản tiền bù chênh lệch trong trường hợp mức tiền lương quy định tại điểm a khoản 1 Điều này tính bình quân theo số ngày làm việc bình thường trong tháng thấp hơn so với mức tiền lương quy định tại khoản 2 và khoản 3 Điều này.",
-        "level": "part",
+        "level": "point",
         "text": "Mức tiền lương tính bình quân theo số ngày làm việc bình thường được xác định bằng tiền lương của tháng trước liền kề trước khi huấn luyện viên, vận động viên được triệu tập tập huấn, thi đấu chia cho 26 ngày.",
         "related_laws": []
       },
@@ -119,43 +119,43 @@
       },
       {
         "heading": "a) Huấn luyện viên trưởng đội tuyển quốc gia: 505.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Huấn luyện viên đội tuyển quốc gia: 375.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Huấn luyện viên trưởng đội tuyển trẻ quốc gia: 375.000 đồng/người/ngày;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "d) Huấn luyện viên đội tuyển trẻ quốc gia: 270.000 đồng/người/ngày;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "đ) Huấn luyện viên đội tuyển ngành, tỉnh, thành phố trực thuộc trung ương: 215.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "e) Huấn luyện viên đội tuyển trẻ ngành, tỉnh, thành phố trực thuộc trung ương: 180.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "g) Huấn luyện viên đội tuyển năng khiếu ngành, tỉnh, thành phố trực thuộc trung ương: 180.000 đồng/người/ngày.",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -167,19 +167,19 @@
       },
       {
         "heading": "a) Vận động viên đội tuyển quốc gia: 270.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Vận động viên đội tuyển trẻ quốc gia: 215.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Vận động viên đội tuyển ngành, tỉnh, thành phố trực thuộc trung ương: 180.000 đồng/người/ngày.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -191,13 +191,13 @@
       },
       {
         "heading": "a) Vận động viên đội tuyển trẻ ngành, tỉnh, thành phố trực thuộc trung ương: 75.000 đồng/người/ngày;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Vận động viên đội tuyển năng khiếu ngành, tỉnh, thành phố trực thuộc trung ương: 55.000 đồng/người/ngày.",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -251,19 +251,19 @@
       },
       {
         "heading": "a) Hưởng chế độ bảo hiểm xã hội, bảo hiểm y tế theo quy định của pháp luật đối với huấn luyện viên, vận động viên đang tham gia bảo hiểm xã hội, bảo hiểm y tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Được cơ quan sử dụng huấn luyện viên, vận động viên chi trả chi phí khám, chữa bệnh ngoài phạm vi được hưởng và mức hưởng bảo hiểm y tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Được cơ quan sử dụng huấn luyện viên, vận động viên hỗ trợ bằng mức chênh lệch (nếu có) khi mức trợ cấp cho ngày nghỉ khám, chữa bệnh do cơ quan bảo hiểm xã hội chi trả thấp hơn mức tiền trả theo ngày quy định tại khoản 2 và khoản 3 Điều 3 Nghị định này đối với huấn luyện viên, vận động viên đang tham gia bảo hiểm xã hội.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -275,19 +275,19 @@
       },
       {
         "heading": "a) Được hưởng chế độ bảo hiểm y tế theo quy định của pháp luật;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Được cơ quan sử dụng huấn luyện viên, vận động viên chi trả chi phí khám, chữa bệnh ngoài phạm vi được hưởng và mức hưởng bảo hiểm y tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Được cơ quan sử dụng huấn luyện viên, vận động viên hỗ trợ bằng 50% mức tiền trả theo ngày quy định tại khoản 2 và khoản 3 Điều 3 Nghị định này cho những ngày nghỉ khám, chữa bệnh.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -299,19 +299,19 @@
       },
       {
         "heading": "a) Được hưởng chế độ bảo hiểm y tế theo quy định của pháp luật;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Được cơ quan sử dụng vận động viên chi trả chi phí khám, chữa bệnh ngoài phạm vi được hưởng và mức hưởng bảo hiểm y tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Được hưởng nguyên mức tiền hỗ trợ quy định tại khoản 4 Điều 3 Nghị định này cho những ngày nghỉ khám, chữa bệnh.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -329,31 +329,31 @@
       },
       {
         "heading": "a) Được cơ quan sử dụng huấn luyện viên, vận động viên kịp thời sơ cứu, cấp cứu và tạm ứng chi phí sơ cứu, cấp cứu, điều trị;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Được cơ quan sử dụng huấn luyện viên, vận động viên thanh toán chi phí y tế từ khi sơ cứu, cấp cứu đến khi điều trị ổn định, gồm: thanh toán phần chi phí đồng chi trả và những chi phí không có trong danh mục do bảo hiểm y tế chi trả đối với người lao động tham gia bảo hiểm y tế; trả phí khám giám định mức suy giảm khả năng lao động đối với những trường hợp kết luận suy giảm khả năng lao động dưới 5% do cơ quan sử dụng huấn luyện viên, vận động viên giới thiệu đi khám giám định mức suy giảm khả năng lao động tại Hội đồng giám định y khoa; thanh toán toàn bộ chi phí y tế đối với huấn luyện viên, vận động viên không tham gia bảo hiểm y tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Được cơ quan sử dụng huấn luyện viên, vận động viên trả đủ tiền lương, tiền hỗ trợ theo quy định tại Điều 3 Nghị định này khi phải nghỉ tập huấn, thi đấu trong thời gian điều trị, phục hồi chức năng lao động;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "d) Được cơ quan sử dụng huấn luyện viên, vận động viên bồi thường hoặc trợ cấp và giới thiệu giám định y khoa theo quy định tại các khoản 4, 5, 6 và 7 Điều 38, Điều 39 Luật An toàn, vệ sinh lao động đối với đối tượng quy định tại các điểm a, b và c khoản 1 Điều 2 Nghị định này; được cơ quan sử dụng vận động viên hỗ trợ 01 lần bằng tiền bằng với mức hỗ trợ cho học sinh, sinh viên bị tai nạn lao động theo quy định tại khoản 4 Điều 33 Nghị định số 39/2016/NĐ-CP ngày 15 tháng 5 năm 2016 của Chính phủ quy định chi tiết thi hành một số điều của Luật An toàn, vệ sinh lao động đối với đối tượng quy định tại điểm d khoản 1 Điều 2 Nghị định này bị tai nạn lao động;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "đ) Được hưởng chế độ bảo hiểm xã hội về tai nạn lao động, bệnh nghề nghiệp quy định tại Mục 3 Chương III Luật An toàn, vệ sinh lao động như đối với lao động tham gia bảo hiểm xã hội bắt buộc.",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -407,25 +407,25 @@
       },
       {
         "heading": "a) Giải thi đấu thể thao dành cho vận động viên đến dưới 12 tuổi: mức thưởng bằng 20% mức thưởng tương ứng quy định tại khoản 1 Điều này;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Giải thi đấu thể thao dành cho vận động viên từ 12 tuổi đến dưới 16 tuổi: mức thưởng bằng 30% mức thưởng tương ứng quy định tại khoản 1 Điều này;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Giải thi đấu thể thao dành cho vận động viên từ 16 tuổi đến dưới 18 tuổi: mức thưởng bằng 40% mức thưởng tương ứng quy định tại khoản 1 Điều này;",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "d) Giải thi đấu thể thao dành cho vận động viên từ 18 tuổi đến dưới 21 tuổi: mức thưởng bằng 50% mức thưởng tương ứng quy định tại khoản 1 Điều này.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -443,19 +443,19 @@
       },
       {
         "heading": "a) Huấn luyện viên trực tiếp đào tạo vận động viên lập thành tích trong các giải thi đấu thể thao quốc tế có nội dung thi đấu cá nhân thì được hưởng mức thưởng chung bằng mức thưởng đối với vận động viên;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Huấn luyện viên trực tiếp đào tạo đội tuyển thi đấu lập thành tích trong các giải thi đấu thể thao quốc tế có môn hoặc nội dung thi đấu tập thể thì được hưởng mức thưởng chung bằng mức thưởng đối với vận động viên đạt giải nhân với số lượng huấn luyện viên, theo quy định như sau: dưới 04 vận động viên tham gia thi đấu, mức thưởng chung tính cho 01 huấn luyện viên; từ 04 đến 08 vận động viên tham gia thi đấu, mức thưởng chung tính cho 02 huấn luyện viên; từ 09 đến 12 vận động viên tham gia thi đấu, mức thưởng chung tính cho 03 huấn luyện viên; từ 13 đến 15 vận động viên tham gia thi đấu, mức thưởng chung tính cho 04 huấn luyện viên; trên 15 vận động viên tham gia thi đấu, mức thưởng chung tính cho 05 huấn luyện viên;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "c) Tỷ lệ phân chia tiền thưởng đối với các huấn luyện viên được thực hiện theo nguyên tắc: Huấn luyện viên trực tiếp huấn luyện đội tuyển được hưởng 60%, huấn luyện viên trực tiếp đào tạo vận động viên ở cơ sở trước khi tham gia đội tuyển được hưởng 40%.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -497,13 +497,13 @@
       },
       {
         "heading": "a) Bộ Văn hóa, Thể thao và Du lịch chi trả tiền lương, tiền hỗ trợ, tiền đóng bảo hiểm xã hội, bảo hiểm y tế, bảo hiểm thất nghiệp, bảo hiểm tai nạn lao động, bệnh nghề nghiệp, bảo hiểm khi tập huấn, thi đấu ở nước ngoài, chi phí khám, chữa bệnh, tai nạn, tiền trợ cấp và tiền bồi thường theo quy định cho huấn luyện viên, vận động viên đội tuyển, đội tuyển trẻ quốc gia; chi tiền thưởng cho huấn luyện viên, vận động viên đội tuyển, đội tuyển trẻ quốc gia đạt thành tích thi đấu tại các đại hội, giải thi đấu thể thao quốc tế;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Các bộ, ngành, Ủy ban nhân dân các tỉnh, thành phố trực thuộc trung ương chi trả tiền lương, tiền hỗ trợ, tiền đóng bảo hiểm xã hội, bảo hiểm y tế, bảo hiểm thất nghiệp, bảo hiểm tai nạn lao động, bệnh nghề nghiệp, bảo hiểm khi tập huấn, thi đấu ở nước ngoài, chi phí khám, chữa bệnh, tai nạn, tiền trợ cấp và tiền bồi thường theo quy định cho huấn luyện viên, vận động viên thuộc bộ, ngành, Ủy ban nhân dân các tỉnh, thành phố trực thuộc trung ương quản lý; chi tiền thưởng cho huấn luyện viên, vận động viên đạt thành tích tại các giải thi đấu thể thao quốc gia và các giải thi đấu thể thao của bộ, ngành, tỉnh thành phố trực thuộc trung ương.",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -539,13 +539,13 @@
       },
       {
         "heading": "a) Bộ trưởng Bộ Văn hóa, Thể thao và Du lịch quy định danh mục các môn thể thao thuộc các nhóm I, II, III; đối tượng huấn luyện viên, vận động viên được thưởng bằng tiền khi lập thành tích tại các giải thi đấu thể thao quốc tế quy định tại Điều 8 Nghị định này;",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
       {
         "heading": "b) Bộ trưởng Bộ Lao động - Thương binh và Xã hội quy định chi tiết các nội dung về tiền lương, tiền hỗ trợ tập huấn, thi đấu, bảo hiểm xã hội, bảo hiểm thất nghiệp, bảo hiểm tai nạn lao động, bệnh nghề nghiệp; chế độ đối với huấn luyện viên, vận động viên khi ốm đau, thai sản, bị tai nạn lao động quy định tại Điều 3, Điều 4, Điều 5 và Điều 6 Nghị định này.",
-        "level": "part",
+        "level": "point",
         "text": "",
         "related_laws": []
       },

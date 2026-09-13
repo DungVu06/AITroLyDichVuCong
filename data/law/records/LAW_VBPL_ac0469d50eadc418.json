@@ -111,7 +111,13 @@
       {
         "heading": "3. Việc giải quyết trợ cấp ốm đau đối với CNVC hiện đang nghỉ ốm. Những người đang nghỉ ốm tính đến ngày 1-7-1994 vẫn còn thời hạn nghỉ ốm hưởng trợ cấp theo tỷ lệ % tiền lương theo quy định trước đây, thì từ ngày 1-7-1994 được chuyển sang hưởng trợ cấp và thời hạn hưởng trợ cấp đối với mỗi loại theo quy định tại Nghị định 43/CP và Thông tư 21/TT-LB.",
         "level": "subsection",
-        "text": "Những người thuộc danh mục bệnh cần chữa dài ngày tính đến 30-6-1994 đã hết hạn hưởng trợ cấp ốm đau theo % tiền lương theo quy định trước đây, nhưng vẫn đang nghỉ việc điều trị bệnh tại bệnh viện thì từ 1-7-1994 chuyển sang hưởng trợ cấp bằng 75% mức lương tối thiểu đến hết đợt điều trị.\n- Những người thuộc diện nghỉ chăm sóc con nhỏ ốm đau tính đến ngày 1-7-1994 vẫn đang trong thời hạn nghỉ hưởng trợ cấp bảo hiểm xã hội thì vẫn được nghỉ hưởng trợ cấp theo thời hạn cũ. Riêng mức trợ cấp từ 1-7-1994 tính bằng 75% mức tiền lương của bản thân đóng bảo hiểm xã hội trước khi nghỉ.\nII. CHẾ ĐỘ TRỢ CẤP THAI SẢN",
+        "text": "Những người thuộc danh mục bệnh cần chữa dài ngày tính đến 30-6-1994 đã hết hạn hưởng trợ cấp ốm đau theo % tiền lương theo quy định trước đây, nhưng vẫn đang nghỉ việc điều trị bệnh tại bệnh viện thì từ 1-7-1994 chuyển sang hưởng trợ cấp bằng 75% mức lương tối thiểu đến hết đợt điều trị.\n- Những người thuộc diện nghỉ chăm sóc con nhỏ ốm đau tính đến ngày 1-7-1994 vẫn đang trong thời hạn nghỉ hưởng trợ cấp bảo hiểm xã hội thì vẫn được nghỉ hưởng trợ cấp theo thời hạn cũ. Riêng mức trợ cấp từ 1-7-1994 tính bằng 75% mức tiền lương của bản thân đóng bảo hiểm xã hội trước khi nghỉ.",
+        "related_laws": []
+      },
+      {
+        "heading": "II. CHẾ ĐỘ TRỢ CẤP THAI SẢN",
+        "level": "section",
+        "text": "",
         "related_laws": []
       },
       {
@@ -181,7 +187,7 @@
       {
         "heading": "6. Việc giải quyết chế độ nghỉ đẻ đối với nữ CNVC sinh con trước ngày 1-7-1994.",
         "level": "subsection",
-        "text": "- Lao động nữ sinh con trước ngày 1-7-1994 thuộc diện được nghỉ thời gian 180 ngày, 90 ngày và 75 ngày hưởng trợ cấp bảo hiểm xã hội bằng 100% tiền lương theo quy định tại Quyết định số 121/HĐBT ngày 19-4-1985 đến ngày 1-7-1994 vẫn đang trong thời gian nghỉ thì tiếp tục nghỉ hưởng chế độ nghỉ đẻ cũ bao gồm thời gian nghỉ, trợ cấp bồi dưỡng, trợ cấp nuôi con nhỏ theo mức quy định tại Thông tư số 04/TT-TCĐ ngày 10-5-1985 và Thông tư số 05/TT-TLĐ ngày 9-9-1991 của Tổng Liên đoàn Lao động Việt Nam.\nIII. CHẾ ĐỘ TRỢ CẤP TAI NẠN LAO ĐỘNG BỆNH NGHỀ NGHIỆP",
+        "text": "- Lao động nữ sinh con trước ngày 1-7-1994 thuộc diện được nghỉ thời gian 180 ngày, 90 ngày và 75 ngày hưởng trợ cấp bảo hiểm xã hội bằng 100% tiền lương theo quy định tại Quyết định số 121/HĐBT ngày 19-4-1985 đến ngày 1-7-1994 vẫn đang trong thời gian nghỉ thì tiếp tục nghỉ hưởng chế độ nghỉ đẻ cũ bao gồm thời gian nghỉ, trợ cấp bồi dưỡng, trợ cấp nuôi con nhỏ theo mức quy định tại Thông tư số 04/TT-TCĐ ngày 10-5-1985 và Thông tư số 05/TT-TLĐ ngày 9-9-1991 của Tổng Liên đoàn Lao động Việt Nam.",
         "related_laws": [
           {
             "document_type": "Quyết định",
@@ -202,6 +208,12 @@
             "relation_type": "dẫn_chiếu"
           }
         ]
+      },
+      {
+        "heading": "III. CHẾ ĐỘ TRỢ CẤP TAI NẠN LAO ĐỘNG BỆNH NGHỀ NGHIỆP",
+        "level": "section",
+        "text": "",
+        "related_laws": []
       },
       {
         "heading": "1. Điều kiện được hưởng chế độ tai nạn lao động, bệnh nghề nghiệp - Điều kiện được hưởng trợ cấp chế độ tai nạn lao động thực hiện theo quy định tại Thông tư số 21/TT-LB.",
@@ -236,13 +248,13 @@
       },
       {
         "heading": "a. Đối tượng hưởng trợ cấp thương tật một lần.",
-        "level": "part",
+        "level": "point",
         "text": "- Người lao động bị tai nạn lao động, bệnh nghề nghiệp được Hội đồng giám định y khoa xác định mức suy giảm khả năng lao động từ 5% dến 60% do thương tật, được hưởng trợ cấp thương tật một lần tính theo mức lương trung bình của công chức Nhà nước (không cấp thẻ tai nạn lao động, bệnh nghề nghiệp).",
         "related_laws": []
       },
       {
         "heading": "b. Đối tượng hưởng trợ cấp thương tật hàng tháng",
-        "level": "part",
+        "level": "point",
         "text": "- Người lao động bị tai nạn lao động, bệnh nghề nghiệp được Hội đồng giám định y khoa xác định mức suy giảm khả năng lao động từ 61% đến 100% do thương tật được xếp hạng thương tật, cấp thẻ tai nạn lao động, bệnh nghề nghiệp và được hưởng trợ cấp thương tật hàng tháng theo 4 hạng mới tính trên mức lương trung bình của công chức Nhà nước. - Mức lương trung bình hiện nay tính bằng hai lần mức lương tối thiểu quy định tại Nghị định số 25/CP ngày 23-5-1993.",
         "related_laws": [
           {
@@ -255,7 +267,7 @@
       },
       {
         "heading": "c. Mức trợ cấp thương tật một lần, trợ cấp thương tật hàng tháng và phụ cấp phục vụ thực hiện theo quy định tại Thông tư số 21/TT-LB.",
-        "level": "section",
+        "level": "point",
         "text": "",
         "related_laws": []
       },
@@ -279,14 +291,20 @@
       },
       {
         "heading": "a. Người lao động bị tai nạn lao động, bệnh nghề nghiệp trước ngày 1-7-1994 mà sau đó mới được Hội đồng GĐYK xác định mức suy giảm khả năng lao động do thương tật thì việc giải quyết chế độ trợ cấp thương tật thực hiện theo quy định tại Nghị định số 43/CP Thông tư số 21/TT-LB.",
-        "level": "part",
+        "level": "point",
         "text": "Ví dụ 1: Công nhân A bị tai nạn lao động tháng 4-1994. Tháng 5 xuất viện và tháng 7-1994 được Hội đồng GĐYK xác định mức suy giảm khả năng lao động là 41%.\nCông nhân A được giải quyết hưởng trợ cấp thương tật 1 lần bằng 18 tháng tiền lương tối thiểu của công chức Nhà nước.\n(18 tháng x 120.000 đ = 2.160.000 đ)\nVí dụ 2: Công nhân B bị tai nạn lao động tháng 3 năm 1994, tháng 6 năm 1994 xuất viện và tháng 7-1994 được Hội đồng GĐTK xác định mức suy giảm khả năng lao động là 71%.\nCông nhân B được xếp thương tật hạng 3 và từ tháng 7-1994 được hưởng trợ cấp thương tật hàng tháng bằng 1,2 tháng tiền lương tối thiểu của công chức Nhà nước.\n(120.000 đ x 1,2 = 144.000 đ)",
         "related_laws": []
       },
       {
         "heading": "b. Người lao động (kể cả người tại chức và những người đã thôi việc hoặc nghỉ hưu trí) bị tai nạn lao động, bệnh nghề nghiệp trước ngày 1-7-1994 đã được Hội đồng GĐYK xác định mức suy giảm khả năng lao động từ 21% đến 100% do thương tật đã được cấp hoặc chưa được cấp sổ tai nạn lao động, bệnh nghề nghiệp theo quy định trước đây, thì từ 1-7-1994 trở đi vẫn được giữ nguyên hạng thương tật và trợ cấp thương tật hàng tháng.",
-        "level": "part",
-        "text": "Mức trợ cấp thương tật hàng tháng nay điều chỉnh như sau:\nTỷ lệ thương tật\nHạng thương tật\nMức hưởng\nTừ 81%-100%\n1\n192.000 đ\nTừ 61%-80%\n2\n132.000 đ\nTừ 41%-60%\n3\n84.000 đ\nTừ 21%-40%\n4\n36.000 đ\nIV. CHẾ ĐỘ NGHỈ NGƠI DƯỠNG SỨC\nSau khi cân đối ngân sách bảo đảm thực hiện đầy đủ các chế độ trợ cấp ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp đối với người lao động theo đúng quy định tại Nghị định số 43/CP và Thông tư số 21/TT-LB, các cấp công đoàn được sử dụng một phần kinh phí kết dư để chi các chế độ nghỉ ngơi, dưỡng sức đối với người lao động theo quy định của Tổng Liên đoàn Lao động Việt Nam.",
+        "level": "point",
+        "text": "Mức trợ cấp thương tật hàng tháng nay điều chỉnh như sau:\nTỷ lệ thương tật\nHạng thương tật\nMức hưởng\nTừ 81%-100%\n1\n192.000 đ\nTừ 61%-80%\n2\n132.000 đ\nTừ 41%-60%\n3\n84.000 đ\nTừ 21%-40%\n4\n36.000 đ",
+        "related_laws": []
+      },
+      {
+        "heading": "IV. CHẾ ĐỘ NGHỈ NGƠI DƯỠNG SỨC",
+        "level": "section",
+        "text": "Sau khi cân đối ngân sách bảo đảm thực hiện đầy đủ các chế độ trợ cấp ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp đối với người lao động theo đúng quy định tại Nghị định số 43/CP và Thông tư số 21/TT-LB, các cấp công đoàn được sử dụng một phần kinh phí kết dư để chi các chế độ nghỉ ngơi, dưỡng sức đối với người lao động theo quy định của Tổng Liên đoàn Lao động Việt Nam.",
         "related_laws": [
           {
             "document_type": "Nghị định",
@@ -329,7 +347,7 @@
       },
       {
         "heading": "C. TỔ CHỨC THỰC HIỆN",
-        "level": "section",
+        "level": "part",
         "text": "Trong quá trình thực hiện Nghị định số 43/CP; Thông tư số 21/TT-LB và Thông tư này, các LĐLĐ các tỉnh, thành phố, các công đoàn ngành TW cần chú ý một số điểm cơ bản sau đây:",
         "related_laws": [
           {
@@ -366,7 +384,7 @@
       },
       {
         "heading": "D. HIỆU LỰC THI HÀNH",
-        "level": "section",
+        "level": "part",
         "text": "Thông tư này có hiệu lực thi hành từ ngày 1-7-1994\nCác quy định trước đây về chế độ trợ cấp ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp trái với Thông tư số 21/LB-TT và Thông tư này đều bãi bỏ.\nQuá trình thực hiện, nếu có gì vướng mắc, đề nghị phản ánh về Tổng Liên đoàn Lao động Việt Nam để xem xét giải quyết.\nTrần Đình Hoan",
         "related_laws": [
           {

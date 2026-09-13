@@ -2,13 +2,14 @@
 
 Phạm vi:
     - Tạo constraint/index cơ bản.
-    - Import các node Procedure, LifeEvent, Step, RequiredDocument,
-      LawDocument và LawSection.
-    - Import cấu trúc section và dẫn chiếu section-to-section đã resolve.
+    - Import các node Procedure, LawDocument và LawSection.
+    - Import quan hệ procedure đã resolve, cấu trúc section và dẫn chiếu
+      section-to-section đã resolve.
 
 Cách dùng:
     python neo4j_import.py --init-only
     python neo4j_import.py
+    python neo4j_import.py --reset
 
 Cấu hình trong .env:
     NEO4J_URI=neo4j+s://xxxxxxxx.databases.neo4j.io
@@ -69,23 +70,37 @@ def read_json_files(directory: Path, pattern: str) -> list[dict[str, Any]]:
     return records
 
 
+def read_json_list(path: Path) -> list[dict[str, Any]]:
+    """Đọc một file JSON chứa danh sách object, dùng cho file relationship."""
+    if not path.exists():
+        raise FileNotFoundError(f"Không tìm thấy file JSON: {path}")
+
+    with path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, list):
+        raise ValueError(f"File JSON phải là một mảng: {path}")
+    return [item for item in data if isinstance(item, dict)]
+
+
 def build_nodes(
-    procedure_dir: Path, law_dir: Path
+    procedure_dir: Path,
+    law_dir: Path,
+    procedure_relations_path: Path,
+    related_benefit_relations_path: Path | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     procedures: list[dict[str, Any]] = []
-    life_events: dict[str, dict[str, Any]] = {}
-    steps: list[dict[str, Any]] = []
-    required_documents: list[dict[str, Any]] = []
-    authorities: dict[str, dict[str, Any]] = {}
-    jurisdictions: dict[str, dict[str, Any]] = {}
-    sources: dict[str, dict[str, Any]] = {}
     laws: list[dict[str, Any]] = []
     sections: list[dict[str, Any]] = []
     law_section_edges: list[dict[str, Any]] = []
     section_parent_edges: list[dict[str, Any]] = []
     law_citations: list[dict[str, Any]] = []
+    procedure_requires: list[dict[str, str]] = []
+    procedure_next_steps: list[dict[str, str]] = []
+    procedure_part_of: list[dict[str, str]] = []
+    procedure_sub_procedures: list[dict[str, str]] = []
+    procedure_related_benefits: list[dict[str, Any]] = []
 
-    for record in read_json_files(procedure_dir, "*.json"):
+    for record in read_json_files(procedure_dir, "PROC_*.json"):
         procedure = record.get("procedure") or {}
         procedure_id = as_text(record.get("id"))
         if not procedure_id:
@@ -117,63 +132,47 @@ def build_nodes(
             }
         )
 
-        for event in as_list(record.get("life_event")):
-            life_events.setdefault(event, {"id": event, "name": event})
+    procedure_relation_buckets = {
+        "prerequisites": procedure_requires,
+        "next_steps": procedure_next_steps,
+        "part_of": procedure_part_of,
+        "sub_procedures": procedure_sub_procedures,
+    }
+    for relation in read_json_list(procedure_relations_path):
+        if as_text(relation.get("resolution_status")) != "resolved":
+            continue
 
-        if authority_name:
-            authorities.setdefault(
-                authority_name,
-                {"id": authority_name, "name": authority_name},
-            )
+        source_id = as_text(relation.get("source_id"))
+        target_id = as_text(relation.get("target_id"))
+        relation_type = as_text(relation.get("relation_type"))
+        if not source_id or not target_id:
+            continue
 
-        jurisdiction_id = "|".join(
-            item for item in (jurisdiction_level, location) if item
-        )
-        if jurisdiction_id:
-            jurisdictions.setdefault(
-                jurisdiction_id,
-                {
-                    "id": jurisdiction_id,
-                    "level": jurisdiction_level,
-                    "location": location,
-                },
-            )
+        bucket = procedure_relation_buckets.get(relation_type)
+        if bucket is not None:
+            bucket.append({"source_id": source_id, "target_id": target_id})
 
-        source_id = as_text(source.get("url")) or procedure_id
-        sources.setdefault(
-            source_id,
-            {
-                "id": source_id,
-                "name": as_text(source.get("name")),
-                "url": as_text(source.get("url")),
-            },
-        )
-
-        for index, step_text in enumerate(procedure.get("steps") or [], 1):
-            step_text = as_text(step_text)
-            if step_text:
-                steps.append(
-                    {
-                        "id": f"{procedure_id}:step:{index:04d}",
-                        "procedure_id": procedure_id,
-                        "order": index,
-                        "text": step_text,
-                    }
-                )
-
-        for index, document in enumerate(procedure.get("documents") or [], 1):
-            if not isinstance(document, dict):
+    # Đây là quan hệ Procedure -> LawSection, được sinh bởi
+    # create_related_benefit_relations.py. File này tách riêng khỏi
+    # procedure_relations.json vì target của nó là LawSection.
+    if related_benefit_relations_path and related_benefit_relations_path.exists():
+        for relation in read_json_list(related_benefit_relations_path):
+            if as_text(relation.get("resolution_status")) != "resolved":
                 continue
-            name = as_text(document.get("ten_giay_to"))
-            if name:
-                required_documents.append(
-                    {
-                        "id": f"{procedure_id}:document:{index:04d}",
-                        "procedure_id": procedure_id,
-                        "name": name,
-                        "quantity": as_text(document.get("so_luong")),
-                    }
-                )
+            source_id = as_text(relation.get("source_id"))
+            target_section_id = as_text(relation.get("target_section_id"))
+            if not source_id or not target_section_id:
+                continue
+            procedure_related_benefits.append(
+                {
+                    "source_id": source_id,
+                    "target_section_id": target_section_id,
+                    "scope": as_text(relation.get("scope")) or "subtree",
+                    "source": as_text(relation.get("source")) or "manual",
+                    "note": as_text(relation.get("note")),
+                    "benefit_id": as_text(relation.get("benefit_id")),
+                }
+            )
 
     for record in read_json_files(law_dir, "LAW_*.json"):
         content = record.get("content") or {}
@@ -224,6 +223,7 @@ def build_nodes(
                         "article": "LawArticle",
                         "subsection": "LawSubsection",
                         "point": "LawPoint",
+                        "subpoint": "LawSubpoint",
                     }.get(as_text(section.get("level")), "LawSectionOther"),
                 }
             )
@@ -255,31 +255,25 @@ def build_nodes(
 
     return {
         "procedures": procedures,
-        "life_events": list(life_events.values()),
-        "steps": steps,
-        "required_documents": required_documents,
-        "authorities": list(authorities.values()),
-        "jurisdictions": list(jurisdictions.values()),
-        "sources": list(sources.values()),
         "laws": laws,
         "sections": sections,
         "law_section_edges": law_section_edges,
         "section_parent_edges": section_parent_edges,
         "law_citations": law_citations,
+        "procedure_requires": procedure_requires,
+        "procedure_next_steps": procedure_next_steps,
+        "procedure_part_of": procedure_part_of,
+        "procedure_sub_procedures": procedure_sub_procedures,
+        "procedure_related_benefits": procedure_related_benefits,
     }
 
 
 SCHEMA_QUERIES = [
     "CREATE CONSTRAINT procedure_id_unique IF NOT EXISTS FOR (n:Procedure) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT life_event_id_unique IF NOT EXISTS FOR (n:LifeEvent) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT step_id_unique IF NOT EXISTS FOR (n:Step) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT required_document_id_unique IF NOT EXISTS FOR (n:RequiredDocument) REQUIRE n.id IS UNIQUE",
     "CREATE CONSTRAINT law_id_unique IF NOT EXISTS FOR (n:LawDocument) REQUIRE n.id IS UNIQUE",
     "CREATE CONSTRAINT section_id_unique IF NOT EXISTS FOR (n:LawSection) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT authority_id_unique IF NOT EXISTS FOR (n:Authority) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT jurisdiction_id_unique IF NOT EXISTS FOR (n:Jurisdiction) REQUIRE n.id IS UNIQUE",
-    "CREATE CONSTRAINT source_id_unique IF NOT EXISTS FOR (n:Source) REQUIRE n.id IS UNIQUE",
     "CREATE INDEX procedure_name IF NOT EXISTS FOR (n:Procedure) ON (n.name)",
+    "CREATE INDEX procedure_national_code IF NOT EXISTS FOR (n:Procedure) ON (n.national_code)",
     "CREATE INDEX law_document_number IF NOT EXISTS FOR (n:LawDocument) ON (n.document_number)",
 ]
 
@@ -288,36 +282,6 @@ IMPORT_QUERIES = {
     "procedures": """
         UNWIND $rows AS row
         MERGE (n:Procedure {id: row.id})
-        SET n += row
-    """,
-    "life_events": """
-        UNWIND $rows AS row
-        MERGE (n:LifeEvent {id: row.id})
-        SET n += row
-    """,
-    "steps": """
-        UNWIND $rows AS row
-        MERGE (n:Step {id: row.id})
-        SET n += row
-    """,
-    "required_documents": """
-        UNWIND $rows AS row
-        MERGE (n:RequiredDocument {id: row.id})
-        SET n += row
-    """,
-    "authorities": """
-        UNWIND $rows AS row
-        MERGE (n:Authority {id: row.id})
-        SET n += row
-    """,
-    "jurisdictions": """
-        UNWIND $rows AS row
-        MERGE (n:Jurisdiction {id: row.id})
-        SET n += row
-    """,
-    "sources": """
-        UNWIND $rows AS row
-        MERGE (n:Source {id: row.id})
         SET n += row
     """,
     "laws": """
@@ -341,6 +305,8 @@ IMPORT_QUERIES = {
             SET n:LawSubsection)
         FOREACH (_ IN CASE WHEN row.section_label = "LawPoint" THEN [1] ELSE [] END |
             SET n:LawPoint)
+        FOREACH (_ IN CASE WHEN row.section_label = "LawSubpoint" THEN [1] ELSE [] END |
+            SET n:LawSubpoint)
     """,
     "law_section_edges": """
         UNWIND $rows AS row
@@ -363,6 +329,40 @@ IMPORT_QUERIES = {
         SET r.referenced_location = row.referenced_location,
             r.source = "parsed_section"
     """,
+    "procedure_requires": """
+        UNWIND $rows AS row
+        MATCH (source:Procedure {id: row.source_id})
+        MATCH (target:Procedure {id: row.target_id})
+        MERGE (source)-[:REQUIRES]->(target)
+    """,
+    "procedure_next_steps": """
+        UNWIND $rows AS row
+        MATCH (source:Procedure {id: row.source_id})
+        MATCH (target:Procedure {id: row.target_id})
+        MERGE (source)-[:NEXT_STEP]->(target)
+    """,
+    "procedure_part_of": """
+        UNWIND $rows AS row
+        MATCH (source:Procedure {id: row.source_id})
+        MATCH (target:Procedure {id: row.target_id})
+        MERGE (source)-[:PART_OF]->(target)
+    """,
+    "procedure_sub_procedures": """
+        UNWIND $rows AS row
+        MATCH (source:Procedure {id: row.source_id})
+        MATCH (target:Procedure {id: row.target_id})
+        MERGE (source)-[:HAS_SUB_PROCEDURE]->(target)
+    """,
+    "procedure_related_benefits": """
+        UNWIND $rows AS row
+        MATCH (source:Procedure {id: row.source_id})
+        MATCH (section:LawSection {id: row.target_section_id})
+        MERGE (source)-[r:RELATED_TO_BENEFIT]->(section)
+        SET r.scope = row.scope,
+            r.source = row.source,
+            r.note = row.note,
+            r.benefit_id = row.benefit_id
+    """,
 }
 
 
@@ -370,6 +370,12 @@ def init_schema(driver: Driver, database: str) -> None:
     with driver.session(database=database) as session:
         for query in SCHEMA_QUERIES:
             session.run(query).consume()
+
+
+def reset_database(driver: Driver, database: str) -> None:
+    """Xóa toàn bộ node và relationship, giữ nguyên schema Neo4j."""
+    with driver.session(database=database) as session:
+        session.run("MATCH (n) DETACH DELETE n").consume()
 
 
 def import_nodes(driver: Driver, database: str, nodes: dict[str, list[dict[str, Any]]]) -> None:
@@ -389,9 +395,30 @@ def main() -> None:
         help="Chỉ tạo constraint/index, không import dữ liệu",
     )
     parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Xóa toàn bộ node/relationship rồi import lại từ đầu",
+    )
+    parser.add_argument(
         "--procedure-dir",
         type=Path,
-        default=ROOT_DIR / "data" / "procedure",
+        default=ROOT_DIR / "data" / "procedure" / "normalized_records",
+        help="Thư mục chứa các file procedure đã chuẩn hóa (PROC_*.json)",
+    )
+    parser.add_argument(
+        "--procedure-relations",
+        type=Path,
+        default=ROOT_DIR / "data" / "procedure" / "procedure_relations.json",
+        help="File chỉ chứa các quan hệ procedure đã resolve",
+    )
+    parser.add_argument(
+        "--related-benefit-relations",
+        type=Path,
+        default=ROOT_DIR
+        / "data"
+        / "relations"
+        / "related_benefit_relations.json",
+        help="File quan hệ Procedure -> LawSection của related_benefit",
     )
     parser.add_argument(
         "--law-dir",
@@ -399,6 +426,9 @@ def main() -> None:
         default=ROOT_DIR / "data" / "law" / "normalized_records",
     )
     args = parser.parse_args()
+
+    if args.init_only and args.reset:
+        parser.error("--reset không thể dùng cùng --init-only")
 
     load_dotenv()
     uri = os.getenv("NEO4J_URI", "")
@@ -423,9 +453,18 @@ def main() -> None:
         print("Đã tạo constraint/index cơ bản.")
 
         if not args.init_only:
-            nodes = build_nodes(args.procedure_dir, args.law_dir)
+            if args.reset:
+                print("Đang xóa toàn bộ node và relationship trong database...")
+                reset_database(driver, database)
+                print("Đã xóa dữ liệu cũ.")
+            nodes = build_nodes(
+                args.procedure_dir,
+                args.law_dir,
+                args.procedure_relations,
+                args.related_benefit_relations,
+            )
             import_nodes(driver, database, nodes)
-            print("Hoàn tất import node và relationship pháp luật đã resolve.")
+            print("Hoàn tất import node và relationship procedure/law đã resolve.")
     finally:
         driver.close()
 

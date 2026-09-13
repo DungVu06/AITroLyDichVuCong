@@ -202,6 +202,10 @@
     ],
     "part_of": [
       "PROC_3_000722"
+    ],
+    "related_benefit": [
+      "LAW_VBPL_ac0469d50eadc418/part:B/section:II",
+      "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II"
     ]
   },
   "jurisdiction": {

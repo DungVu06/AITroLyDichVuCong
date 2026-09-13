@@ -1,4 +1,7 @@
 import json
+import argparse
+from pathlib import Path
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
@@ -12,40 +15,82 @@ print("Đang tải mô hình Embedding...")
 model = SentenceTransformer('keepitreal/vietnamese-sbert')
 vector_size = model.get_embedding_dimension()
 
-# 3. Tạo Collection (Bảng dữ liệu) trong Qdrant
-collection_name = "procedures"
-if not client.collection_exists(collection_name):
-    client.create_collection(
-        collection_name=collection_name,
-        vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
-    )
-
-points = []
-jsonl_file = "data/procedure_chunks.jsonl"
-
-print("Đang đọc file và nhúng (embedding) văn bản...")
-with open(jsonl_file, "r", encoding="utf-8") as f:
-    for i, line in enumerate(f):
-        chunk = json.loads(line)
-        text = chunk["page_content"]
-        metadata = chunk["metadata"]
-        
-        vector = model.encode(text).tolist()
-
-        points.append(
-            PointStruct(
-                id=i, 
-                vector=vector, 
-                payload={   
-                    "text": text,
-                    **metadata
-                } 
-            )
+def ensure_collection(collection_name: str) -> None:
+    """Tạo collection nếu collection chưa tồn tại."""
+    if not client.collection_exists(collection_name):
+        client.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(
+                size=vector_size,
+                distance=Distance.COSINE,
+            ),
         )
 
-client.upsert(
-    collection_name=collection_name,
-    points=points
-)
 
-print(f"Đã đưa thành công {len(points)} chunks vào Qdrant!")
+def reset_collection(collection_name: str) -> None:
+    """Xóa collection hiện tại để dữ liệu được import lại từ đầu."""
+    if client.collection_exists(collection_name):
+        client.delete_collection(collection_name=collection_name)
+        print(f"Đã xóa collection cũ: {collection_name}")
+
+
+def embed_and_upsert(jsonl_file: str, collection_name: str) -> None:
+    """Embedding page_content và lưu chunk cùng metadata vào Qdrant."""
+    input_file = Path(jsonl_file)
+    if not input_file.exists():
+        print(f"Bỏ qua {collection_name}: không tìm thấy {jsonl_file}")
+        return
+
+    ensure_collection(collection_name)
+    points = []
+
+    print(f"Đang đọc và embedding {jsonl_file}...")
+    with input_file.open("r", encoding="utf-8") as file:
+        for point_id, line in enumerate(file):
+            chunk = json.loads(line)
+            text = chunk["page_content"]
+            metadata = chunk.get("metadata", {})
+
+            vector = model.encode(text).tolist()
+            points.append(
+                PointStruct(
+                    id=point_id,
+                    vector=vector,
+                    payload={"text": text, **metadata},
+                )
+            )
+
+    if not points:
+        print(f"Bỏ qua {collection_name}: file không có chunk")
+        return
+
+    client.upsert(collection_name=collection_name, points=points)
+    print(f"Đã đưa thành công {len(points)} chunks vào collection {collection_name}!")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Embedding và import procedure/law chunks vào Qdrant."
+    )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Xóa các collection procedures và laws hiện tại trước khi import lại",
+    )
+    args = parser.parse_args()
+
+    collections = [
+        ("data/procedure_chunks.jsonl", "procedures"),
+        ("data/law_chunks.jsonl", "laws"),
+    ]
+
+    if args.reset:
+        for _, collection_name in collections:
+            reset_collection(collection_name)
+
+    for jsonl_file, collection_name in collections:
+        embed_and_upsert(jsonl_file, collection_name)
+
+
+if __name__ == "__main__":
+    main()

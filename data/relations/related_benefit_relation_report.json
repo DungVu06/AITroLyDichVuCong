@@ -1,0 +1,50 @@
+[
+  {
+    "source_id": "PROC_1_001193",
+    "target_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II",
+    "relation_type": "related_benefit",
+    "scope": "subtree",
+    "source": "manual",
+    "note": "",
+    "law_id": "LAW_VBPL_ac0469d50eadc418",
+    "section_heading": "II. CHẾ ĐỘ TRỢ CẤP THAI SẢN",
+    "section_level": "section",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_001193",
+    "target_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II",
+    "relation_type": "related_benefit",
+    "scope": "subtree",
+    "source": "manual",
+    "note": "",
+    "law_id": "LAW_VBPL_0cae53bb0a99d71f",
+    "section_heading": "II. Chế độ trợ cấp thai sản",
+    "section_level": "section",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II",
+    "relation_type": "related_benefit",
+    "scope": "subtree",
+    "source": "manual",
+    "note": "",
+    "law_id": "LAW_VBPL_ac0469d50eadc418",
+    "section_heading": "II. CHẾ ĐỘ TRỢ CẤP THAI SẢN",
+    "section_level": "section",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_3_000722",
+    "target_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II",
+    "relation_type": "related_benefit",
+    "scope": "subtree",
+    "source": "manual",
+    "note": "",
+    "law_id": "LAW_VBPL_0cae53bb0a99d71f",
+    "section_heading": "II. Chế độ trợ cấp thai sản",
+    "section_level": "section",
+    "resolution_status": "resolved"
+  }
+]

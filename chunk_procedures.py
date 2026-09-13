@@ -80,8 +80,8 @@ if __name__ == "__main__":
         from langchain_text_splitters import RecursiveCharacterTextSplitter
         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, 
-            chunk_overlap=100,
+            chunk_size=200, 
+            chunk_overlap=20,
             length_function=len,
             separators=["\n\n", "\n", ".", " ", ""]
         )
