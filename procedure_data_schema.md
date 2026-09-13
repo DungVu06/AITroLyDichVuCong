@@ -30,6 +30,7 @@ Phục vụ việc thiết lập đồ thị tri thức, giúp AI chủ động 
 | `next_steps` | `Array of Strings` | Các `id` thủ tục nên làm tiếp theo (VD: `PROC_002_NHAP_KHAU`). |
 | `sub_procedures`| `Array of Strings` | Các `id` thủ tục con |
 | `part_of`| `Array of Strings` | Các `id` thủ tục cha |
+| `related_benefits_laws`| `Array of Strings` | Các luật cho quyền lợi |
 
 ## 4. Object `jurisdiction` (Phạm vi áp dụng)
 Quản lý phạm vi hiệu lực của thủ tục (phân biệt giữa các địa phương).
