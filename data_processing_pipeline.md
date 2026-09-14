@@ -1,2 +1,2 @@
 # Pipeline data
-Official sources -> Crawl/Download -> Parse -> Clean -> Structured Data + Raw Documents -> Normalize -> Add Metadata -> *Procedure Relations -> Chunk -> Embedding -> VectorDB + Knowledge Graph
+Official sources -> Crawl/Download -> Parse -> Clean -> Structured Data + Raw Documents -> Normalize -> Add Metadata -> Procedure Relations -> Chunk -> Embedding -> VectorDB + Knowledge Graph

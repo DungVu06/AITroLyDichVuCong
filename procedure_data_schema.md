@@ -50,9 +50,6 @@ Trích dẫn nguồn và quản lý vòng đời dữ liệu để tránh thông
 | `effective_date` | `String` (Date) | Ngày thủ tục/văn bản bắt đầu có hiệu lực (Định dạng: `YYYY-MM-DD`). |
 | `last_updated` | `String` (Date) | Ngày hệ thống cập nhật/crawl cuối cùng, dùng để trigger update. |
 
-## Note
-`effective_date` và `relations` lấy ở vbpl
-
 ## Ví dụ
 ```bash
 {
