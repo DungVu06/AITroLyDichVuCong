@@ -19,12 +19,10 @@ if not qdrant_url or not qdrant_api_key:
 
 client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
 
-print("Đang tải mô hình Embedding...")
 model = SentenceTransformer('keepitreal/vietnamese-sbert')
 vector_size = model.get_embedding_dimension()
 
 def ensure_collection(collection_name: str) -> None:
-    """Tạo collection nếu collection chưa tồn tại."""
     if not client.collection_exists(collection_name):
         client.create_collection(
             collection_name=collection_name,
@@ -36,14 +34,12 @@ def ensure_collection(collection_name: str) -> None:
 
 
 def reset_collection(collection_name: str) -> None:
-    """Xóa collection hiện tại để dữ liệu được import lại từ đầu."""
     if client.collection_exists(collection_name):
         client.delete_collection(collection_name=collection_name)
         print(f"Đã xóa collection cũ: {collection_name}")
 
 
 def embed_and_upsert(jsonl_file: str, collection_name: str) -> None:
-    """Embedding page_content và lưu chunk cùng metadata vào Qdrant."""
     input_file = Path(jsonl_file)
     if not input_file.exists():
         print(f"Bỏ qua {collection_name}: không tìm thấy {jsonl_file}")

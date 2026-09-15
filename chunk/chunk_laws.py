@@ -176,7 +176,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "data" / "law_chunks.jsonl",
+        default=PROJECT_ROOT / "data" / "chunks" / "law_chunks.jsonl",
         help="File JSONL đầu ra",
     )
     args = parser.parse_args()

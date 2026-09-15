@@ -12,37 +12,38 @@ def chunk_procedure_json(filepath):
         data = json.load(f)
     
     proc_id = data.get("id", "")
-    life_event = data.get("life_event", [])
-    domain = data.get("domain", "")
+    
+    base_metadata = {
+        "doc_id": proc_id,
+        "life_event": data.get("life_event", []),
+        "domain": data.get("domain", ""),
+        "relations": data.get("relations", {})
+    }
     
     procedure_info = data.get("procedure", {})
     proc_name = procedure_info.get("name", "Không rõ tên thủ tục")
     
     chunks = []
     
-    # --- 1. Chunk Hồ sơ (Mỗi giấy tờ là 1 chunk riêng biệt) ---
+    # --- 1. Chunk Hồ sơ ---
     documents = procedure_info.get("documents", [])
     for doc in documents:
         ten_giay_to = doc.get('ten_giay_to', '').strip()
         so_luong = doc.get('so_luong', '').strip()
-        
-        # Chỉ tạo chunk nếu có nội dung
         if ten_giay_to:
             doc_content = f"Thành phần hồ sơ cần nộp để thực hiện {proc_name} (Mã: {proc_id}) bao gồm:\n- {ten_giay_to} (Số lượng: {so_luong})"
-            chunks.append({
-                "page_content": doc_content,
-                "metadata": {"doc_id": proc_id, "chunk_type": "document_item", "life_event": life_event, "domain": domain}
-            })
+            meta = base_metadata.copy()
+            meta["chunk_type"] = "document_item"
+            chunks.append({"page_content": doc_content, "metadata": meta})
 
-    # --- 2. Chunk Trình tự thực hiện (Mỗi bước là 1 chunk riêng biệt) ---
+    # --- 2. Chunk Trình tự thực hiện ---
     steps = procedure_info.get("steps", [])
     for i, step in enumerate(steps, 1):
         if step.strip():
             step_content = f"Trình tự thực hiện {proc_name} (Mã: {proc_id}) - Bước {i}:\n{step.strip()}"
-            chunks.append({
-                "page_content": step_content,
-                "metadata": {"doc_id": proc_id, "chunk_type": "step_item", "life_event": life_event, "domain": domain}
-            })
+            meta = base_metadata.copy()
+            meta["chunk_type"] = "step_item"
+            chunks.append({"page_content": step_content, "metadata": meta})
 
     # --- 3. Chunk Cách thức & Lệ phí ---
     exec_methods = procedure_info.get("execution_methods", [])
@@ -52,38 +53,36 @@ def chunk_procedure_json(filepath):
             method_texts.append(f"- Hình thức: {method.get('method', '')}. Thời gian: {method.get('processing_time', '')}. Lệ phí: {method.get('fee', '')}.")
         
         method_content = f"Cách thức thực hiện, thời gian giải quyết và lệ phí của {proc_name} (Mã: {proc_id}):\n" + "\n".join(method_texts)
-        chunks.append({
-            "page_content": method_content,
-            "metadata": {"doc_id": proc_id, "chunk_type": "execution_methods", "life_event": life_event, "domain": domain}
-        })
+        meta = base_metadata.copy()
+        meta["chunk_type"] = "execution_methods"
+        chunks.append({"page_content": method_content, "metadata": meta})
 
-    # --- 4. Chunk Lưu ý (Mỗi lưu ý là 1 chunk riêng biệt) ---
+    # --- 4. Chunk Lưu ý ---
     notes = procedure_info.get("notes", [])
     for note in notes:
         if note.strip():
             note_content = f"Lưu ý quan trọng khi thực hiện {proc_name} (Mã: {proc_id}):\n{note.strip()}"
-            chunks.append({
-                "page_content": note_content,
-                "metadata": {"doc_id": proc_id, "chunk_type": "note_item", "life_event": life_event, "domain": domain}
-            })
+            meta = base_metadata.copy()
+            meta["chunk_type"] = "note_item"
+            chunks.append({"page_content": note_content, "metadata": meta})
             
     return chunks
 
-# ==========================================
 if __name__ == "__main__":
+    # SỬA ĐƯỜNG DẪN TRỎ VÀO NORMALIZED_RECORDS
     parser = argparse.ArgumentParser(
         description="Tạo JSONL chunks từ procedure records."
     )
     parser.add_argument(
         "--input-dir",
         type=Path,
-        default=PROJECT_ROOT / "data" / "procedure",
+        default=PROJECT_ROOT / "data" / "procedure/normalized_records",
         help="Thư mục chứa PROC_*.json",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "data" / "procedure_chunks.jsonl",
+        default=PROJECT_ROOT / "data" / "chunks" / "procedure_chunks.jsonl",
         help="File JSONL đầu ra",
     )
     args = parser.parse_args()
@@ -100,9 +99,10 @@ if __name__ == "__main__":
                 
         from langchain_text_splitters import RecursiveCharacterTextSplitter
         
+        # CHÚ Ý: chunk_size tính bằng KÝ TỰ (Characters). 1000 ký tự tương đương ~200 từ.
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=200, 
-            chunk_overlap=20,
+            chunk_size=1000, 
+            chunk_overlap=100,
             length_function=len,
             separators=["\n\n", "\n", ".", " ", ""]
         )
@@ -113,7 +113,6 @@ if __name__ == "__main__":
             split_texts = text_splitter.split_text(text)
             for split_idx, split_txt in enumerate(split_texts):
                 new_metadata = chunk["metadata"].copy()
-                # Tạo ID duy nhất: [Mã văn bản]_[Thứ tự chunk gốc]_[Thứ tự cắt đệ quy]
                 new_metadata["chunk_id"] = f"{new_metadata['doc_id']}_c{doc_idx}_s{split_idx}"
                 
                 safe_chunks_for_sbert.append({
