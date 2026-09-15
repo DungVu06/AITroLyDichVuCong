@@ -7,7 +7,8 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# This file lives in db/vector; data remains at the project root.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 qdrant_url = os.getenv("QDRANT_URL")
 qdrant_api_key = os.getenv("QDRANT_API_KEY")

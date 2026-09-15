@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 VALID_SCOPES = {"self", "subtree"}
 
 

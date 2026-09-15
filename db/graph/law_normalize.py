@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def clean_text(value: Any) -> str:

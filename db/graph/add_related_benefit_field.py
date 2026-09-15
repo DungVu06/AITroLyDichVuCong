@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def add_field(input_dir: Path, field_name: str = "related_benefit") -> tuple[int, int]:
@@ -64,7 +64,7 @@ def main() -> None:
     parser.add_argument(
         "--input-dir",
         type=Path,
-        default=ROOT_DIR/ .. / "data" / "procedure" / "normalized_records",
+        default=ROOT_DIR / "data" / "procedure" / "normalized_records",
         help="Thư mục chứa các file procedure normalized",
     )
     parser.add_argument(

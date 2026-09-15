@@ -34,7 +34,7 @@ except ImportError as exc:  # pragma: no cover - thông báo thân thiện khi t
     ) from exc
 
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def load_dotenv(path: Path = ROOT_DIR / ".env") -> None:
