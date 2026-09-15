@@ -35,6 +35,30 @@ Tài liệu này mô tả các loại node, thuộc tính của node và các re
 | `source_url` | `string` | URL nguồn |
 | `crawled_at` | `datetime` | Thời điểm thu thập |
 
+Ví dụ node `LawDocument`:
+
+```json
+{
+  "labels": ["LawDocument"],
+  "properties": {
+    "id": "LAW_VBPL_10089",
+    "title": "Thông tư hướng dẫn thực hiện các chế độ bảo hiểm xã hội",
+    "document_type": "Thông tư",
+    "document_number": "34/TT-LB",
+    "issuing_authority": "Bộ Lao động - Thương binh và Xã hội",
+    "issued_date_raw": "12/03/1990",
+    "effective_date_raw": "12/03/1990",
+    "validity_raw": "Còn hiệu lực",
+    "life_events": ["sinh_con"],
+    "domain": "Pháp luật",
+    "jurisdiction_level": "Toàn quốc",
+    "location": "Việt Nam",
+    "source_url": "https://vbpl.vn/...",
+    "crawled_at": "2026-09-15T08:00:00+00:00"
+  }
+}
+```
+
 ### `LawSection`
 
 Node nội dung thuộc văn bản pháp luật: `LawSection`
@@ -50,6 +74,27 @@ Node nội dung thuộc văn bản pháp luật: `LawSection`
 | `marker` | `string` | Ký hiệu hiển thị, ví dụ `Điều 1` |
 | `structural_path` | `string` | Đường dẫn cấu trúc |
 | `section_label` | `string` | Loại section |
+
+Ví dụ node `LawSection`:
+
+```json
+{
+  "labels": ["LawSection"],
+  "properties": {
+    "id": "LAW_VBPL_10089:section:0001",
+    "law_id": "LAW_VBPL_10089",
+    "order": 0,
+    "heading": "Điều 1. Phạm vi điều chỉnh",
+    "level": "article",
+    "text": "Thông tư này hướng dẫn thực hiện các chế độ bảo hiểm xã hội.",
+    "marker": "Điều 1",
+    "structural_path": "Điều 1",
+    "section_label": "LawArticle"
+  }
+}
+```
+
+`LawArticle` chỉ là giá trị phân loại cấp nội dung; node chính vẫn là `LawSection`.
 
 ### `Procedure`
 
@@ -72,6 +117,31 @@ Node nội dung thuộc văn bản pháp luật: `LawSection`
 | `source_name` | `string` | Tên nguồn |
 | `effective_date` | `date` | Ngày có hiệu lực |
 | `last_updated` | `date` | Ngày cập nhật gần nhất |
+
+Ví dụ node `Procedure`:
+
+```json
+{
+  "labels": ["Procedure"],
+  "properties": {
+    "id": "PROC_3_000722",
+    "national_code": "1.000001",
+    "name": "Đăng ký khai sinh",
+    "eligibility": "Cha, mẹ hoặc người có trách nhiệm đăng ký khai sinh",
+    "domain": "Hộ tịch",
+    "procedure_type": "Dịch vụ công",
+    "life_events": ["sinh_con"],
+    "target_audience": ["Cá nhân"],
+    "authority": "Ủy ban nhân dân cấp xã",
+    "jurisdiction_level": "Cấp xã",
+    "location": "Việt Nam",
+    "source_url": "https://dichvucong.gov.vn/...",
+    "source_name": "Cổng Dịch vụ công Quốc gia",
+    "effective_date": "2026-01-01",
+    "last_updated": "2026-09-15"
+  }
+}
+```
 
 ## Các loại relation
 
