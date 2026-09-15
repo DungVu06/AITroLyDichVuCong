@@ -4,9 +4,9 @@ Chi luu JSON da chuan hoa vao thu muc records; khong luu HTML raw.
 Khong dung crawler de tu dong ket luan van ban con hieu luc. Hieu luc va
 quan he thay the/phap ly can duoc kiem tra lai tu trang van ban.
 
-Vi du:
-  python crawl_law.py --url 'https://vbpl.vn/...' --out data/law
-  python crawl_law.py --seed seed_law_urls.txt --out data/law --headed
+Vi du (chay tu bat ky thu muc nao):
+  python crawl/crawl_law.py --url 'https://vbpl.vn/...' --out data/law
+  python crawl/crawl_law.py --seed crawl/seed_law_urls.txt --out data/law --headed
 """
 
 from __future__ import annotations
@@ -21,7 +21,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, parse_qsl, urlencode, urlunparse
 
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+try:
+    from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+except ModuleNotFoundError:  # Allows data-only utilities to import this module.
+    sync_playwright = None
+    PlaywrightTimeoutError = TimeoutError
+
+
+# Keep defaults independent of the current working directory. Explicit paths
+# passed through CLI are still interpreted relative to the directory where the
+# command is run, as is conventional for command-line tools.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def require_playwright() -> None:
+    if sync_playwright is None:
+        raise SystemExit(
+            "Thiếu dependency Playwright. Cài bằng: "
+            "python3 -m pip install playwright && python3 -m playwright install chromium"
+        )
 
 
 # Nhom chu de phap ly, tach khoi du lieu thu tuc hanh chinh.
@@ -467,6 +485,7 @@ def discover_urls(page, query: str, max_pages: int = 3) -> list[str]:
 
 
 def crawl(urls: list[str], out: Path, headed: bool, delay: float) -> None:
+    require_playwright()
     out.joinpath("records").mkdir(parents=True, exist_ok=True)
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=not headed)
@@ -498,11 +517,12 @@ def main() -> None:
     group.add_argument("--url", action="append", help="URL trang chi tiet van ban; lap lai de them URL")
     group.add_argument("--seed", type=Path, help="File txt, moi dong mot URL")
     group.add_argument("--query", action="append", help="Tu khoa tim tren vbpl.vn; lap lai de them tu khoa")
-    parser.add_argument("--out", type=Path, default=Path("data/law"))
+    parser.add_argument("--out", type=Path, default=PROJECT_ROOT / "data" / "law")
     parser.add_argument("--headed", action="store_true", help="Hien trinh duyet de xu ly captcha/kiem tra")
     parser.add_argument("--delay", type=float, default=3.0)
     args = parser.parse_args()
     if args.query:
+        require_playwright()
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=not args.headed)
             page = browser.new_context(locale="vi-VN").new_page()
@@ -513,7 +533,12 @@ def main() -> None:
         if not urls:
             raise SystemExit("Khong tim thay URL. Hay thu --headed va kiem tra giao dien.")
     else:
-        urls = args.url or [x.strip() for x in args.seed.read_text(encoding="utf-8").splitlines()
+        seed_path = args.seed
+        if not seed_path.is_absolute() and not seed_path.exists():
+            project_candidate = PROJECT_ROOT / seed_path
+            if project_candidate.exists():
+                seed_path = project_candidate
+        urls = args.url or [x.strip() for x in seed_path.read_text(encoding="utf-8").splitlines()
                             if x.strip() and not x.lstrip().startswith("#")]
     if any(urlparse(u).netloc and not urlparse(u).netloc.endswith("vbpl.vn") for u in urls):
         raise SystemExit("Chi chap nhan URL thuoc vbpl.vn")

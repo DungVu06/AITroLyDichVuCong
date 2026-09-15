@@ -1,15 +1,23 @@
 import json
 import argparse
+import os
 from pathlib import Path
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
 
-client = QdrantClient(
-    url="https://e455e45e-f953-4bad-b8e5-9cbc8230cb85.australia-southeast1-0.gcp.cloud.qdrant.io", # URL bạn lấy trên web
-    api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwic3ViamVjdCI6ImFwaS1rZXk6NDRjYTYxNTEtMWIwNi00OTYyLWI5NDUtNWI3ZmE1OWM3NmM3In0.JEqEijIGgIkSAN6LOpvRwFYqpbbRFL153mWmtcaqkhs"                                         # API Key bạn lấy trên web
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+qdrant_url = os.getenv("QDRANT_URL")
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
+if not qdrant_url or not qdrant_api_key:
+    raise RuntimeError(
+        "Thiếu QDRANT_URL hoặc QDRANT_API_KEY. "
+        "Hãy cấu hình hai biến môi trường trước khi chạy."
+    )
+
+client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
 
 print("Đang tải mô hình Embedding...")
 model = SentenceTransformer('keepitreal/vietnamese-sbert')
@@ -80,8 +88,8 @@ def main() -> None:
     args = parser.parse_args()
 
     collections = [
-        ("data/procedure_chunks.jsonl", "procedures"),
-        ("data/law_chunks.jsonl", "laws"),
+        (PROJECT_ROOT / "data" / "procedure_chunks.jsonl", "procedures"),
+        (PROJECT_ROOT / "data" / "law_chunks.jsonl", "laws"),
     ]
 
     if args.reset:

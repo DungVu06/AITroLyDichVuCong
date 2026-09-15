@@ -1,9 +1,0 @@
---- Chunk 36 (491 words) ---
-Trình tự thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193) - Bước 4:
-Công chức tư pháp - hộ tịch thẩm tra hồ sơ (thẩm tra tính thống nhất, hợp lệ của các thông tin trong hồ sơ, giấy tờ, tài liệu
---- Chunk 79 (463 words) ---
-Trình tự thực hiện Cấp thẻ căn cước cho người dưới 06 tuổi (Mã: PROC_1_116410) - Bước 2:
-Bước 2: Giải quyết và trả kết quả thủ tục hành chính: Cán bộ thu nhận thông tin người dưới 14 tuổi tìm kiếm thô
---- Chunk 87 (458 words) ---
-Trình tự thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722) - Bước 3:
-Bước 3. Giải quyết hồ sơ đăng

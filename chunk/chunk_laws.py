@@ -19,6 +19,9 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 from typing import Any
 
 
@@ -167,13 +170,13 @@ def main() -> None:
     parser.add_argument(
         "--input-dir",
         type=Path,
-        default=Path("data/law/normalized_records"),
+        default=PROJECT_ROOT / "data" / "law" / "normalized_records",
         help="Thư mục chứa các law normalized records",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("data/law_chunks.jsonl"),
+        default=PROJECT_ROOT / "data" / "law_chunks.jsonl",
         help="File JSONL đầu ra",
     )
     args = parser.parse_args()

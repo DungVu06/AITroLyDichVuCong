@@ -1,7 +1,11 @@
 import json
-import os
+import argparse
+from pathlib import Path
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 def chunk_procedure_json(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
@@ -67,15 +71,32 @@ def chunk_procedure_json(filepath):
 
 # ==========================================
 if __name__ == "__main__":
-    procedure_dir = "data/procedure"
+    parser = argparse.ArgumentParser(
+        description="Tạo JSONL chunks từ procedure records."
+    )
+    parser.add_argument(
+        "--input-dir",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "procedure",
+        help="Thư mục chứa PROC_*.json",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "procedure_chunks.jsonl",
+        help="File JSONL đầu ra",
+    )
+    args = parser.parse_args()
+
+    procedure_dir = args.input_dir
     all_chunks = []
 
-    if os.path.exists(procedure_dir):
-        for filename in os.listdir(procedure_dir):
-            if filename.endswith(".json") and filename.startswith("PROC_"):
-                filepath = os.path.join(procedure_dir, filename)
-                file_chunks = chunk_procedure_json(filepath)
-                all_chunks.extend(file_chunks)
+    if not procedure_dir.exists():
+        raise SystemExit(f"Không tìm thấy thư mục dữ liệu: {procedure_dir}")
+
+    for filepath in sorted(procedure_dir.glob("PROC_*.json")):
+        file_chunks = chunk_procedure_json(filepath)
+        all_chunks.extend(file_chunks)
                 
         from langchain_text_splitters import RecursiveCharacterTextSplitter
         
@@ -102,8 +123,9 @@ if __name__ == "__main__":
                 
         print(f"Từ {len(all_chunks)} chunks gốc, đã chia thành {len(safe_chunks_for_sbert)} chunks an toàn cho SBERT.")
         
-        output_file = "data/procedure_chunks.jsonl"
-        with open(output_file, 'w', encoding='utf-8') as out_f:
+        output_file = args.output
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with output_file.open('w', encoding='utf-8') as out_f:
             for chunk in safe_chunks_for_sbert:
                 out_f.write(json.dumps(chunk, ensure_ascii=False) + '\n')
                 

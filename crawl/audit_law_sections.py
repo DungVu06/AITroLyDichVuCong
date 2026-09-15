@@ -16,10 +16,14 @@ import re
 from pathlib import Path
 from typing import Any
 
-from crawl_law import classify_legal_heading, split_legal_sections, validate_section_split
+try:
+    from .crawl_law import classify_legal_heading, split_legal_sections, validate_section_split
+except ImportError:  # Supports `python crawl/audit_law_sections.py` as well.
+    from crawl_law import classify_legal_heading, split_legal_sections, validate_section_split
 
 
-ROOT_DIR = Path(__file__).resolve().parent
+# `crawl` is a tooling directory; the data directory remains at project root.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 LEVEL_RANK = {
     "chapter": 1,
     "part": 2,
@@ -158,7 +162,7 @@ def main() -> None:
     parser.add_argument(
         "--records-dir",
         type=Path,
-        default=ROOT_DIR / "data" / "law" / "records",
+        default=PROJECT_ROOT / "data" / "law" / "records",
     )
     parser.add_argument(
         "--apply",
