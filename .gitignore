@@ -2,3 +2,4 @@
 crawl.py
 .env
 __pycache__/
+tests/*
