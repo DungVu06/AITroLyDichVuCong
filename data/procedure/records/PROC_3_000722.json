@@ -66,7 +66,24 @@
     "prerequisites": [],
     "next_steps": [],
     "part_of": [],
-    "related_benefits": []
+    "related_benefits": [
+      {
+        "law_section_id": "LAW_VBPL_ac0469d50eadc418/part:B/section:II",
+        "scope": "subtree",
+        "note": ""
+      },
+      {
+        "law_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II",
+        "scope": "subtree",
+        "note": ""
+      }
+    ],
+    "sub_procedures": [
+      "PROC_1_001193",
+      "PROC_1_116788",
+      "PROC_1_014137",
+      "PROC_1_116410"
+    ]
   },
   "jurisdiction": {
     "level": "Cấp xã",

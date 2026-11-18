@@ -92,10 +92,15 @@
         "code": "Luật 46/2014/QH13"
       }
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      "PROC_1_001193"
+    ],
     "next_steps": [],
-    "part_of": [],
-    "related_benefits": []
+    "part_of": [
+      "PROC_3_000722"
+    ],
+    "related_benefits": [],
+    "sub_procedures": []
   },
   "jurisdiction": {
     "level": "Cấp tỉnh",
