@@ -191,6 +191,22 @@ Thực hiện theo luồng chuẩn bị dữ liệu ở trên, dùng các script
 - File quan hệ quyền lợi có sẵn nằm trong `data/benefit_relation/`; Neo4j importer có tham số `--related-benefit-relations` để chỉ định đúng file.
 - Các tùy chọn `--reset` của importer xóa dữ liệu hiện có; không cần dùng khi chỉ chạy ứng dụng demo.
 
+#### Tự động khám phá quyền lợi
+
+Sau khi có JSON luật/thủ tục đã chuẩn hóa và collection `laws` trong Qdrant, có thể tạo hàng chờ duyệt:
+
+```powershell
+python -m db.graph.discover_benefits --top-k 30
+```
+
+Kiểm tra `data/benefit_relation/discovery_review.jsonl`, rồi đổi `status` thành `approved` hoặc `rejected`. Import graph với các liên kết đã duyệt:
+
+```powershell
+python -m db.graph.neo4j_import --reviewed-benefits data/benefit_relation/discovery_review.jsonl
+```
+
+Pipeline dùng Gemini Flash qua `GEMINI_BENEFIT_MODEL`, Vietnamese SBERT/Qdrant để tìm ứng viên và không tự ghi graph trước khi duyệt. Xem [hướng dẫn benefit discovery](db/graph/benefit_discovery.md) để biết schema review, cache và chi tiết các bước.
+
 ## Giới hạn hiện tại
 
 - Câu trả lời phụ thuộc vào phạm vi và chất lượng dữ liệu demo; một số văn bản thiếu thông tin hiệu lực. Có trích dẫn không đồng nghĩa với đã xác minh quy định còn áp dụng.
@@ -205,6 +221,7 @@ Thực hiện theo luồng chuẩn bị dữ liệu ở trên, dùng các script
 | --- | --- |
 | [RAG engine](rag/README.md) | Pipeline 13 bước, prompt/engineering, demo và cách tích hợp |
 | [Pipeline dữ liệu](data_processing_pipeline.md) | Sơ lược luồng chuẩn bị dữ liệu |
+| [Benefit discovery](db/graph/benefit_discovery.md) | Tạo ứng viên quyền lợi, duyệt JSONL và import các liên kết đã duyệt |
 | [Schema thủ tục](procedure_data_schema.md) | Cấu trúc bản ghi thủ tục |
 | [Schema pháp luật](law_data_schema.md) | Cấu trúc bản ghi pháp luật |
 | [Dữ liệu Qdrant](db/qdrant_data_format.md) | Chunk, metadata và định dạng lưu vector |

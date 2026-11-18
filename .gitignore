@@ -3,3 +3,4 @@ crawl.py
 .env
 __pycache__/
 tests/*
+data/benefit_relation/discovery.cache.jsonl

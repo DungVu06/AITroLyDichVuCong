@@ -96,12 +96,22 @@ Thủ tục nguồn là một phần con (thủ tục thành phần) thuộc th�
 ```
 Thủ tục nguồn chứa thủ tục đích như một thủ tục thành phần. (Đây là chiều ngược lại của `PART_OF`).
 
-### 3.5. `RELATES_TO_BENEFIT` (từ `related_benefits`)
+### 3.5. Liên kết quyền lợi đã duyệt
 
 ```text
-(:Procedure)-[:RELATES_TO_BENEFIT]->(:Benefit)
+(:Procedure)-[:HAS_RELATED_BENEFIT {review_status: "approved"}]->(:Benefit)
+(:Benefit)-[:SUPPORTED_BY {quote, evidence_id}]->(:LawSection)
 ```
-Thủ tục này liên quan đến việc giải quyết hoặc hưởng một chính sách trợ cấp/phúc lợi `Benefit` (VD: `BEN_001_THAI_SAN`). 
+
+`Benefit` là một chế độ cụ thể. `HAS_RELATED_BENEFIT` nối thủ tục với chế độ
+được gợi ý; `SUPPORTED_BY` nối chế độ tới các section luật làm chứng cứ. Các
+cạnh mới chỉ được tạo từ dòng discovery có `status = "approved"`. Chạy pipeline
+và quy trình duyệt tại [benefit_discovery.md](benefit_discovery.md).
+
+Graph cũng tiếp tục đọc cạnh thủ công cũ
+`(:Procedure)-[:RELATED_TO_BENEFIT]->(:LawSection)` để tương thích trong giai
+đoạn chuyển đổi. Đây là liên kết trực tiếp tới section luật, không phải node
+`Benefit`.
 
 ## 4. Trạng thái resolve của tham chiếu
 

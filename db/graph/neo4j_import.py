@@ -62,6 +62,10 @@ def as_list(value: Any) -> list[str]:
     return [as_text(item) for item in value if as_text(item)]
 
 
+def normalized_quote(value: Any) -> str:
+    return " ".join(as_text(value).split())
+
+
 def read_json_files(directory: Path, pattern: str) -> list[dict[str, Any]]:
     records = []
     for path in sorted(directory.glob(pattern)):
@@ -82,11 +86,28 @@ def read_json_list(path: Path) -> list[dict[str, Any]]:
     return [item for item in data if isinstance(item, dict)]
 
 
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    """Read approved records from a discovery review queue."""
+    records = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Invalid JSONL at {path}:{line_number}: {exc}") from exc
+            if isinstance(value, dict) and as_text(value.get("status")).casefold() == "approved":
+                records.append(value)
+    return records
+
+
 def build_nodes(
     procedure_dir: Path,
     law_dir: Path,
     procedure_relations_path: Path,
     related_benefit_relations_path: Path | None = None,
+    reviewed_benefits_path: Path | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     procedures: list[dict[str, Any]] = []
     laws: list[dict[str, Any]] = []
@@ -99,6 +120,9 @@ def build_nodes(
     procedure_part_of: list[dict[str, str]] = []
     procedure_sub_procedures: list[dict[str, str]] = []
     procedure_related_benefits: list[dict[str, Any]] = []
+    benefits: dict[str, dict[str, Any]] = {}
+    benefit_procedure_edges: list[dict[str, Any]] = []
+    benefit_law_edges: list[dict[str, Any]] = []
 
     for record in read_json_files(procedure_dir, "PROC_*.json"):
         procedure = record.get("procedure") or {}
@@ -173,6 +197,81 @@ def build_nodes(
                     "benefit_id": as_text(relation.get("benefit_id")),
                 }
             )
+
+    if reviewed_benefits_path and reviewed_benefits_path.exists():
+        known_procedures = {as_text(item.get("id")) for item in procedures}
+        known_sections: dict[str, str] = {}
+        for record in read_json_files(law_dir, "LAW_*.json"):
+            law_id = as_text(record.get("id"))
+            for index, section in enumerate((record.get("content") or {}).get("sections") or []):
+                if isinstance(section, dict):
+                    section_id = (
+                        as_text(section.get("normalized_id"))
+                        or f"{law_id}:section:{index:04d}"
+                    )
+                    known_sections[section_id] = as_text(section.get("text"))
+
+        for candidate in read_jsonl(reviewed_benefits_path):
+            procedure_id = as_text(candidate.get("procedure_id"))
+            benefit_id = as_text(candidate.get("benefit_id"))
+            title = as_text(candidate.get("benefit_title"))
+            if not procedure_id or procedure_id not in known_procedures or not benefit_id or not title:
+                continue
+            valid_evidence = [
+                evidence
+                for evidence in candidate.get("evidence") or []
+                if isinstance(evidence, dict)
+                and as_text(evidence.get("quote"))
+                and normalized_quote(evidence.get("quote"))
+                in normalized_quote(known_sections.get(as_text(evidence.get("section_id")), ""))
+            ]
+            if not valid_evidence:
+                continue
+            benefit = benefits.setdefault(
+                benefit_id,
+                {
+                    "id": benefit_id,
+                    "title": title,
+                    "benefit_type": as_text(candidate.get("benefit_type")),
+                    "beneficiaries": as_list(candidate.get("beneficiaries")),
+                    "triggers": as_list(candidate.get("triggers")),
+                    "conditions": as_list(candidate.get("conditions")),
+                    "amount_or_duration": as_list(candidate.get("amount_or_duration")),
+                    "aliases": as_list(candidate.get("aliases")),
+                    "source": "benefit_discovery",
+                },
+            )
+            for key in ("beneficiaries", "triggers", "conditions", "amount_or_duration", "aliases"):
+                benefit[key] = list(dict.fromkeys([*benefit[key], *as_list(candidate.get(key))]))
+            benefit_procedure_edges.append(
+                {
+                    "procedure_id": procedure_id,
+                    "benefit_id": benefit_id,
+                    "candidate_id": as_text(candidate.get("candidate_id")),
+                    "relation_basis": as_text(candidate.get("relation_basis")),
+                    "reason": as_text(candidate.get("reason")),
+                    "score": (candidate.get("ranking") or {}).get("score"),
+                    "supporting_evidence_ids": [
+                        as_text(value) for value in candidate.get("supporting_evidence_ids", [])
+                        if as_text(value)
+                    ],
+                    "pipeline_version": as_text(candidate.get("pipeline_version")),
+                    "review_status": "approved",
+                }
+            )
+            for evidence in valid_evidence:
+                section_id = as_text(evidence.get("section_id"))
+                benefit_law_edges.append(
+                    {
+                        "benefit_id": benefit_id,
+                        "section_id": section_id,
+                        "evidence_id": as_text(evidence.get("evidence_id")),
+                        "quote": as_text(evidence.get("quote")),
+                        "category": as_text(evidence.get("category")),
+                        "source_url": as_text(evidence.get("source_url")),
+                        "pipeline_version": as_text(candidate.get("pipeline_version")),
+                    }
+                )
 
     for record in read_json_files(law_dir, "LAW_*.json"):
         content = record.get("content") or {}
@@ -265,6 +364,9 @@ def build_nodes(
         "procedure_part_of": procedure_part_of,
         "procedure_sub_procedures": procedure_sub_procedures,
         "procedure_related_benefits": procedure_related_benefits,
+        "benefits": list(benefits.values()),
+        "benefit_procedure_edges": benefit_procedure_edges,
+        "benefit_law_edges": benefit_law_edges,
     }
 
 
@@ -272,6 +374,7 @@ SCHEMA_QUERIES = [
     "CREATE CONSTRAINT procedure_id_unique IF NOT EXISTS FOR (n:Procedure) REQUIRE n.id IS UNIQUE",
     "CREATE CONSTRAINT law_id_unique IF NOT EXISTS FOR (n:LawDocument) REQUIRE n.id IS UNIQUE",
     "CREATE CONSTRAINT section_id_unique IF NOT EXISTS FOR (n:LawSection) REQUIRE n.id IS UNIQUE",
+    "CREATE CONSTRAINT benefit_id_unique IF NOT EXISTS FOR (n:Benefit) REQUIRE n.id IS UNIQUE",
     "CREATE INDEX procedure_name IF NOT EXISTS FOR (n:Procedure) ON (n.name)",
     "CREATE INDEX procedure_national_code IF NOT EXISTS FOR (n:Procedure) ON (n.national_code)",
     "CREATE INDEX law_document_number IF NOT EXISTS FOR (n:LawDocument) ON (n.document_number)",
@@ -363,6 +466,36 @@ IMPORT_QUERIES = {
             r.note = row.note,
             r.benefit_id = row.benefit_id
     """,
+    "benefits": """
+        UNWIND $rows AS row
+        MERGE (n:Benefit {id: row.id})
+        SET n += row
+    """,
+    "benefit_procedure_edges": """
+        UNWIND $rows AS row
+        MATCH (procedure:Procedure {id: row.procedure_id})
+        MATCH (benefit:Benefit {id: row.benefit_id})
+        MERGE (procedure)-[r:HAS_RELATED_BENEFIT]->(benefit)
+        SET r.candidate_id = row.candidate_id,
+            r.source = "benefit_discovery",
+            r.relation_basis = row.relation_basis,
+            r.reason = row.reason,
+            r.score = row.score,
+            r.supporting_evidence_ids = row.supporting_evidence_ids,
+            r.pipeline_version = row.pipeline_version,
+            r.review_status = row.review_status
+    """,
+    "benefit_law_edges": """
+        UNWIND $rows AS row
+        MATCH (benefit:Benefit {id: row.benefit_id})
+        MATCH (section:LawSection {id: row.section_id})
+        MERGE (benefit)-[r:SUPPORTED_BY {evidence_id: row.evidence_id}]->(section)
+        SET r.quote = row.quote,
+            r.category = row.category,
+            r.source_url = row.source_url,
+            r.pipeline_version = row.pipeline_version,
+            r.review_status = "approved"
+    """,
 }
 
 
@@ -376,6 +509,22 @@ def reset_database(driver: Driver, database: str) -> None:
     """Xóa toàn bộ node và relationship, giữ nguyên schema Neo4j."""
     with driver.session(database=database) as session:
         session.run("MATCH (n) DETACH DELETE n").consume()
+
+
+def clear_discovered_benefit_edges(driver: Driver, database: str) -> None:
+    """Replace generated approval edges from the supplied review queue."""
+    with driver.session(database=database) as session:
+        session.run(
+            "MATCH ()-[r:HAS_RELATED_BENEFIT]->() "
+            "WHERE r.source = 'benefit_discovery' DELETE r"
+        ).consume()
+        session.run(
+            "MATCH (:Benefit {source: 'benefit_discovery'})-[r:SUPPORTED_BY]->() DELETE r"
+        ).consume()
+        session.run(
+            "MATCH (b:Benefit {source: 'benefit_discovery'}) "
+            "WHERE NOT (b)<-[:HAS_RELATED_BENEFIT]-() DETACH DELETE b"
+        ).consume()
 
 
 def import_nodes(driver: Driver, database: str, nodes: dict[str, list[dict[str, Any]]]) -> None:
@@ -421,6 +570,12 @@ def main() -> None:
         help="File quan hệ Procedure -> LawSection của related_benefit",
     )
     parser.add_argument(
+        "--reviewed-benefits",
+        type=Path,
+        default=None,
+        help="Discovery review JSONL; only records with status=approved are imported",
+    )
+    parser.add_argument(
         "--law-dir",
         type=Path,
         default=ROOT_DIR / "data" / "law" / "normalized_records",
@@ -429,6 +584,8 @@ def main() -> None:
 
     if args.init_only and args.reset:
         parser.error("--reset không thể dùng cùng --init-only")
+    if args.reviewed_benefits and not args.reviewed_benefits.exists():
+        parser.error(f"Không tìm thấy review queue: {args.reviewed_benefits}")
 
     load_dotenv()
     uri = os.getenv("NEO4J_URI", "")
@@ -462,7 +619,10 @@ def main() -> None:
                 args.law_dir,
                 args.procedure_relations,
                 args.related_benefit_relations,
+                args.reviewed_benefits,
             )
+            if args.reviewed_benefits:
+                clear_discovered_benefit_edges(driver, database)
             import_nodes(driver, database, nodes)
             print("Hoàn tất import node và relationship procedure/law đã resolve.")
     finally:

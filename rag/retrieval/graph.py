@@ -50,6 +50,23 @@ ORDER BY procedure.id, section.law_id, section.order
 """
 
 
+DISCOVERED_BENEFIT_QUERY = """
+MATCH (procedure:Procedure)-[relation:HAS_RELATED_BENEFIT]->(benefit:Benefit)
+WHERE procedure.id IN $procedure_ids AND relation.review_status = "approved"
+MATCH (benefit)-[support:SUPPORTED_BY]->(section:LawSection)
+WHERE support.review_status = "approved"
+  AND support.evidence_id IN relation.supporting_evidence_ids
+OPTIONAL MATCH (law:LawDocument)-[:HAS_SECTION]->(section)
+RETURN procedure.id AS procedure_id,
+       properties(relation) AS relation,
+       properties(benefit) AS benefit,
+       properties(section) AS section,
+       properties(law) AS law,
+       properties(support) AS support
+ORDER BY procedure.id, section.law_id, section.order
+"""
+
+
 LAW_EVIDENCE_QUERY = """
 UNWIND $sections AS requested
 MATCH (section:LawSection)
@@ -124,6 +141,35 @@ class GraphRetriever:
 
         benefits: list[BenefitGraphRelation] = []
         if include_benefits:
+            discovered_rows = self.client.query(
+                DISCOVERED_BENEFIT_QUERY, {"procedure_ids": ids}
+            )
+            for row in discovered_rows:
+                relation = row["relation"] or {}
+                benefit = row["benefit"] or {}
+                section = row["section"] or {}
+                law = row["law"] or {}
+                benefits.append(
+                    BenefitGraphRelation(
+                        procedure_id=row["procedure_id"],
+                        benefit_id=benefit.get("id"),
+                        anchor_section_id=section.get("id"),
+                        title=benefit.get("title"),
+                        note=relation.get("reason"),
+                        evidence=LegalEvidence(
+                            law_id=str(section.get("law_id", "")),
+                            law_title=law.get("title"),
+                            validity=law.get("validity_raw"),
+                            section_id=str(section.get("id", "")),
+                            section_order=section.get("order"),
+                            heading=section.get("heading"),
+                            text=section.get("text"),
+                            source_url=law.get("source_url"),
+                            relation_scope="self",
+                        ),
+                    )
+                )
+
             benefit_rows = self.client.query(BENEFIT_QUERY, {"procedure_ids": ids})
             for row in benefit_rows:
                 relation = row["relation"] or {}
