@@ -1,315 +1,355 @@
-from playwright.sync_api import sync_playwright
-import time
-import json
-import datetime
+"""Thu thập metadata và nội dung thủ tục hành chính từ Cổng Dịch vụ công Quốc gia (dichvucong.gov.vn).
+
+Cơ chế hoạt động:
+  - Khởi chạy Playwright để mở trang thủ tục.
+  - Intercept (bắt gói tin) REST API gốc của Cổng DVCQG: /api/v1/configuring/formality/get-formality-by-citizen.
+  - Chuẩn hóa trực tiếp từ dữ liệu JSON gốc sang Schema của dự án bằng Rule (chính xác 100%, không bị dính HTML rác).
+  - Tự động bóc tách:
+      + Thành phần hồ sơ (tên, số lượng bản chính/sao, mã giấy tờ, tính bắt buộc)
+      + Trình tự các bước (chia nhỏ danh sách steps)
+      + Căn cứ pháp lý (legal_bases: tên văn bản, số hiệu) phục vụ Knowledge Graph
+      + Cơ quan giải quyết (tự động fallback unitGroupsExecuting/departmentsExecuting)
+      + Quản lý phiên bản & Hiệu lực (proposal_number, effective_date, state, last_updated)
+
+Ví dụ sử dụng:
+  # Crawl 1 URL cụ thể:
+  python crawl/crawl_procedures.py --url "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bfd-3fe0-70ac-b9d6-5e9e20d6eef7" --out tests
+
+  # Crawl toàn bộ danh sách từ file seed:
+  python crawl/crawl_procedures.py --seed crawl/seed_procedures_urls.csv --out tests
+"""
+
+import os
 import re
+import csv
+import json
+import argparse
+import datetime
 import unicodedata
+from urllib.parse import urlparse
+from playwright.sync_api import sync_playwright
+
 
 def clean_text(text: str) -> str:
+    """Làm sạch ký tự ẩn, chuẩn hóa unicode NFC và khoảng trắng."""
     if not text:
         return ""
-    cleaned = text.replace('\u200e', '').replace('\u200f', '').replace('\u200b', '')
+    cleaned = text.replace('\u200e', '').replace('\u200f', '').replace('\u200b', '').replace('\xa0', ' ')
     cleaned = unicodedata.normalize('NFC', cleaned)
     cleaned = re.sub(r'[ \t]+', ' ', cleaned)
     return cleaned.strip()
 
-def extract_div_table(page, heading_text):
-    pattern = re.compile(f"^\s*{heading_text}\s*$", re.IGNORECASE)
-    heading_locator = page.get_by_text(pattern)
-    
-    if heading_locator.count() == 0:
-        print(f"Không tìm thấy tiêu đề bảng: {heading_text}")
-        return []
-        
-    content_locator = heading_locator.first.locator("xpath=./following-sibling::div[1]")
-    if content_locator.count() == 0:
-        content_locator = heading_locator.first.locator("xpath=./parent::*/following-sibling::div[1]")
-        
-    if content_locator.count() == 0:
-        print(f"Không tìm thấy khối chứa bảng của: {heading_text}")
+
+def split_steps(raw_steps_text: str) -> list[str]:
+    """Tách trình tự thực hiện thành từng bước chuẩn xác."""
+    if not raw_steps_text:
         return []
 
-    rows = content_locator.locator("xpath=.//div[contains(@class, 'md:flex-row')]")
-    row_count = rows.count()
-    if row_count == 0:
-        rows = content_locator.locator("xpath=./div/div")
-        row_count = rows.count()
+    lines = [clean_text(l) for l in raw_steps_text.split('\n') if clean_text(l)]
+    steps = []
+    current_step = ""
 
-    table_data = []
-    for i in range(row_count):
-        cells = rows.nth(i).locator("xpath=./div")
-        cell_count = cells.count()
-        
-        if cell_count > 0:
-            row_data = [cells.nth(j).inner_text().strip() for j in range(cell_count)]
-            table_data.append(row_data)
-    return table_data
+    # Nhận diện đầu mục mới: a), b) hoặc Bước 1: hoặc 1. hoặc - hoặc +
+    pattern = r'^([a-z]\)|\d+[\.\)]|Bước\s*\d+[:\.-]|\-|\+)'
 
-def extract_general_info(page):
-    general_info = {}
-    grid_container = page.locator("div.grid.grid-cols-1.md\:grid-cols-2").first
-    
-    if grid_container.count() > 0:
-        items = grid_container.locator("xpath=./div[contains(@class, 'flex')]")
-        total = items.count()
-        
-        for i in range(total):
-            item = items.nth(i)
-            sub_divs = item.locator("xpath=./div")
-            if sub_divs.count() >= 2:
-                key = sub_divs.nth(0).inner_text().strip()
-                val = sub_divs.nth(1).inner_text().strip()
-                if key:
-                    general_info[key] = val
-                    
-    return general_info
-
-def extract_execution_methods(page):
-    methods = []
-    heading = page.locator("h4").filter(has_text=re.compile("Cách Thức Thực Hiện", re.IGNORECASE)).first
-    
-    if heading.count() == 0:
-        return methods
-
-    container = heading.locator("xpath=following-sibling::div[1]")
-    if container.count() == 0:
-        return methods
-
-    raw_text = container.inner_text().strip()
-    if not raw_text:
-        return methods
-
-    lines = [line.strip() for line in raw_text.split("\n") if line.strip()]
-
-    data_lines = [l for l in lines if l not in ["Hình thức nộp", "Thời gian", "Phí, lệ phí", "Mô tả"]]
-
-    known_methods = ["Trực tuyến", "Dịch vụ bưu chính", "Trực tiếp"]
-    
-    current_method = None
-    for item in data_lines:
-        if item in known_methods:
-            current_method = {
-                "method": item,
-                "processing_time": "",
-                "fee": "",
-                "description": ""
-            }
-            methods.append(current_method)
-        elif current_method:
-            if not current_method["processing_time"]:
-                current_method["processing_time"] = item
-            elif not current_method["fee"]:
-                current_method["fee"] = item
-            elif not current_method["description"]:
-                current_method["description"] = item
-
-    return methods
-
-def extract_steps(raw_text):
-    if not raw_text:
-        return []
-    
-    lines = [clean_text(line) for line in raw_text.split('\n')]
-    
-    steps_list = []
-    
-    current_chunk = ""
-    
     for line in lines:
-        if not line:
-            continue
-
-        if line.startswith("-"):
-            if current_chunk:
-                steps_list.append(current_chunk.strip())
-            current_chunk = line
+        if re.match(pattern, line, re.IGNORECASE):
+            if current_step:
+                steps.append(current_step.strip())
+            current_step = line
         else:
-            if current_chunk:
-                if line.startswith("+") or line.startswith("(i"):
-                    current_chunk += "\n  " + line 
-                else:
-                    current_chunk += " " + line 
+            if current_step:
+                current_step += "\n" + line
             else:
-                current_chunk = line
-    
-    if current_chunk:
-        steps_list.append(current_chunk.strip())
-            
-    return steps_list
+                current_step = line
 
-def extract_notes(page):
-    notes_list = []
-    
-    heading = page.locator("h5").filter(has_text=re.compile(r"\*?\s*Lưu ý", re.IGNORECASE)).first
-    
-    if heading.count() == 0:
-        return notes_list
+    if current_step:
+        steps.append(current_step.strip())
 
-    container = heading.locator("xpath=following-sibling::div[1]")
-    
-    if container.count() == 0 or not container.inner_text().strip():
-        container = heading.locator("xpath=./parent::*/following-sibling::div[1]")
+    return steps if steps else [clean_text(raw_steps_text)]
 
-    if container.count() > 0:
-        raw_text = container.first.inner_text().strip()
-        if raw_text:
-            lines = [clean_text(l) for l in raw_text.split('\n') if l.strip()]
-            
-            current_note = ""
-            for line in lines:
-                if line.startswith(('-', '*', '•')):
-                    if current_note:
-                        notes_list.append(current_note.strip())
-                    current_note = line
-                else:
-                    if current_note:
-                        current_note += " " + line
-                    else:
-                        current_note = line
-                        
-            if current_note:
-                notes_list.append(current_note.strip())
 
-    return notes_list
+def extract_authority(d: dict) -> str:
+    """Trích xuất cơ quan thực hiện, tự động dự phòng nếu trường executingAgencies bị rỗng."""
+    direct_agency = clean_text(d.get("executingAgencies", ""))
+    if direct_agency:
+        return direct_agency
 
-def crawl(url):
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        page = browser.new_page()
-        
+    # Fallback 1: Lấy từ unitGroupsExecuting (ví dụ: 'Ủy ban nhân dân cấp xã', 'Công an Xã')
+    unit_groups = d.get("unitGroupsExecuting", [])
+    if unit_groups:
+        names = [clean_text(u.get("name", "")) for u in unit_groups if u.get("name")]
+        if names:
+            return ", ".join(names)
+
+    # Fallback 2: Lấy từ departmentsExecuting
+    dept_groups = d.get("departmentsExecuting", [])
+    if dept_groups:
+        names = [clean_text(u.get("name", "")) for u in dept_groups if u.get("name")]
+        if names:
+            return ", ".join(names)
+
+    # Fallback 3: Dựa vào cấp thực hiện
+    if d.get("isWard"):
+        return "Ủy ban nhân dân / Công an cấp Xã"
+    if d.get("isProvince"):
+        return "Cơ quan chuyên môn cấp Tỉnh"
+    if d.get("isMinistry"):
+        return clean_text(d.get("departmentPromulgateName", "Cơ quan cấp Bộ"))
+
+    return "Cơ quan có thẩm quyền theo quy định"
+
+
+def map_api_to_schema(api_data: dict, source_url: str, life_events: list[str] = None) -> dict:
+    """Chuyển đổi dữ liệu JSON từ API Cổng DVCQG sang Schema chuẩn của dự án."""
+    d = api_data.get("data", {})
+    if "data" in d and isinstance(d["data"], dict):
+        d = d["data"]
+
+    code = d.get("code") or d.get("codeNotation") or ""
+    proc_id = f"PROC_{code.replace('.', '_')}" if code else f"PROC_{d.get('id', 'UNKNOWN')}"
+
+    # 1. Trích xuất Thành phần hồ sơ / Giấy tờ
+    documents = []
+    for case in d.get("executionCases", []):
+        for comp in case.get("profileComponents", []):
+            orig_qty = comp.get("originalQty", 0)
+            copy_qty = comp.get("copyQty", 0)
+            qty_parts = []
+            if orig_qty > 0:
+                qty_parts.append(f"{orig_qty} Bản chính")
+            if copy_qty > 0:
+                qty_parts.append(f"{copy_qty} Bản sao")
+            qty_str = ", ".join(qty_parts) if qty_parts else "Theo quy định"
+
+            documents.append({
+                "ten_giay_to": clean_text(comp.get("name", "")),
+                "so_luong": qty_str,
+                "bat_buoc": comp.get("required", False),
+                "ma_giay_to": comp.get("code", "")
+            })
+
+    # 2. Trình tự thực hiện (steps)
+    raw_steps_list = d.get("executionSteps", [])
+    steps = []
+    for s in raw_steps_list:
+        desc = s.get("description", "")
+        if desc:
+            steps.extend(split_steps(desc))
+
+    # 3. Cách thức thực hiện & Lệ phí
+    execution_methods = []
+    method_map = {
+        "ONLINE": "Trực tuyến",
+        "DIRECT": "Trực tiếp",
+        "POSTAL": "Dịch vụ bưu chính"
+    }
+    for m in d.get("executionMethods", []):
+        sub_method = m.get("submissionMethod", "")
+        method_name = method_map.get(sub_method, sub_method)
+
+        fees_info = []
+        for fee in m.get("fees", []):
+            val = fee.get("value", 0)
+            currency = fee.get("currencyName", "VNĐ")
+            desc = fee.get("description", "")
+            if val == 0:
+                fees_info.append("Miễn phí")
+            else:
+                fee_txt = f"{val:,} {currency}"
+                if desc:
+                    fee_txt += f" ({desc})"
+                fees_info.append(fee_txt)
+        fee_str = "; ".join(fees_info) if fees_info else "Miễn phí"
+
+        proc_time = m.get("processingTime", "")
+        unit = m.get("processingTimeUnit", "")
+        unit_str = "ngày làm việc" if "WORKING_DAY" in unit else "ngày"
+        time_str = f"{proc_time} {unit_str}".strip() if proc_time else ""
+
+        execution_methods.append({
+            "method": method_name,
+            "processing_time": time_str,
+            "fee": fee_str,
+            "description": clean_text(m.get("description", ""))
+        })
+
+    # 4. Căn cứ pháp lý (legal_bases cho Knowledge Graph)
+    legal_bases = []
+    for lb in d.get("legalBasisesDetails", []):
+        legal_bases.append({
+            "name": clean_text(lb.get("name", "")),
+            "code": clean_text(lb.get("code", "")).strip()
+        })
+
+    # 5. Đối tượng thực hiện
+    target_audiences = [clean_text(s.get("name", "")) for s in d.get("subjectTypesDetails", []) if s.get("name")]
+    if not target_audiences and d.get("formalityTargetType"):
+        target_audiences = d.get("formalityTargetType")
+
+    # 6. Cấp thực hiện (Jurisdiction Level)
+    level = "Cấp tỉnh" if d.get("isProvince") else (
+            "Cấp xã" if d.get("isWard") else (
+            "Cấp Bộ" if d.get("isMinistry") else "Toàn quốc"))
+
+    # 7. Metadata phiên bản & Ngày ban hành / Hiệu lực
+    proposal = d.get("procedureProposal", {}) or {}
+    proposal_no = proposal.get("proposalNumber") or proposal.get("decisionNumber") or ""
+    pub_date_ms = proposal.get("decisionDate") or proposal.get("publicationDate")
+    effective_date_str = ""
+    if pub_date_ms:
         try:
-            page.goto(url)
-            page.wait_for_load_state("networkidle")
-            time.sleep(2) 
-            info_table = extract_general_info(page)
+            effective_date_str = datetime.datetime.fromtimestamp(pub_date_ms / 1000, tz=datetime.timezone.utc).strftime("%Y-%m-%d")
+        except Exception:
+            effective_date_str = ""
 
-            raw_data = {}
-            danh_sach_muc = [
-                "Thủ tục hành chính liên quan",
-                "Trình tự thực hiện", 
-                "Căn cứ pháp lý", 
-                "Cơ quan thực hiện",
-                "Yêu cầu, điều kiện thực hiện",
-                "Kết quả xử lý",
-                "Từ khóa",
-                "Mô tả"
-            ]
+    structured_json = {
+        "id": proc_id,
+        "national_code": code,
+        "life_event": life_events or ["sinh_con"],
+        "target_audience": target_audiences,
+        "domain": clean_text(d.get("categoriesDetails", [{}])[0].get("name", "") if d.get("categoriesDetails") else ""),
+        "procedure_type": d.get("formalityType", ""),
 
-            for muc in danh_sach_muc:
-                try:
-                    pattern = re.compile(f"^\s*{muc}\s*$", re.IGNORECASE)
-                    heading_locator = page.get_by_text(pattern)
-                    
-                    if heading_locator.count() > 0:
-                        noidung = ""
-                        sibling_locator = heading_locator.first.locator("xpath=./following-sibling::*[1]")
-                        if sibling_locator.count() > 0:
-                            noidung = sibling_locator.first.inner_text().strip()
-                        if not noidung:
-                            parent_sibling = heading_locator.first.locator("xpath=./parent::*/following-sibling::*[1]")
-                            if parent_sibling.count() > 0:
-                                noidung = parent_sibling.first.inner_text().strip()
-                        raw_data[muc] = noidung
-                    else:
-                        raw_data[muc] = None
-                except Exception as e:
-                    print(f"Lỗi khi bóc {muc}: {e}")
+        "procedure": {
+            "name": clean_text(d.get("name", "")),
+            "eligibility": clean_text(d.get("requirementsAndConditions", "")),
+            "documents": documents,
+            "steps": steps,
+            "authority": extract_authority(d),
+            "execution_methods": execution_methods,
+            "online_portal_url": source_url
+        },
 
-            bang_ho_so = extract_div_table(page, "Thành phần hồ sơ")
-            execution_methods_list = extract_execution_methods(page)
+        "relations": {
+            "legal_bases": legal_bases,
+            "prerequisites": [],
+            "next_steps": [],
+            "part_of": [],
+            "related_benefits": []
+        },
 
-            documents_list = []
-            for row in bang_ho_so:
-                if len(row) == 1 and "Tên giấy tờ" in row[0]:
-                    raw_text = row[0]
-                    
-                    text_norm = re.sub(r'\n[\t ]+\n[\t ]+\n|\n[\t ]+\n|\t', '|', raw_text)
-                    
-                    row_parts = re.split(r'\n{2,}', text_norm)
-                    
-                    for part in row_parts:
-                        if "Tên giấy tờ" in part or not part.strip():
-                            continue 
-                            
-                        cols = [c.strip() for c in part.split('|') if c.strip()]
-                        
-                        if len(cols) > 0:
-                            ten = cols[0]
-                            sl = cols[-1] if len(cols) > 1 else ""
-                            mau = cols[1] if len(cols) >= 3 else ""
-                            
-                            documents_list.append({
-                                "ten_giay_to": clean_text(ten),
-                                "so_luong": clean_text(sl)
-                            })
-                            
-                elif len(row) >= 3 and row[0] != "Tên giấy tờ":
-                    documents_list.append({
-                        "ten_giay_to": row[0],
-                        "so_luong": row[2]
-                    })
+        "jurisdiction": {
+            "level": level,
+            "location": "Toàn quốc"
+        },
 
-            raw_target_audience = info_table.get("Đối tượng thực hiện", "")
-            target_audience = [dt.strip() for dt in raw_target_audience.split(",") if dt.strip()]
+        "source": {
+            "name": "Cổng Dịch vụ công Quốc gia",
+            "url": source_url,
+            "effective_date": effective_date_str,
+            "last_updated": datetime.datetime.now().strftime("%Y-%m-%d")
+        },
 
-            raw_steps_and_notes = raw_data.get("Trình tự thực hiện", "")
-            steps_list = extract_steps(raw_steps_and_notes)
-            notes_list = extract_notes(page)
+        "version_control": {
+            "proposal_number": proposal_no,
+            "state": d.get("state", "ACTIVE"),
+            "raw_id": d.get("id", "")
+        }
+    }
+    return structured_json
 
-            raw_id = info_table.get("Mã thủ tục", "")
-            proc_id = f"PROC_{raw_id.replace('.', '_')}" if raw_id else "PROC_UNKNOWN"
 
-            structured_json = {
-                "id": proc_id,
-                "national_code": raw_id,
-                "life_event": ["sinh_con"],
-                "target_audience": target_audience,
-                "domain": info_table.get("Lĩnh vực", ""),
-                "procedure_type": info_table.get("Loại thủ tục", ""),
-                
-                "procedure": {
-                    "name": info_table.get("Tên thủ tục", raw_data.get("ten_thu_tuc", "")),
-                    "eligibility": raw_data.get("Yêu cầu, điều kiện thực hiện", ""),
-                    "documents": documents_list,
-                    "steps": steps_list,
-                    "notes": notes_list,
-                    "authority": raw_data.get("Cơ quan thực hiện", ""),
-                    "execution_methods": execution_methods_list,
-                    "online_portal_url": url
-                },
+def crawl_single_url(page, url: str, output_dir: str, save_raw: bool = True) -> dict | None:
+    """Crawl một URL cụ thể bằng cách lắng nghe response API."""
+    uuid = url.rstrip("/").split("/")[-1]
+    captured_data = []
 
-                "relations": {
-                    "prerequisites": [],
-                    "next_steps": [],
-                    "related_benefits": []
-                },
+    def handle_response(response):
+        if response.request.resource_type in ["xhr", "fetch"]:
+            try:
+                content_type = response.headers.get("content-type", "")
+                if "application/json" in content_type:
+                    data = response.json()
+                    if "get-formality-by-citizen" in response.url or (uuid in response.url and "formality" in response.url):
+                        captured_data.append(data)
+            except Exception:
+                pass
 
-                "jurisdiction": {
-                    "level": info_table.get("Cấp thực hiện", ""),
-                    "location": "Toàn quốc"
-                },
+    page.on("response", handle_response)
+    print(f"\n[*] Đang truy cập: {url}")
 
-                "source": {
-                    "name": "Cổng Dịch vụ công Quốc gia",
-                    "url": url,
-                    "effective_date": "",
-                    "last_updated": datetime.datetime.now().strftime("%Y-%m-%d")
-                }
-            }
+    try:
+        page.goto(url, wait_until="networkidle", timeout=30000)
+        page.wait_for_timeout(2000)
+    except Exception as e:
+        print(f"[!] Cảnh báo khi tải trang ({url}): {e}")
 
-            output_filename = f"{proc_id}.json"
-            
-            with open(output_filename, 'w', encoding='utf-8') as f:
-                json.dump(structured_json, f, ensure_ascii=False, indent=4)
-                
-            print(f"\nĐã lưu thành công dữ liệu vào file: {output_filename}")
+    # Bỏ lắng nghe handler này cho trang tiếp theo
+    page.remove_listener("response", handle_response)
 
-        except Exception as e:
-            print(f"Lỗi toàn cục: {e}")
-        finally:
-            browser.close()
-            print("Đã đóng trình duyệt.")
+    if not captured_data:
+        print(f"[-] Không bắt được API formality cho: {url}")
+        return None
+
+    raw_api_payload = captured_data[0]
+    structured = map_api_to_schema(raw_api_payload, url)
+
+    # 1. Lưu file JSON chuẩn hóa
+    proc_id = structured["id"]
+    clean_file = os.path.join(output_dir, f"{proc_id}.json")
+    with open(clean_file, "w", encoding="utf-8") as f:
+        json.dump(structured, f, ensure_ascii=False, indent=2)
+    print(f"[+] Đã lưu file chuẩn hóa: {clean_file}")
+
+    # 2. Lưu file RAW nếu cần đối chiếu
+    if save_raw:
+        raw_file = os.path.join(output_dir, f"RAW_{proc_id.replace('PROC_', '')}.json")
+        with open(raw_file, "w", encoding="utf-8") as f:
+            json.dump(raw_api_payload, f, ensure_ascii=False, indent=2)
+
+    return structured
+
+
+def run_crawler(url: str = None, seed_path: str = None, output_dir: str = "tests", save_raw: bool = True):
+    """Điều phối crawl một URL hoặc toàn bộ danh sách từ file seed CSV."""
+    os.makedirs(output_dir, exist_ok=True)
+
+    urls_to_crawl = []
+    if seed_path and os.path.exists(seed_path):
+        with open(seed_path, mode='r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row and len(row) >= 3:
+                    u = row[2].strip()
+                    if u.startswith("http"):
+                        urls_to_crawl.append(u)
+    elif url:
+        urls_to_crawl.append(url)
+
+    if not urls_to_crawl:
+        print("[-] Không có URL nào để crawl.")
+        return
+
+    print(f"[+] Tìm thấy {len(urls_to_crawl)} URL cần crawl...")
+
+    with sync_playwright() as p:
+        # Bắt buộc headless=False để vượt qua WAF Cloudflare/Bộ Thông tin của DVCQG
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+        )
+        page = context.new_page()
+
+        for idx, u in enumerate(urls_to_crawl, 1):
+            print(f"--- Tiến trình: [{idx}/{len(urls_to_crawl)}] ---")
+            crawl_single_url(page, u, output_dir, save_raw=save_raw)
+
+        browser.close()
+        print("\n[✔] Hoàn thành toàn bộ quá trình crawl!")
+
 
 if __name__ == "__main__":
-    test_url = "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019f9217-74e4-73e4-a228-bb4a73425e67"
-    crawl(test_url)
+    parser = argparse.ArgumentParser(description="Crawl dữ liệu thủ tục DVC Quốc gia qua API intercept.")
+    parser.add_argument("--url", type=str, default=None, help="Crawl 1 URL thủ tục đơn lẻ")
+    parser.add_argument("--seed", type=str, default="crawl/seed_procedures_urls.csv", help="Đường dẫn file seed CSV")
+    parser.add_argument("--out", type=str, default="tests", help="Thư mục xuất file JSON")
+    parser.add_argument("--no-raw", action="store_true", help="Không lưu file RAW API")
+    args = parser.parse_args()
+
+    run_crawler(
+        url=args.url,
+        seed_path=args.seed if not args.url else None,
+        output_dir=args.out,
+        save_raw=not args.no_raw
+    )
