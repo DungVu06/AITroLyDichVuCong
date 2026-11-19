@@ -85,8 +85,8 @@ def main() -> None:
     args = parser.parse_args()
 
     collections = [
-        (PROJECT_ROOT / "data" / "procedure_chunks.jsonl", "procedures"),
-        (PROJECT_ROOT / "data" / "law_chunks.jsonl", "laws"),
+        (PROJECT_ROOT / "data" / "chunks" / "procedure_chunks.jsonl", "procedures"),
+        (PROJECT_ROOT / "data" / "chunks" / "law_chunks.jsonl", "laws"),
     ]
 
     if args.reset:

@@ -277,8 +277,12 @@ def main() -> None:
 
     try:
         from google import genai
-    except ModuleNotFoundError as exc:
-        raise SystemExit("Install google-genai from requirements.txt") from exc
+    except ImportError as exc:
+        raise SystemExit(
+            "Gemini SDK is unavailable in this Python environment. "
+            "Activate the project venv, then run: "
+            "python -m pip install google-genai==2.23.0"
+        ) from exc
 
     cache, cache_handle = load_cache(args.cache)
     prior_reviews = load_existing_reviews(args.output)

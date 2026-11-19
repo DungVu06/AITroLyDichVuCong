@@ -186,10 +186,42 @@ python -m rag "Khai sinh cần giấy tờ gì?" --json
 
 Thực hiện theo luồng chuẩn bị dữ liệu ở trên, dùng các script trong `crawl/`, `chunk/`, `db/graph/` và `db/vector/`. Cần đối chiếu đường dẫn đầu vào/đầu ra trước khi import:
 
-- Các script chunk mặc định xuất vào `data/chunks/`, còn script import Qdrant hiện đọc `data/procedure_chunks.jsonl` và `data/law_chunks.jsonl`.
+- Các script chunk và script import Qdrant dùng chung đầu vào tại `data/chunks/` (`procedure_chunks.jsonl` và `law_chunks.jsonl`).
 - Script import Qdrant đọc biến môi trường của process; không tự nạp `.env` như các client runtime.
 - File quan hệ quyền lợi có sẵn nằm trong `data/benefit_relation/`; Neo4j importer có tham số `--related-benefit-relations` để chỉ định đúng file.
 - Các tùy chọn `--reset` của importer xóa dữ liệu hiện có; không cần dùng khi chỉ chạy ứng dụng demo.
+
+#### Crawl văn bản pháp luật theo từ khóa
+
+Crawler hỗ trợ cả VBPL và Thư Viện Pháp Luật (TVPL). Giới hạn `--limit` là số
+văn bản hợp lệ tối đa cho **mỗi từ khóa**; mặc định là 50. Khi chạy lại, bản ghi
+hợp lệ đã có sẽ được bỏ qua. Dùng `--refresh` để cập nhật lại bản ghi hoặc
+`--discover-only` để chỉ liệt kê URL tìm thấy.
+
+```powershell
+# Tìm và crawl tối đa 100 văn bản công khai từ TVPL
+python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 100
+
+# Nhiều từ khóa, mỗi từ khóa tối đa 30 văn bản
+python crawl/crawl_law.py --source tvpl --query "thai sản" --query "khai sinh" --limit 30
+
+# Xem trước URL mà không tải nội dung
+python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 20 --discover-only
+
+# Làm mới các bản ghi TVPL đã có
+python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 50 --refresh
+```
+
+Các lệnh cũ tiếp tục dùng VBPL mặc định; có thể ghi rõ `--source vbpl`. Bản ghi
+TVPL dùng cùng cấu trúc `data/law/records/LAW_*.json`, có ID dạng
+`LAW_TVPL_<mã-văn-bản>` và chỉ lưu phần điều khoản công khai. Phần căn cứ, chữ ký,
+nơi nhận, phụ lục và biểu mẫu được bỏ qua. Các giá trị hiệu lực mà TVPL chỉ hiển
+thị là “Đã biết” được giữ nguyên, không được diễn giải thành ngày hoặc trạng thái
+cụ thể. Mỗi văn bản và mỗi lượt tìm kiếm được ghi vào
+`data/law/crawl_report.jsonl`. Nếu trang yêu cầu xác minh hoặc chặn truy cập,
+crawler ghi lỗi và không lưu trang chặn như một văn bản.
+Trang TVPL có thông báo quyền tác giả đối với bản dịch; hãy kiểm tra quyền sử
+dụng trước khi công bố hoặc phân phối lại dữ liệu thu thập.
 
 #### Tự động khám phá quyền lợi
 

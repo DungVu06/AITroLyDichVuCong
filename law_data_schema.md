@@ -8,7 +8,8 @@ File này mô tả cấu trúc của các file:
 data/law/records/LAW_*.json
 ```
 
-Đây là dữ liệu được tạo bởi `crawl_law.py` sau khi thu thập văn bản từ `vbpl.vn`.
+Đây là dữ liệu được tạo bởi `crawl/crawl_law.py` từ `vbpl.vn` hoặc
+`thuvienphapluat.vn` (TVPL). Hai nguồn cùng dùng cấu trúc JSON này.
 Mỗi file JSON biểu diễn một văn bản pháp luật, gồm:
 
 ```text
@@ -81,8 +82,8 @@ Schema này phục vụ ba mục đích:
 
 `crawl_law.py` tạo ID theo quy tắc:
 
-- Nếu URL có `ItemID` hoặc `id`, dùng dạng `LAW_VBPL_<ItemID>`.
-- Nếu không có, dùng một phần SHA-1 của URL và tiêu đề.
+- Với VBPL, ID dựa trên `ItemID`/`id` nếu có, hoặc một phần SHA-1 của URL và tiêu đề.
+- Với TVPL, ID có dạng `LAW_TVPL_<mã-văn-bản>` theo số cuối URL chi tiết.
 
 ID này nên được dùng làm khóa chính cho Knowledge Graph và làm tiền tố của
 `chunk_id` trong Vector DB.
@@ -110,9 +111,9 @@ kiểm duyệt khi dùng cho các câu trả lời quan trọng.
 | `level` | String | Cấp hoặc phạm vi áp dụng, ví dụ `Toàn quốc`, `Cấp tỉnh`, `Cấp xã`. |
 | `location` | String | Địa phương cụ thể hoặc `Việt Nam`. |
 
-Trong phiên bản hiện tại, `crawl_law.py` đang gán mặc định `Toàn quốc` và
-`Việt Nam`. Đây là giá trị kỹ thuật của pipeline, không nên mặc nhiên xem là
-kết luận cuối cùng về phạm vi hiệu lực của mọi văn bản.
+Crawler VBPL hiện gán mặc định `Toàn quốc` và `Việt Nam`; đây là giá trị kỹ
+thuật, không phải kết luận cuối cùng về phạm vi hiệu lực. Crawler TVPL ghi
+`Chưa xác định` cho đến khi trích xuất được phạm vi áp dụng cụ thể.
 
 ## 5. Object `source`
 
@@ -162,9 +163,13 @@ phát hiện trong từng section nằm ở `content.sections[].related_laws`, k
 | `issued_date_raw` | String | Ngày ban hành ở dạng nguyên bản từ nguồn. |
 | `effective_date_raw` | String | Ngày có hiệu lực ở dạng nguyên bản từ nguồn. |
 | `validity_raw` | String | Tình trạng hiệu lực được hiển thị trên nguồn. |
-| `full_text` | String | Toàn văn đã được làm sạch. |
+| `full_text` | String | Nội dung đã làm sạch theo nguồn. VBPL giữ nội dung trích được; TVPL lưu phần điều khoản công khai, bỏ căn cứ, chữ ký, nơi nhận, phụ lục và biểu mẫu. |
 | `sections` | Array[Object] | Các section được tách từ toàn văn. |
 | `attachments` | Array[String] | URL của file PDF/DOC/DOCX hoặc file tải xuống. |
+
+Với TVPL, metadata không được suy diễn khi website chỉ hiển thị “Đã biết”. Phạm
+vi địa lý chưa xác định được ghi là `Chưa xác định`. Các record TVPL giữ
+`source.name` là `Thư Viện Pháp Luật`; `source.url` là link văn bản chuẩn hóa.
 
 ### Về các trường ngày
 
@@ -359,7 +364,7 @@ Một quan hệ được tự động phát hiện nên có thêm thông tin ki�
 
 ## 12. Quy tắc dữ liệu cần giữ
 
-1. Không xóa `full_text`; đây là bản toàn văn dùng để kiểm tra lại chunk.
+1. Không xóa `full_text`; đây là nội dung đã thu thập theo quy tắc của nguồn, dùng để kiểm tra lại chunk.
 2. Không coi `validity_raw` là kết luận pháp lý tuyệt đối nếu chưa kiểm tra nguồn.
 3. Không coi `related_laws` là quan hệ đã xác minh cho đến khi resolve được văn bản.
 4. Giữ `source.url` trong mọi chunk để sinh citation.

@@ -1,11 +1,12 @@
-"""Thu thap metadata va noi dung van ban phap luat tu vbpl.vn.
+"""Thu thap metadata va noi dung van ban phap luat tu VBPL hoac TVPL.
 
 Chi luu JSON da chuan hoa vao thu muc records; khong luu HTML raw.
 Khong dung crawler de tu dong ket luan van ban con hieu luc. Hieu luc va
 quan he thay the/phap ly can duoc kiem tra lai tu trang van ban.
 
 Vi du (chay tu bat ky thu muc nao):
-  python crawl/crawl_law.py --url 'https://vbpl.vn/...' --out data/law
+  python crawl/crawl_law.py --source vbpl --url 'https://vbpl.vn/...' --out data/law
+  python crawl/crawl_law.py --source tvpl --query 'thuế thu nhập cá nhân' --limit 50
   python crawl/crawl_law.py --seed crawl/seed_law_urls.txt --out data/law --headed
 """
 
@@ -314,7 +315,7 @@ def open_tab(page, url: str, tab: str) -> None:
     label = tab_labels[tab]
     real_tab = page.get_by_role("tab", name=label, exact=True).first
     if real_tab.count() == 0:
-        page.goto(tab_url(url, tab), wait_until="domcontentloaded", timeout=0)
+        page.goto(tab_url(url, tab), wait_until="domcontentloaded", timeout=60000)
         page.wait_for_timeout(8000)
         real_tab = page.get_by_role("tab", name=label, exact=True).first
     if real_tab.count() == 0:
@@ -328,7 +329,7 @@ def open_tab(page, url: str, tab: str) -> None:
             return tab?.getAttribute('aria-selected') === 'true' && !!panel && panel.innerText.trim().length > 0;
         }""",
         arg=panel_id,
-        timeout=0,
+        timeout=60000,
     )
     page.wait_for_timeout(1000)
 
@@ -349,8 +350,7 @@ def extract(page, url: str) -> dict:
     try:
         page.wait_for_function(
             """() => { const t = document.body?.innerText || ''; return t.length > 500 && !t.includes('Đang tải dữ liệu...'); }""",
-            # timeout=0: cho phep vbpl.vn tai API lau tuy y, khong tu dong fail.
-            timeout=0,
+            timeout=60000,
         )
     except PlaywrightTimeoutError:
         raise RuntimeError("VBPL chua tra ve noi dung van ban (API co the bi chan hoac dang loi).")
@@ -465,7 +465,8 @@ def discover_urls(page, query: str, max_pages: int = 3) -> list[str]:
     page.wait_for_load_state("domcontentloaded", timeout=60000)
     page.wait_for_timeout(1500)
 
-    found = set()
+    found = []
+    seen = set()
     for _ in range(max_pages):
         for anchor in page.locator("a[href]").all():
             href = anchor.get_attribute("href")
@@ -475,74 +476,305 @@ def discover_urls(page, query: str, max_pages: int = 3) -> list[str]:
             parsed = urlparse(absolute)
             path = parsed.path.casefold()
             if parsed.netloc.endswith("vbpl.vn") and any(token in path for token in ("vbpq", "van-ban", "toanvan", "chitiet")):
-                found.add(absolute)
+                if absolute not in seen:
+                    seen.add(absolute)
+                    found.append(absolute)
         next_link = page.locator("a").filter(has_text=re.compile(r"^(Trang sau|Tiếp|Next|>)$", re.I)).first
         if next_link.count() == 0 or not next_link.is_visible():
             break
         next_link.click()
         page.wait_for_timeout(1200)
-    return sorted(found)
+    return found
 
 
-def crawl(urls: list[str], out: Path, headed: bool, delay: float) -> None:
-    require_playwright()
-    out.joinpath("records").mkdir(parents=True, exist_ok=True)
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=not headed)
-        context = browser.new_context(locale="vi-VN", user_agent=(
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-            "Chrome/131 Safari/537.36"))
-        page = context.new_page()
-        for url in urls:
+def _canonical_url(url: str, source: str) -> str:
+    if source == "tvpl":
+        try:
+            from .tvpl_source import canonicalize_document_url
+        except ImportError:
+            from tvpl_source import canonicalize_document_url
+        return canonicalize_document_url(url)
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").casefold()
+    if not (host == "vbpl.vn" or host.endswith(".vbpl.vn")):
+        raise ValueError(f"Không phải URL VBPL: {url}")
+    return urlunparse(parsed._replace(fragment=""))
+
+
+def _record_is_valid(path: Path, url: str) -> bool:
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+        content = record.get("content") or {}
+        return (
+            bool(record.get("id"))
+            and (record.get("source") or {}).get("url") == url
+            and len((content.get("full_text") or "").strip()) >= 40
+            and isinstance(content.get("sections"), list)
+        )
+    except (OSError, ValueError, TypeError, AttributeError):
+        return False
+
+
+def _existing_record_paths(out: Path, source: str) -> dict[str, Path]:
+    records_dir = out / "records"
+    if not records_dir.exists():
+        return {}
+    existing: dict[str, Path] = {}
+    for path in records_dir.glob("LAW_*.json"):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+            url = (record.get("source") or {}).get("url", "")
+            if url:
+                existing[_canonical_url(url, source)] = path
+        except (OSError, ValueError, TypeError, AttributeError):
+            continue
+    return existing
+
+
+def _write_record(record: dict, records_dir: Path) -> Path:
+    records_dir.mkdir(parents=True, exist_ok=True)
+    destination = records_dir / f"{record['id']}.json"
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
+    temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+    temporary.replace(destination)
+    return destination
+
+
+def _report(out: Path, **event) -> None:
+    out.mkdir(parents=True, exist_ok=True)
+    event.setdefault("timestamp", datetime.now(timezone.utc).isoformat())
+    with (out / "crawl_report.jsonl").open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(event, ensure_ascii=False) + "\n")
+
+
+def _crawl_one(page, url: str, source: str) -> dict:
+    if source == "tvpl":
+        try:
+            from .tvpl_source import extract_record
+        except ImportError:
+            from tvpl_source import extract_record
+        return extract_record(page, url)
+
+    page.goto(url, wait_until="domcontentloaded", timeout=60000)
+    page.wait_for_timeout(1500)
+    return extract(page, page.url)
+
+
+def _process_one(
+    page,
+    url: str,
+    source: str,
+    out: Path,
+    existing: dict[str, Path],
+    refresh: bool,
+    query: str = "",
+) -> tuple[bool, str]:
+    canonical = _canonical_url(url, source)
+    old_path = existing.get(canonical)
+    if old_path and not refresh and _record_is_valid(old_path, canonical):
+        print(f"SKIP {old_path.stem} | Đã có bản ghi hợp lệ")
+        _report(out, event="document", source=source, query=query, url=canonical,
+                id=old_path.stem, status="skipped")
+        return True, old_path.stem
+
+    last_error = ""
+    for attempt in range(1, 4):
+        try:
+            record = _crawl_one(page, canonical, source)
+            if not record.get("id") or not (record.get("content") or {}).get("full_text"):
+                raise RuntimeError("Trang không có nội dung quy định công khai để lưu.")
+            path = _write_record(record, out / "records")
+            existing[canonical] = path
+            print(f"OK {record['id']} | {record['content']['title'][:100]}")
+            _report(out, event="document", source=source, query=query, url=canonical,
+                    id=record["id"], status="ok")
+            return True, record["id"]
+        except PlaywrightTimeoutError as exc:
+            last_error = f"Timeout: {exc}"
+            if attempt < 3:
+                print(f"RETRY {attempt}/2 {canonical}")
+        except Exception as exc:
+            last_error = str(exc)
+            break
+
+    print(f"ERROR {canonical}: {last_error}")
+    _report(out, event="document", source=source, query=query, url=canonical,
+            status="error", error=last_error)
+    return False, last_error
+
+
+def _process_url_list(
+    page,
+    urls: list[str],
+    source: str,
+    out: Path,
+    limit: int,
+    delay: float,
+    refresh: bool,
+) -> int:
+    existing = _existing_record_paths(out, source)
+    seen: set[str] = set()
+    successes = 0
+    for url in urls:
+        try:
+            canonical = _canonical_url(url, source)
+        except ValueError as exc:
+            print(f"ERROR {url}: {exc}")
+            continue
+        if canonical in seen:
+            continue
+        seen.add(canonical)
+        success, detail_status = _process_one(page, canonical, source, out, existing, refresh)
+        successes += int(success)
+        if not success and any(token in detail_status.casefold() for token in (
+            "captcha", "access denied", "403", "đang chặn", "xác minh",
+        )):
+            break
+        if successes >= limit:
+            break
+        time.sleep(delay)
+    return successes
+
+
+def _guard_search_pages(result_pages):
+    try:
+        yield from result_pages
+    except Exception as exc:
+        yield {"search_error": str(exc)}
+
+
+def _run_searches(page, args) -> None:
+    try:
+        from .tvpl_source import document_id, iter_search_result_pages
+    except ImportError:
+        from tvpl_source import document_id, iter_search_result_pages
+
+    for query in args.query:
+        successes = 0
+        discovered = 0
+        seen: set[str] = set()
+        reason = "hết kết quả"
+        blocked = False
+        existing = _existing_record_paths(args.out, args.source)
+
+        if args.source == "tvpl":
+            result_pages = iter_search_result_pages(page, query)
+        else:
+            # Trang VBPL thường trả về 20 kết quả; đọc thêm trang đệm để có thể
+            # tiếp tục sau các URL lỗi mà không tải toàn bộ thư viện.
+            page_cap = max(3, ((args.limit + 19) // 20) * 2 + 2)
             try:
-                page.goto(url, wait_until="domcontentloaded", timeout=0)
-                # Cho API cua trang co thoi gian tai toan van.
-                page.wait_for_timeout(8000)
-                record = extract(page, page.url)
-                stem = record["id"]
-                out.joinpath("records", stem + ".json").write_text(
-                    json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
-                print(f"OK {record['id']} | {record['content']['title'][:100]}")
-            except PlaywrightTimeoutError:
-                print(f"TIMEOUT {url}")
+                urls = discover_urls(page, query, max_pages=page_cap)
             except Exception as exc:
-                print(f"ERROR {url}: {exc}")
-            time.sleep(delay)
-        browser.close()
+                reason = f"lỗi nguồn: {exc}"
+                print(f"[{query}] {reason}")
+                _report(args.out, event="query_summary", source=args.source, query=query,
+                        status="error", discovered=0, successful=0,
+                        limit=args.limit, stop_reason=reason)
+                continue
+            result_pages = (urls[index:index + 20] for index in range(0, len(urls), 20))
+
+        for result_page in _guard_search_pages(result_pages):
+            if isinstance(result_page, dict) and "search_error" in result_page:
+                reason = f"lỗi nguồn: {result_page['search_error']}"
+                break
+            for url in result_page:
+                if args.source == "tvpl":
+                    key = document_id(url)
+                else:
+                    key = url
+                if key in seen:
+                    continue
+                seen.add(key)
+                if args.discover_only:
+                    print(url)
+                    discovered += 1
+                    if discovered >= args.limit:
+                        reason = "đủ giới hạn URL"
+                        break
+                    continue
+
+                success, detail_status = _process_one(
+                    page, url, args.source, args.out, existing, args.refresh, query=query
+                )
+                discovered += 1
+                successes += int(success)
+                if not success and any(token in detail_status.casefold() for token in (
+                    "captcha", "access denied", "403", "đang chặn", "xác minh",
+                )):
+                    reason = f"lỗi nguồn: {detail_status}"
+                    blocked = True
+                    break
+                if successes >= args.limit:
+                    reason = "đủ giới hạn văn bản hợp lệ"
+                    break
+                time.sleep(args.delay)
+            if blocked or (args.discover_only and discovered >= args.limit) or successes >= args.limit:
+                break
+            if result_page:
+                time.sleep(args.delay)
+
+        count = discovered if args.discover_only else successes
+        status = "discovered" if args.discover_only else "complete"
+        if reason.startswith("lỗi nguồn:"):
+            status = "error"
+        print(f"[{query}] {count}/{args.limit} — {reason}")
+        _report(args.out, event="query_summary", source=args.source, query=query,
+                status=status, discovered=discovered, successful=successes,
+                limit=args.limit, stop_reason=reason)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Crawl văn bản pháp luật từ VBPL hoặc Thư Viện Pháp Luật")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--url", action="append", help="URL trang chi tiet van ban; lap lai de them URL")
-    group.add_argument("--seed", type=Path, help="File txt, moi dong mot URL")
-    group.add_argument("--query", action="append", help="Tu khoa tim tren vbpl.vn; lap lai de them tu khoa")
+    group.add_argument("--url", action="append", help="URL văn bản; lặp lại để thêm URL")
+    group.add_argument("--seed", type=Path, help="File txt, mỗi dòng một URL")
+    group.add_argument("--query", action="append", help="Từ khóa tìm kiếm; lặp lại để thêm từ khóa")
+    parser.add_argument("--source", choices=("vbpl", "tvpl"), default="vbpl",
+                        help="Nguồn văn bản (mặc định: vbpl)")
+    parser.add_argument("--limit", type=int, default=50,
+                        help="Tối đa số văn bản hợp lệ cho mỗi từ khóa hoặc đợt URL (mặc định: 50)")
     parser.add_argument("--out", type=Path, default=PROJECT_ROOT / "data" / "law")
-    parser.add_argument("--headed", action="store_true", help="Hien trinh duyet de xu ly captcha/kiem tra")
-    parser.add_argument("--delay", type=float, default=3.0)
+    parser.add_argument("--headed", action="store_true", help="Hiện trình duyệt để quan sát trang hoặc kiểm tra chặn truy cập")
+    parser.add_argument("--delay", type=float, default=3.0, help="Khoảng nghỉ giữa các văn bản/trang tìm kiếm")
+    parser.add_argument("--refresh", action="store_true", help="Tải lại các bản ghi đã có")
+    parser.add_argument("--discover-only", action="store_true", help="Chỉ in tối đa K URL cho mỗi từ khóa")
     args = parser.parse_args()
-    if args.query:
-        require_playwright()
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=not args.headed)
-            page = browser.new_context(locale="vi-VN").new_page()
-            urls = sorted({url for query in args.query for url in discover_urls(page, query)})
+
+    if args.limit < 1:
+        parser.error("--limit phải lớn hơn 0")
+    if args.delay < 0:
+        parser.error("--delay không được âm")
+    if args.discover_only and not args.query:
+        parser.error("--discover-only chỉ dùng cùng --query")
+
+    require_playwright()
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=not args.headed)
+        context = browser.new_context(locale="vi-VN", user_agent=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"))
+        page = context.new_page()
+        try:
+            if args.query:
+                _run_searches(page, args)
+            else:
+                if args.url:
+                    urls = args.url
+                else:
+                    seed_path = args.seed
+                    if not seed_path.is_absolute() and not seed_path.exists():
+                        project_candidate = PROJECT_ROOT / seed_path
+                        if project_candidate.exists():
+                            seed_path = project_candidate
+                    urls = [
+                        line.strip() for line in seed_path.read_text(encoding="utf-8").splitlines()
+                        if line.strip() and not line.lstrip().startswith("#")
+                    ]
+                _process_url_list(page, urls, args.source, args.out, args.limit,
+                                  args.delay, args.refresh)
+        finally:
             browser.close()
-        print(f"Tim thay {len(urls)} URL:")
-        print("\n".join(urls))
-        if not urls:
-            raise SystemExit("Khong tim thay URL. Hay thu --headed va kiem tra giao dien.")
-    else:
-        seed_path = args.seed
-        if not seed_path.is_absolute() and not seed_path.exists():
-            project_candidate = PROJECT_ROOT / seed_path
-            if project_candidate.exists():
-                seed_path = project_candidate
-        urls = args.url or [x.strip() for x in seed_path.read_text(encoding="utf-8").splitlines()
-                            if x.strip() and not x.lstrip().startswith("#")]
-    if any(urlparse(u).netloc and not urlparse(u).netloc.endswith("vbpl.vn") for u in urls):
-        raise SystemExit("Chi chap nhan URL thuoc vbpl.vn")
-    crawl(urls, args.out, args.headed, args.delay)
 
 
 if __name__ == "__main__":
