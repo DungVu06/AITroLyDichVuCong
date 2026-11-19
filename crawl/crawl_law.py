@@ -547,13 +547,13 @@ def _report(out: Path, **event) -> None:
         stream.write(json.dumps(event, ensure_ascii=False) + "\n")
 
 
-def _crawl_one(page, url: str, source: str) -> dict:
+def _crawl_one(page, url: str, source: str, *, pause_on_challenge: bool = False) -> dict:
     if source == "tvpl":
         try:
             from .tvpl_source import extract_record
         except ImportError:
             from tvpl_source import extract_record
-        return extract_record(page, url)
+        return extract_record(page, url, pause_on_challenge=pause_on_challenge)
 
     page.goto(url, wait_until="domcontentloaded", timeout=60000)
     page.wait_for_timeout(1500)
@@ -568,6 +568,7 @@ def _process_one(
     existing: dict[str, Path],
     refresh: bool,
     query: str = "",
+    pause_on_error: bool = False,
 ) -> tuple[bool, str]:
     canonical = _canonical_url(url, source)
     old_path = existing.get(canonical)
@@ -580,7 +581,7 @@ def _process_one(
     last_error = ""
     for attempt in range(1, 4):
         try:
-            record = _crawl_one(page, canonical, source)
+            record = _crawl_one(page, canonical, source, pause_on_challenge=pause_on_error)
             if not record.get("id") or not (record.get("content") or {}).get("full_text"):
                 raise RuntimeError("Trang không có nội dung quy định công khai để lưu.")
             path = _write_record(record, out / "records")
@@ -600,6 +601,11 @@ def _process_one(
     print(f"ERROR {canonical}: {last_error}")
     _report(out, event="document", source=source, query=query, url=canonical,
             status="error", error=last_error)
+    if pause_on_error:
+        try:
+            input("Chromium vẫn đang mở để kiểm tra trang lỗi. Nhấn Enter để tiếp tục và đóng trình duyệt...")
+        except EOFError:
+            pass
     return False, last_error
 
 
@@ -611,6 +617,7 @@ def _process_url_list(
     limit: int,
     delay: float,
     refresh: bool,
+    pause_on_error: bool,
 ) -> int:
     existing = _existing_record_paths(out, source)
     seen: set[str] = set()
@@ -624,7 +631,10 @@ def _process_url_list(
         if canonical in seen:
             continue
         seen.add(canonical)
-        success, detail_status = _process_one(page, canonical, source, out, existing, refresh)
+        success, detail_status = _process_one(
+            page, canonical, source, out, existing, refresh,
+            pause_on_error=pause_on_error,
+        )
         successes += int(success)
         if not success and any(token in detail_status.casefold() for token in (
             "captcha", "access denied", "403", "đang chặn", "xác minh",
@@ -658,7 +668,7 @@ def _run_searches(page, args) -> None:
         existing = _existing_record_paths(args.out, args.source)
 
         if args.source == "tvpl":
-            result_pages = iter_search_result_pages(page, query)
+            result_pages = iter_search_result_pages(page, query, pause_on_challenge=args.headed)
         else:
             # Trang VBPL thường trả về 20 kết quả; đọc thêm trang đệm để có thể
             # tiếp tục sau các URL lỗi mà không tải toàn bộ thư viện.
@@ -695,7 +705,8 @@ def _run_searches(page, args) -> None:
                     continue
 
                 success, detail_status = _process_one(
-                    page, url, args.source, args.out, existing, args.refresh, query=query
+                    page, url, args.source, args.out, existing, args.refresh,
+                    query=query, pause_on_error=args.headed,
                 )
                 discovered += 1
                 successes += int(success)
@@ -722,6 +733,11 @@ def _run_searches(page, args) -> None:
         _report(args.out, event="query_summary", source=args.source, query=query,
                 status=status, discovered=discovered, successful=successes,
                 limit=args.limit, stop_reason=reason)
+        if args.headed and reason.startswith("lỗi nguồn:") and not blocked:
+            try:
+                input("Chromium vẫn đang mở để kiểm tra trang tìm kiếm. Nhấn Enter để tiếp tục và đóng trình duyệt...")
+            except EOFError:
+                pass
 
 
 def main() -> None:
@@ -736,6 +752,12 @@ def main() -> None:
                         help="Tối đa số văn bản hợp lệ cho mỗi từ khóa hoặc đợt URL (mặc định: 50)")
     parser.add_argument("--out", type=Path, default=PROJECT_ROOT / "data" / "law")
     parser.add_argument("--headed", action="store_true", help="Hiện trình duyệt để quan sát trang hoặc kiểm tra chặn truy cập")
+    parser.add_argument("--user-data-dir", type=Path,
+                        help="Dùng profile Chromium hiện có; truyền thư mục User Data gốc")
+    parser.add_argument("--profile-directory", default="Default",
+                        help="Thư mục profile bên trong User Data, ví dụ Default hoặc 'Profile 1'")
+    parser.add_argument("--channel", choices=("chrome", "msedge"),
+                        help="Dùng Chrome hoặc Edge đã cài thay cho Chromium của Playwright")
     parser.add_argument("--delay", type=float, default=3.0, help="Khoảng nghỉ giữa các văn bản/trang tìm kiếm")
     parser.add_argument("--refresh", action="store_true", help="Tải lại các bản ghi đã có")
     parser.add_argument("--discover-only", action="store_true", help="Chỉ in tối đa K URL cho mỗi từ khóa")
@@ -750,10 +772,23 @@ def main() -> None:
 
     require_playwright()
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=not args.headed)
-        context = browser.new_context(locale="vi-VN", user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"))
+        context_options = {
+            "locale": "vi-VN",
+            "headless": not args.headed,
+        }
+        if args.channel:
+            context_options["channel"] = args.channel
+        if args.user_data_dir:
+            profile_root = args.user_data_dir.expanduser().resolve()
+            context_options["args"] = [f"--profile-directory={args.profile_directory}"]
+            context = pw.chromium.launch_persistent_context(str(profile_root), **context_options)
+            browser = None
+        else:
+            context_options.pop("headless")
+            context = pw.chromium.launch(headless=not args.headed, channel=args.channel).new_context(
+                locale=context_options["locale"]
+            )
+            browser = context.browser
         page = context.new_page()
         try:
             if args.query:
@@ -772,9 +807,12 @@ def main() -> None:
                         if line.strip() and not line.lstrip().startswith("#")
                     ]
                 _process_url_list(page, urls, args.source, args.out, args.limit,
-                                  args.delay, args.refresh)
+                                  args.delay, args.refresh, args.headed)
         finally:
-            browser.close()
+            if browser:
+                browser.close()
+            else:
+                context.close()
 
 
 if __name__ == "__main__":

@@ -210,7 +210,23 @@ python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --
 
 # Làm mới các bản ghi TVPL đã có
 python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 50 --refresh
+
+# Dùng profile Chrome có sẵn (đổi Profile 1 thành Default nếu đó là profile bạn dùng)
+python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 50 --headed --channel chrome --user-data-dir "$env:LOCALAPPDATA\Google\Chrome\User Data" --profile-directory "Profile 1"
+
+# Hoặc dùng profile Edge
+python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 50 --headed --channel msedge --user-data-dir "$env:LOCALAPPDATA\Microsoft\Edge\User Data" --profile-directory "Default"
 ```
+
+`--user-data-dir` là thư mục `User Data` gốc; `--profile-directory` chọn thư mục
+con như `Default` hoặc `Profile 1`. Với Chromium độc lập, truyền thư mục dữ liệu
+của Chromium và bỏ `--channel`. Đóng mọi cửa sổ đang dùng profile đó trước khi
+chạy để trình duyệt không khóa profile. `--headed` mở cửa sổ để bạn quan sát.
+Khi gặp trang xác minh/chặn truy cập của TVPL với `--headed`, crawler tạm dừng
+để bạn xác minh thủ công trong cửa sổ trình duyệt. Chờ trang nội dung tải xong,
+rồi nhấn Enter trong terminal để kiểm tra lại và tiếp tục ngay tại trang đó.
+Nếu vẫn còn dấu hiệu bị chặn, crawler tiếp tục chờ; nhấn Ctrl+C để dừng.
+Bước chờ áp dụng cho cả trang tìm kiếm và trang văn bản.
 
 Các lệnh cũ tiếp tục dùng VBPL mặc định; có thể ghi rõ `--source vbpl`. Bản ghi
 TVPL dùng cùng cấu trúc `data/law/records/LAW_*.json`, có ID dạng
@@ -218,8 +234,9 @@ TVPL dùng cùng cấu trúc `data/law/records/LAW_*.json`, có ID dạng
 nơi nhận, phụ lục và biểu mẫu được bỏ qua. Các giá trị hiệu lực mà TVPL chỉ hiển
 thị là “Đã biết” được giữ nguyên, không được diễn giải thành ngày hoặc trạng thái
 cụ thể. Mỗi văn bản và mỗi lượt tìm kiếm được ghi vào
-`data/law/crawl_report.jsonl`. Nếu trang yêu cầu xác minh hoặc chặn truy cập,
-crawler ghi lỗi và không lưu trang chặn như một văn bản.
+`data/law/crawl_report.jsonl`. Khi không dùng `--headed` hoặc terminal không
+nhận được đầu vào, trang xác minh/chặn truy cập được ghi lỗi. Crawler không lưu
+trang chặn như một văn bản.
 Trang TVPL có thông báo quyền tác giả đối với bản dịch; hãy kiểm tra quyền sử
 dụng trước khi công bố hoặc phân phối lại dữ liệu thu thập.
 

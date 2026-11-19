@@ -56,21 +56,37 @@ def search_page_url(query: str, page_number: int) -> str:
     return f"{SEARCH_URL}?{urlencode(params)}"
 
 
-def _page_guard(page) -> None:
-    body_text = page.locator("body").inner_text(timeout=15000)
-    folded = body_text.casefold()
+def _page_guard(page, *, pause_on_challenge: bool = False) -> None:
+    """Allow headed users to finish verification before reading the same page."""
     signals = (
         "access denied", "403 forbidden", "captcha", "xác minh bạn không phải",
         "verify you are human", "checking your browser", "unusual traffic",
     )
-    matched = next((token for token in signals if token in folded), None)
-    if matched:
+    while True:
+        body_text = page.locator("body").inner_text(timeout=15000)
+        folded = body_text.casefold()
+        matched = next((token for token in signals if token in folded), None)
+        if not matched:
+            return
         position = folded.find(matched)
         excerpt = " ".join(body_text[max(0, position - 100):position + 220].split())
-        raise RuntimeError(
+        error = RuntimeError(
             f"TVPL đang chặn hoặc yêu cầu xác minh (dấu hiệu: {matched!r}; "
             f"URL: {page.url}; đoạn trang: {excerpt!r})."
         )
+        if not pause_on_challenge:
+            raise error
+        print(f"WAIT {error}")
+        try:
+            input(
+                "Hãy xác minh trong cửa sổ Chromium và chờ trang nội dung tải xong. "
+                "Sau đó nhấn Enter tại đây để kiểm tra lại và tiếp tục crawl "
+                "(Ctrl+C để dừng)..."
+            )
+        except EOFError:
+            raise error from None
+        # Resume from the verified page without reloading the challenge URL.
+        page.wait_for_load_state("domcontentloaded", timeout=60000)
 
 
 def _result_links(page) -> list[str]:
@@ -99,7 +115,9 @@ def _result_links(page) -> list[str]:
     return found
 
 
-def iter_search_result_pages(page, query: str) -> Iterator[list[str]]:
+def iter_search_result_pages(
+    page, query: str, *, pause_on_challenge: bool = False,
+) -> Iterator[list[str]]:
     """Yield one page of search result URLs at a time in website order."""
     visited_signatures: set[tuple[str, ...]] = set()
     page_number = 1
@@ -119,7 +137,7 @@ def iter_search_result_pages(page, query: str) -> Iterator[list[str]]:
             # A complete page without the summary is still inspected so that
             # an access error is reported clearly by _page_guard below.
             pass
-        _page_guard(page)
+        _page_guard(page, pause_on_challenge=pause_on_challenge)
         links = _result_links(page)
         signature = tuple(document_id(url) for url in links)
         if not signature or signature in visited_signatures:
@@ -201,7 +219,7 @@ def _select_regulations(text: str) -> str:
     return result
 
 
-def extract_record(page, url: str) -> dict:
+def extract_record(page, url: str, *, pause_on_challenge: bool = False) -> dict:
     """Read one public TVPL detail page and return the shared law-record shape."""
     try:
         from .crawl_law import (
@@ -227,7 +245,7 @@ def extract_record(page, url: str) -> dict:
         )
     except Exception:
         pass
-    _page_guard(page)
+    _page_guard(page, pause_on_challenge=pause_on_challenge)
 
     body_text = page.locator("body").inner_text(timeout=15000)
     document_region = _regulatory_container(page)
