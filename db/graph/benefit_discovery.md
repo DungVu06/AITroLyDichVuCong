@@ -10,18 +10,19 @@ marked `approved` are imported.
    normalized law sections for entitlements, payments/support, exemptions or
    reductions, and priority/guarantees. Broad phrases are accepted only in a
    benefit-related heading. Child sections under a benefit heading are included
-   because conditions and amounts are often stated separately. Cue matches are
-   recorded for review; they are only a recall filter.
-2. **Classify and extract.** Gemini Flash classifies sections in batches of eight
+   because conditions and amounts are often stated separately. BM25 then selects
+   up to 20 matching sections per procedure; shared sections are sent once. If
+   no section has a positive BM25 score, nothing is sent for extraction.
+2. **Classify and extract.** Gemini Flash classifies selected sections in batches of up to eight
    using a Pydantic structured-output schema. Categories distinguish benefit
    rules, eligibility, amounts/duration, application steps, exceptions,
    cross-references, irrelevant text, and insufficient context. Extracted quotes
    must occur verbatim in the source section or the extraction is discarded.
 3. **Match to procedures.** Extracted benefit concepts are ranked with BM25 over
-   procedure fields and verified benefit text. The top 30 positive-scoring
-   benefits and benefits sharing a `life_event` are passed to Gemini for pair
-   checking. BM25 is a ranking signal, not a probability; a shared life event
-   adds a candidate but does not add score.
+   procedure fields and verified benefit text. Up to 10 positive-scoring
+   benefits and benefits sharing a `life_event` become pending review candidates.
+   BM25 is a ranking signal, not a probability; a shared life event adds a
+   candidate but does not add score. This step makes no Gemini calls.
 4. **Review.** Candidate pairs are grouped by normalized benefit title, ranked
    using transparent retrieval signals, and written as one JSON object per line
    with `status: pending`. Reviewers may set `approved` or `rejected`, edit the
@@ -41,7 +42,7 @@ or matching instructions.
 Generate a review file from normalized law and procedure records:
 
 ```powershell
-python -m db.graph.discover_benefits --top-k 30
+python -m db.graph.discover_benefits --section-top-k 20 --top-k 10
 ```
 
 For a small trial, use `--max-sections 20`. This caps classification after

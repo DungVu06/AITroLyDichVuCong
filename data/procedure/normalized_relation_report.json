@@ -82,17 +82,5 @@
     "target_id": "PROC_1_116410",
     "relation_type": "sub_procedures",
     "resolution_status": "resolved"
-  },
-  {
-    "source_id": "PROC_3_000722",
-    "target_id": "LAW_VBPL_0cae53bb0a99d71f",
-    "relation_type": "related_benefits",
-    "resolution_status": "unresolved"
-  },
-  {
-    "source_id": "PROC_3_000722",
-    "target_id": "LAW_VBPL_ac0469d50eadc418",
-    "relation_type": "related_benefits",
-    "resolution_status": "unresolved"
   }
 ]

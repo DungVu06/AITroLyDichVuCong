@@ -7,7 +7,7 @@ to ``approved``.
 
 Example::
 
-    python -m db.graph.discover_benefits --top-k 30
+    python -m db.graph.discover_benefits --section-top-k 20 --top-k 10
 """
 
 from __future__ import annotations
@@ -27,7 +27,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from rag.core.config import PROJECT_ROOT, load_env_file
 
 
-PROMPT_VERSION = "benefit-discovery-v2-cues-bm25"
+EXTRACTION_VERSION = "benefit-extraction-v3-single-pass"
+LINK_VERSION = "benefit-link-v2-bm25"
+PROMPT_VERSION = f"{EXTRACTION_VERSION}+{LINK_VERSION}"
 CUE_GROUPS = {
     "entitlement": ("có quyền", "được hưởng", "được nhận", "được cấp", "được hưởng chế độ"),
     "payment_support": ("trợ cấp", "được hỗ trợ", "được thanh toán", "được hoàn trả", "bồi thường"),
@@ -65,16 +67,6 @@ class BenefitSectionExtraction(StrictModel):
 
 class BenefitSectionExtractionBatch(StrictModel):
     items: list[BenefitSectionExtraction]
-
-
-class ProcedureBenefitMatch(StrictModel):
-    is_related: bool
-    relation_basis: Literal[
-        "explicit_procedure_reference", "same_life_event",
-        "same_target_group", "access_path", "other", "insufficient_evidence",
-    ]
-    reason: str
-    supporting_evidence_ids: list[str] = Field(default_factory=list)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -243,7 +235,6 @@ def section_batch_prompt(items: list[tuple[dict[str, Any], dict[str, Any], str]]
             "heading": clean(section.get("heading")),
             "parent_context": context,
             "section_text": clean(section.get("text")),
-            "matched_cues": section.get("matched_cues", []),
         })
     return f"""Bạn phân loại các section pháp luật tiếng Việt để xây danh mục chế độ quyền lợi.
 Mỗi item là một section độc lập. Chỉ căn cứ vào văn bản được cung cấp; không dùng kiến thức ngoài.
@@ -256,35 +247,6 @@ insufficient_context hoặc non_benefit. Trả đúng một kết quả cho mỗ
 Trả đúng một kết quả cho mỗi section_id được cung cấp, không bỏ và không tự thêm ID.
 
 SECTIONS: {json.dumps(payload, ensure_ascii=False)}
-"""
-
-
-def match_prompt(
-    procedure: dict[str, Any], benefit: dict[str, Any], evidence: list[dict[str, Any]],
-) -> str:
-    record = procedure["record"]
-    detail = record.get("procedure") or {}
-    proc_context = {
-        "name": clean(detail.get("name")),
-        "eligibility": clean(detail.get("eligibility")),
-        "domain": clean(record.get("domain")),
-        "life_event": record.get("life_event") or [],
-        "target_audience": record.get("target_audience") or [],
-    }
-    evidence_payload = [
-        {"evidence_id": item["evidence_id"], "quote": item["quote"],
-         "section_heading": item["heading"], "law_title": item["law_title"]}
-        for item in evidence
-    ]
-    return f"""Xác định xem chế độ quyền lợi này có đáng gợi ý cùng thủ tục hành chính không.
-Chỉ dùng thông tin thủ tục, quyền lợi và evidence bên dưới. Cùng life_event đơn thuần
-không đủ để khẳng định liên hệ; nếu không có cơ sở rõ, đặt is_related=false.
-Đây là gợi ý liên quan, không phải kết luận người dân đủ điều kiện hưởng.
-supporting_evidence_ids chỉ gồm evidence_id được cung cấp và thực sự hỗ trợ lý do.
-
-PROCEDURE: {json.dumps(proc_context, ensure_ascii=False)}
-BENEFIT: {json.dumps(benefit, ensure_ascii=False)}
-EVIDENCE: {json.dumps(evidence_payload, ensure_ascii=False)}
 """
 
 
@@ -320,7 +282,8 @@ def main() -> None:
     parser.add_argument("--law-dir", type=Path, default=PROJECT_ROOT / "data/law/normalized_records")
     parser.add_argument("--output", type=Path, default=PROJECT_ROOT / "data/benefit_relation/discovery_review.jsonl")
     parser.add_argument("--cache", type=Path, default=PROJECT_ROOT / "data/benefit_relation/discovery.cache.jsonl")
-    parser.add_argument("--top-k", type=int, default=30, help="Maximum BM25-ranked benefits per procedure")
+    parser.add_argument("--top-k", type=int, default=10, help="Maximum suggested benefits per procedure")
+    parser.add_argument("--section-top-k", type=int, default=20, help="Maximum cue-matched law sections selected per procedure before LLM extraction")
     parser.add_argument("--max-sections", type=int, default=0, help="Optional cap for trial runs; 0 means no cap")
     args = parser.parse_args()
 
@@ -386,18 +349,41 @@ def main() -> None:
                     seen.add(ancestor_id)
                     ancestor_id = clean(sections[ancestor_id].get("parent_section_id"))
 
-    try:
-        if args.max_sections:
-            section_candidates = set(sorted(section_candidates)[:args.max_sections])
+    # Use BM25 to select a compact, query-relevant section pool before sending
+    # anything to Gemini. Each section is included once even if several procedures retrieve it.
+    selected_sections: set[str] = set()
+    section_scores_by_id: dict[str, float] = {}
+    section_documents = {
+        sid: " ".join([
+            clean(sections[sid].get("heading")),
+            section_context(sections[sid], sections_by_law[sections[sid]["law_id"]]),
+            clean(sections[sid].get("text")),
+        ])
+        for sid in section_candidates
+    }
+    for record in procedures:
+        query = procedure_query(record)
+        scores = bm25_scores(query, section_documents)
+        chosen = sorted((sid for sid, score in scores.items() if score > 0), key=lambda sid: (-scores[sid], sid))[:args.section_top_k]
+        selected_sections.update(chosen)
+        for sid in chosen:
+            section_scores_by_id[sid] = max(section_scores_by_id.get(sid, 0.0), scores[sid])
+    if args.max_sections:
+        selected_sections = set(sorted(selected_sections, key=lambda sid: (-section_scores_by_id.get(sid, 0.0), sid))[:args.max_sections])
 
+    print(f"Cue sections: {len(section_candidates)}; selected for extraction: {len(selected_sections)}")
+
+    try:
         extracted: dict[str, dict[str, Any]] = {}
         uncached: list[tuple[str, str]] = []
-        for section_id in sorted(section_candidates):
+        cache_hits = 0
+        for section_id in sorted(selected_sections):
             section = sections[section_id]
             law = law_by_section[section_id]
             parent_context = section_context(section, sections_by_law[section["law_id"]])
-            key = hash_key(PROMPT_VERSION, model_name, section_id, clean(section.get("text")), clean(section.get("heading")), parent_context)
+            key = hash_key(EXTRACTION_VERSION, model_name, section_id, clean(section.get("text")), clean(section.get("heading")), parent_context)
             if key in cache:
+                cache_hits += 1
                 result = BenefitSectionExtraction.model_validate(cache[key])
                 results = [result]
             else:
@@ -410,8 +396,24 @@ def main() -> None:
 
         # Batch independent sections to reduce API overhead. Cache each result
         # independently so a changed law only invalidates its own section.
-        for start in range(0, len(uncached), 8):
-            batch = uncached[start:start + 8]
+        batches: list[list[tuple[str, str]]] = []
+        batch: list[tuple[str, str]] = []
+        batch_chars = 0
+        for entry in uncached:
+            section = sections[entry[0]]
+            size = len(clean(section.get("text")))
+            if batch and (len(batch) >= 8 or batch_chars + size > 12000):
+                batches.append(batch)
+                batch, batch_chars = [], 0
+            batch.append(entry)
+            batch_chars += size
+            if size > 12000:
+                batches.append(batch)
+                batch, batch_chars = [], 0
+        if batch:
+            batches.append(batch)
+        print(f"Extraction cache hits: {cache_hits}; Gemini batches remaining: {len(batches)}")
+        for batch_index, batch in enumerate(batches, start=1):
             prompt_items = []
             for section_id, _key in batch:
                 section = sections[section_id]
@@ -429,6 +431,7 @@ def main() -> None:
                 cache_handle.write(json.dumps({"key": key, "value": cache[key]}, ensure_ascii=False) + "\n")
                 cache_handle.flush()
                 extracted[section_id] = result.model_dump(mode="json")
+            print(f"Extracted batch {batch_index}/{len(batches)}")
 
         validated_extractions: dict[str, dict[str, Any]] = {}
         for section_id, result_data in extracted.items():
@@ -502,33 +505,14 @@ def main() -> None:
                 for benefit_id, benefit in grouped.items()
             }
             scores = bm25_scores(procedure["query"], benefit_documents)
-            ranked_ids = sorted(scores, key=lambda item: (-scores[item], item))
-            selected_ids = set(sorted(
-                (item for item in ranked_ids if scores[item] > 0),
-                key=lambda item: (-scores[item], item),
-            )[:args.top_k])
+            eligible = []
             for benefit_id, benefit in grouped.items():
                 benefit_events = {norm(clean(x)) for x in benefit["life_events"] if clean(x)}
                 same_event = bool(proc_events & benefit_events)
-                if benefit_id not in selected_ids and not same_event:
-                    continue
-                match_key = hash_key(
-                    PROMPT_VERSION, model_name, procedure_id, procedure["query"],
-                    benefit["benefit_id"],
-                    json.dumps(benefit, ensure_ascii=False, sort_keys=True, default=list),
-                )
-                if match_key in cache:
-                    match = ProcedureBenefitMatch.model_validate(cache[match_key])
-                else:
-                    match = call_structured(client, model_name, match_prompt(procedure, benefit, benefit["evidence"]), ProcedureBenefitMatch)
-                    cache[match_key] = match.model_dump(mode="json")
-                    cache_handle.write(json.dumps({"key": match_key, "value": cache[match_key]}, ensure_ascii=False) + "\n")
-                    cache_handle.flush()
-                valid_evidence_ids = {item["evidence_id"] for item in benefit["evidence"]}
-                supported_ids = [item for item in match.supporting_evidence_ids if item in valid_evidence_ids]
-                if not match.is_related or not supported_ids:
-                    continue
-                rank = scores.get(benefit_id, 0.0)
+                if scores.get(benefit_id, 0.0) > 0 or same_event:
+                    eligible.append((benefit_id, benefit, same_event, scores.get(benefit_id, 0.0)))
+            eligible.sort(key=lambda row: (-row[3], -int(row[2]), row[0]))
+            for benefit_id, benefit, same_event, rank in eligible[:args.top_k]:
                 candidate_id = "CAND_" + hash_key(procedure_id, benefit["benefit_id"])[:16]
                 candidate_record = {
                     "candidate_id": candidate_id,
@@ -542,9 +526,9 @@ def main() -> None:
                     "amount_or_duration": benefit["amount_or_duration"],
                     "aliases": [],
                     "status": "pending",
-                    "relation_basis": match.relation_basis,
-                    "reason": match.reason,
-                    "supporting_evidence_ids": supported_ids,
+                    "relation_basis": "bm25_candidate" if rank > 0 else "same_life_event",
+                    "reason": "Ứng viên được xếp hạng bằng BM25." if rank > 0 else "Ứng viên được chọn do cùng sự kiện đời sống.",
+                    "supporting_evidence_ids": [item["evidence_id"] for item in benefit["evidence"]],
                     "evidence": benefit["evidence"],
                     "ranking": {"score": rank, "bm25_score": rank, "same_life_event": same_event,
                                 "matched_tokens": sorted(set(bm25_tokens(procedure["query"])) & set(bm25_tokens(benefit_documents[benefit_id]))),
@@ -576,8 +560,6 @@ def main() -> None:
                     }
                     evidence_unchanged = (
                         current_evidence == previous_evidence
-                        and prior.get("reason") == candidate_record["reason"]
-                        and prior.get("relation_basis") == candidate_record["relation_basis"]
                         and prior.get("benefit_title") == candidate_record["benefit_title"]
                     )
                     if evidence_unchanged:
