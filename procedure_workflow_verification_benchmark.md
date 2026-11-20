@@ -84,10 +84,10 @@ Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_1_001193`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Xử lý giấy tờ thiếu (Missing Doc)** | Hướng dẫn thay thế Giấy chứng sinh bằng: **Văn bản của người làm chứng** hoặc **Giấy cam đoan về việc sinh**. | `Thay vì Giấy chứng sinh, bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo thiếu giấy chứng sinh thì không giải quyết được.* |
-| **Cơ quan thẩm quyền (Authority)** | **Ủy ban nhân dân cấp xã** (Bộ phận Một cửa cấp xã hoặc Cổng DVCQG/VNeID). | `Nộp hồ sơ trực tuyến, qua dịch vụ bưu chính hoặc trực tiếp tại Ủy ban nhân dân cấp xã ` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu hướng dẫn lên cấp huyện hoặc sai cơ quan.* |
-| **Thời hạn giải quyết (Processing Time)** | **01 ngày làm việc** (theo `execution_methods` của bản ghi local). | `Giải quyết trong 1 ngày` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu nêu thời hạn > 01 ngày làm việc đối với hồ sơ thường.* |
-| **Căn cứ pháp lý (Legal Citation)** | Luật Hộ tịch (60/2014/QH13), Thông tư 04/2020/TT-BTP, Nghị định 123/2015/NĐ-CP. | `Như trên text kia` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu trích dẫn văn bản không có trong legal_bases của thủ tục.* |
+| **Xử lý giấy tờ thiếu (Missing Doc)** | Hướng dẫn thay thế Giấy chứng sinh bằng: **Văn bản của người làm chứng** hoặc **Giấy cam đoan về việc sinh**. | `Thay vì Giấy chứng sinh, bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo thiếu giấy chứng sinh thì không giải quyết được.* |
+| **Cơ quan thẩm quyền (Authority)** | **Ủy ban nhân dân cấp xã** (Bộ phận Một cửa cấp xã hoặc Cổng DVCQG/VNeID). | `Nộp hồ sơ trực tuyến, qua dịch vụ bưu chính hoặc trực tiếp tại Ủy ban nhân dân cấp xã ` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu hướng dẫn lên cấp huyện hoặc sai cơ quan.* |
+| **Thời hạn giải quyết (Processing Time)** | **01 ngày làm việc** (theo `execution_methods` của bản ghi local). | `Giải quyết trong 1 ngày` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu nêu thời hạn > 01 ngày làm việc đối với hồ sơ thường.* |
+| **Căn cứ pháp lý (Legal Citation)** | Luật Hộ tịch (60/2014/QH13), Thông tư 04/2020/TT-BTP, Nghị định 123/2015/NĐ-CP. | `Như trên text kia` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu trích dẫn văn bản không có trong legal_bases của thủ tục.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
 * **Hệ thống có chủ động hỏi người dùng về người làm chứng hay giấy cam đoan không?**: `[ ] Có  |  [x] Không`
@@ -137,8 +137,13 @@ Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
 
 ```text
 [=== BẮT ĐẦU ĐIỀN KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
+Thứ tự thủ tục
+Bạn có thể cung cấp thêm:
+Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ quan, tổ chức có thẩm quyền hoặc công chứng, chứng thực chưa?
+(Đã dùng câu trả lời dự phòng vì hậu kiểm bản chi tiết không đạt.)
 
-
+-> Nếu bảo chưa: Dữ liệu hiện tại chưa có thông tin thủ tục và căn cứ pháp lý cụ thể cho trường hợp đăng ký thường trú tại chỗ ở thuê với hợp đồng viết tay tại xã Tân Triều. Vui lòng cung cấp thêm thông tin để tôi có thể hỗ trợ chi tiết hơn.
+-> Nếu bảo có: Xin lỗi, hiện tại dữ liệu hệ thống chưa có sẵn thông tin chi tiết về thủ tục đăng ký thường trú tại chỗ ở hợp pháp do thuê cũng như các văn bản pháp luật liên quan trong phạm vi này. Do đó, tôi chưa thể cung cấp chính xác các điều kiện, hồ sơ và cơ quan tiếp nhận cụ thể cho trường hợp của bạn.
 
 [=== KẾT THÚC KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
 ```
@@ -149,18 +154,20 @@ Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_1_116788`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Cơ quan tiếp nhận (Authority)** | **Công an Xã** (Cơ quan đăng ký cư trú cấp xã). | `[Điền cơ quan AI chỉ dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo nộp UBND xã.* |
-| **Yêu cầu sự đồng ý của chủ sở hữu** | Bắt buộc có **ý kiến đồng ý bằng văn bản của chủ sở hữu chỗ ở hợp pháp** trong mẫu CT01. | `[Điền AI có yêu cầu chủ nhà ký]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu cho phép người thuê tự đăng ký mà không cần chủ nhà đồng ý.* |
-| **Yêu cầu tính hợp pháp của hợp đồng** | Hợp đồng thuê nhà phải **được công chứng hoặc chứng thực**; Hợp đồng viết tay không đủ điều kiện. | `[Điền AI xử lý HĐ viết tay]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu chấp nhận hợp đồng viết tay không chứng thực.* |
-| **Chứng minh diện tích nhà ở** | Phải có thông tin/giấy tờ chứng minh đủ diện tích nhà ở tối thiểu (theo Điều 5 NĐ 154/2024/NĐ-CP). | `[Điền AI có nhắc diện tích nhà]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bỏ qua yêu cầu chứng minh diện tích.* |
-| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu **CT01** (theo Thông tư 116/2026/TT-BCA). | `[Điền thời hạn và mẫu AI nêu]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu sai thời hạn 7 ngày làm việc hoặc dùng mẫu sổ giấy cũ.* |
+| **Cơ quan tiếp nhận (Authority)** | **Công an Xã** (Cơ quan đăng ký cư trú cấp xã). | `[Điền cơ quan AI chỉ dẫn]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bảo nộp UBND xã.* |
+| **Yêu cầu sự đồng ý của chủ sở hữu** | Bắt buộc có **ý kiến đồng ý bằng văn bản của chủ sở hữu chỗ ở hợp pháp** trong mẫu CT01. | `[Điền AI có yêu cầu chủ nhà ký]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu cho phép người thuê tự đăng ký mà không cần chủ nhà đồng ý.* |
+| **Yêu cầu tính hợp pháp của hợp đồng** | Hợp đồng thuê nhà phải **được công chứng hoặc chứng thực**; Hợp đồng viết tay không đủ điều kiện. | `[Điền AI xử lý HĐ viết tay]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu chấp nhận hợp đồng viết tay không chứng thực.* |
+| **Chứng minh diện tích nhà ở** | Phải có thông tin/giấy tờ chứng minh đủ diện tích nhà ở tối thiểu (theo Điều 5 NĐ 154/2024/NĐ-CP). | `[Điền AI có nhắc diện tích nhà]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bỏ qua yêu cầu chứng minh diện tích.* |
+| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu **CT01** (theo Thông tư 116/2026/TT-BCA). | `[Điền thời hạn và mẫu AI nêu]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu sai thời hạn 7 ngày làm việc hoặc dùng mẫu sổ giấy cũ.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
-* **Hệ thống có hỏi làm rõ về việc chủ nhà có đồng ý hay hợp đồng đã công chứng chưa?**: `[ ] Có  |  [ ] Không`
+* **Hệ thống có hỏi làm rõ về việc chủ nhà có đồng ý hay hợp đồng đã công chứng chưa?**: `[x] Có  |  [ ] Không`
 * **Nội dung phản hồi làm rõ của AI**:
 ```text
 [=== ĐIỀN CÂU HỎI LÀM RÕ CỦA AI NẾU CÓ ===]
+Bạn có thể cung cấp thêm:
 
+Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ quan, tổ chức có thẩm quyền hoặc công chứng, chứng thực chưa?
 ```
 
 ---
