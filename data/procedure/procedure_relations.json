@@ -1,7 +1,7 @@
 [
   {
     "source_id": "PROC_1_001193",
-    "target_id": "PROC_1_004222",
+    "target_id": "PROC_1_116788",
     "relation_type": "next_steps",
     "resolution_status": "resolved"
   },
@@ -13,18 +13,12 @@
   },
   {
     "source_id": "PROC_1_001193",
-    "target_id": "PROC_3_000722",
-    "relation_type": "part_of",
+    "target_id": "PROC_1_116410",
+    "relation_type": "next_steps",
     "resolution_status": "resolved"
   },
   {
-    "source_id": "PROC_1_004222",
-    "target_id": "PROC_1_001193",
-    "relation_type": "prerequisites",
-    "resolution_status": "resolved"
-  },
-  {
-    "source_id": "PROC_1_004222",
+    "source_id": "PROC_1_001193",
     "target_id": "PROC_3_000722",
     "relation_type": "part_of",
     "resolution_status": "resolved"
@@ -49,6 +43,18 @@
   },
   {
     "source_id": "PROC_1_116410",
+    "target_id": "PROC_3_000722",
+    "relation_type": "part_of",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_116788",
+    "target_id": "PROC_1_001193",
+    "relation_type": "prerequisites",
+    "resolution_status": "resolved"
+  },
+  {
+    "source_id": "PROC_1_116788",
     "target_id": "PROC_3_000722",
     "relation_type": "part_of",
     "resolution_status": "resolved"
@@ -61,7 +67,7 @@
   },
   {
     "source_id": "PROC_3_000722",
-    "target_id": "PROC_1_004222",
+    "target_id": "PROC_1_116788",
     "relation_type": "sub_procedures",
     "resolution_status": "resolved"
   },

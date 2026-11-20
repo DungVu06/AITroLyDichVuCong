@@ -4,3 +4,5 @@ crawl.py
 __pycache__/
 tests/*
 data/benefit_relation/discovery.cache.jsonl
+.vscode/
+test.py
