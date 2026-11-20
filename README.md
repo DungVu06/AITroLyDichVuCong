@@ -194,13 +194,23 @@ Thực hiện theo luồng chuẩn bị dữ liệu ở trên, dùng các script
 #### Crawl văn bản pháp luật theo từ khóa
 
 Crawler hỗ trợ cả VBPL và Thư Viện Pháp Luật (TVPL). Giới hạn `--limit` là số
-văn bản hợp lệ tối đa cho **mỗi từ khóa**; mặc định là 50. Khi chạy lại, bản ghi
-hợp lệ đã có sẽ được bỏ qua. Dùng `--refresh` để cập nhật lại bản ghi hoặc
-`--discover-only` để chỉ liệt kê URL tìm thấy.
+văn bản tối đa cho **mỗi từ khóa**; mặc định là 50. Với VBPL, crawler mở
+`vbpl.vn`, chọn chế độ tìm trong nội dung toàn văn, gửi từ khóa, đọc các trang
+kết quả, kiểm tra tình trạng hiệu lực và ngày ban hành, rồi lấy K văn bản còn
+hiệu lực mới nhất. Ngày ban hành phải đọc được; văn bản không rõ trạng thái hoặc hết hiệu lực một phần bị loại.
+`--max-search-pages` giới hạn số trang kết quả được quét (mặc định 1000); chạm
+giới hạn sẽ báo lỗi thay vì coi danh sách chưa đầy đủ là top K. Với TVPL, bản ghi
+hợp lệ đã có được bỏ qua nếu không dùng `--refresh`.
 
 ```powershell
 # Tìm và crawl tối đa 100 văn bản công khai từ TVPL
 python crawl/crawl_law.py --source tvpl --query "thuế thu nhập cá nhân" --limit 100
+
+# Tìm toàn văn VBPL, lấy tối đa 50 văn bản còn hiệu lực mới nhất
+python crawl/crawl_law.py --source vbpl --query "thai sản" --limit 50
+
+# Xem trước top K URL VBPL sau khi kiểm tra thuộc tính và xếp hạng
+python crawl/crawl_law.py --source vbpl --query "thai sản" --limit 20 --discover-only
 
 # Nhiều từ khóa, mỗi từ khóa tối đa 30 văn bản
 python crawl/crawl_law.py --source tvpl --query "thai sản" --query "khai sinh" --limit 30

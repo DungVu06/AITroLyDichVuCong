@@ -45,7 +45,10 @@ Schema này phục vụ ba mục đích:
   "source": {
     "name": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
     "url": "https://vbpl.vn/...",
-    "crawled_at": "2026-09-12T11:45:30+00:00"
+    "crawled_at": "2026-09-12T11:45:30+00:00",
+    "search_matches": [
+      {"query": "thai sản", "rank": 1, "issued_date": "2025-08-07"}
+    ]
   },
   "relations": {
     "related_laws": [],
@@ -57,8 +60,18 @@ Schema này phục vụ ba mục đích:
     "document_number": "21-LB/TT",
     "issuing_authority": "Cơ quan ban hành",
     "issued_date_raw": "18/06/1994",
+    "issued_date": "1994-06-18",
     "effective_date_raw": "01/01/1994",
+    "effective_date": "1994-01-01",
+    "expired_date_raw": "",
     "validity_raw": "Còn hiệu lực",
+    "validity_checked_at": "2026-11-20T00:00:00+00:00",
+    "section_validation": {
+      "is_lossless": true,
+      "full_text_length": 5000,
+      "reconstructed_length": 4980,
+      "section_count": 24
+    },
     "full_text": "Toàn văn...",
     "sections": [],
     "attachments": []
@@ -130,6 +143,7 @@ thuật, không phải kết luận cuối cùng về phạm vi hiệu lực. Cr
 | `name` | String | Tên nguồn dữ liệu. |
 | `url` | String | URL chính thức của văn bản để người dùng đối chiếu. |
 | `crawled_at` | String | Thời điểm thu thập dữ liệu, định dạng ISO-8601 và múi giờ UTC. |
+| `search_matches` | Array[Object] | Query VBPL đã chọn văn bản, thứ hạng theo từng query và ngày ban hành dùng xếp hạng. |
 
 `crawled_at` là ngày hệ thống lấy dữ liệu, không phải ngày văn bản bắt đầu có
 hiệu lực. Ngày hiệu lực nằm trong `content.effective_date_raw`.
@@ -161,8 +175,13 @@ phát hiện trong từng section nằm ở `content.sections[].related_laws`, k
 | `document_number` | String | Số hiệu văn bản, ví dụ `21-LB/TT`. |
 | `issuing_authority` | String | Cơ quan ban hành. |
 | `issued_date_raw` | String | Ngày ban hành ở dạng nguyên bản từ nguồn. |
+| `issued_date` | String \| null | Ngày ban hành chuẩn `YYYY-MM-DD`, dùng để xếp hạng kết quả VBPL. |
 | `effective_date_raw` | String | Ngày có hiệu lực ở dạng nguyên bản từ nguồn. |
+| `effective_date` | String \| null | Ngày có hiệu lực chuẩn `YYYY-MM-DD`. |
+| `expired_date_raw` | String | Ngày hết hiệu lực nếu nguồn cung cấp. |
 | `validity_raw` | String | Tình trạng hiệu lực được hiển thị trên nguồn. |
+| `validity_checked_at` | String | Thời điểm crawler đọc lại tình trạng hiệu lực từ VBPL. |
+| `section_validation` | Object | Kết quả đối chiếu nội dung toàn văn với các section đã tách. Bản ghi VBPL không đạt kiểm tra sẽ không được lưu. |
 | `full_text` | String | Nội dung đã làm sạch theo nguồn. VBPL giữ nội dung trích được; TVPL lưu phần điều khoản công khai, bỏ căn cứ, chữ ký, nơi nhận, phụ lục và biểu mẫu. |
 | `sections` | Array[Object] | Các section được tách từ toàn văn. |
 | `attachments` | Array[String] | URL của file PDF/DOC/DOCX hoặc file tải xuống. |
@@ -223,16 +242,21 @@ article
 part
 subsection
 point
+subpoint
 ```
 
-`level` là kết quả nhận diện cấu trúc, không nhất thiết phản ánh đầy đủ quan hệ
-cha-con. Nếu cần lưu chính xác đường dẫn pháp lý, nên bổ sung:
+`level` giữ cấu trúc tuần tự; bước chuẩn hóa tạo `parent_section_id` và
+`structural_path` để lưu quan hệ cha-con. Parser nhận diện khoản đánh số hoặc
+ghi rõ `Khoản`, điểm chữ cái hoặc ghi rõ `Điểm`, cùng các heading `Phần` và
+`Tiểu mục` phổ biến.
+
+Thứ tự và quan hệ cha-con được giữ ở dữ liệu chuẩn hóa; không suy ra heading bị
+thiếu trong toàn văn:
 
 ```json
 {
-  "ordinal": 12,
-  "parent_path": ["CHƯƠNG II", "MỤC I"],
-  "citation": "Chương II, Mục I, Điều 12"
+  "parent_section_id": "LAW_VBPL_xxx/article:12/subsection:1",
+  "structural_path": "article:12/subsection:1/point:a"
 }
 ```
 

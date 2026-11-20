@@ -122,12 +122,20 @@ def infer_section_level(heading: Any, fallback_level: Any) -> str:
     không có ký hiệu rõ ràng vẫn giữ fallback để không làm mất cấu trúc.
     """
     text = clean_text(heading)
-    if re.match(r"^CHƯƠNG\s+[IVXLCDM0-9]+", text, re.IGNORECASE):
+    if re.match(r"^CHƯƠNG\s+[IVXLCDM0-9]+(?:[.:]?\s|$)", text, re.IGNORECASE):
         return "chapter"
-    if re.match(r"^(?:MỤC\s+)?[IVXL]+[.)\-–](?:\s|$)", text, re.IGNORECASE):
+    if re.match(r"^PHẦN\s+[IVXLCDM0-9]+(?:[.:]?\s|$)", text, re.IGNORECASE):
+        return "part"
+    if re.match(r"^(?:MỤC\s+)?[IVXL]+[.):\-–](?:\s|$)", text, re.IGNORECASE):
         return "section"
     if re.match(r"^Điều\s+\d+", text, re.IGNORECASE):
         return "article"
+    if re.match(r"^KHOẢN\s+\d+", text, re.IGNORECASE):
+        return "subsection"
+    if re.match(r"^ĐIỂM\s+[a-zđ]", text, re.IGNORECASE):
+        return "point"
+    if re.match(r"^TIỂU MỤC\s+\d+", text, re.IGNORECASE):
+        return "subsection"
     if re.match(r"^(?:[a-zđ]|\d+)\.\d+[.)](?:\s|$)", text, re.IGNORECASE):
         return "subpoint"
     if re.match(r"^[A-HĐ][.)\-–](?:\s|$)", text):
@@ -145,15 +153,16 @@ def section_marker(heading: Any, level: Any, fallback_order: int) -> str:
     level = clean_text(level)
     patterns = {
         "chapter": r"^CHƯƠNG\s+([IVXLCDM0-9]+)",
-        "section": r"^(?:MỤC\s+)?([IVXL]+)[.)\-–]?(?:\s|$)",
+        "part": r"^(?:PHẦN\s+([IVXLCDM0-9]+)|([A-HĐ]))",
+        "section": r"^(?:MỤC\s+)?([IVXL]+)[.):\-–]?(?:\s|$)",
         "article": r"^Điều\s+(\d+)",
-        "part": r"^([A-HĐ])[.)\-–](?:\s|$)",
-        "subsection": r"^(\d+)[.)\-–](?:\s|$)",
-        "point": r"^([a-zđ])[.)\-–](?:\s|$)",
+        "subsection": r"^(?:KHOẢN\s+|TIỂU MỤC\s+)?(\d+)[.)\-–:]?(?:\s|$)",
+        "point": r"^(?:ĐIỂM\s+)?([a-zđ])[.)\-–:]?(?:\s|$)",
         "subpoint": r"^((?:[a-zđ]|\d+)\.\d+)[.)](?:\s|$)",
     }
     match = re.search(patterns.get(level, r"$^"), text, re.IGNORECASE)
-    marker = match.group(1) if match else str(fallback_order + 1)
+    marker = next((group for group in match.groups() if group), "") if match else ""
+    marker = marker or str(fallback_order + 1)
     return marker.upper() if level in {"chapter", "part", "section"} else marker.lower()
 
 

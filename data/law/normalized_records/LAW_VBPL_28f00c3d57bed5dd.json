@@ -29,21 +29,10 @@
             "source_section_id": "LAW_VBPL_28f00c3d57bed5dd/article:1",
             "relation_type": "dẫn_chiếu",
             "referenced_location": "Điều 3, Điều 4, Điều 5 và Điều 6",
-            "resolution_status": "resolved_section",
-            "target_document_id": "LAW_VBPL_56f94e74bd2946fd",
-            "target_section_ids": [
-              "LAW_VBPL_56f94e74bd2946fd/article:3",
-              "LAW_VBPL_56f94e74bd2946fd/article:4",
-              "LAW_VBPL_56f94e74bd2946fd/article:5",
-              "LAW_VBPL_56f94e74bd2946fd/article:6"
-            ]
-          },
-          {
-            "source_section_id": "LAW_VBPL_28f00c3d57bed5dd/article:1",
-            "relation_type": "dẫn_chiếu",
-            "referenced_location": "",
-            "resolution_status": "document_resolved_location_missing",
-            "target_document_id": "LAW_VBPL_56f94e74bd2946fd"
+            "resolution_status": "unresolved_document",
+            "reference_id": "LAWREF_2bd096821cae805f",
+            "document_type": "Nghị định",
+            "document_number": "152/2018/NĐ-CP"
           }
         ],
         "normalized_id": "LAW_VBPL_28f00c3d57bed5dd/article:1",
@@ -160,11 +149,10 @@
             "source_section_id": "LAW_VBPL_28f00c3d57bed5dd/article:3/subsection:1/point:d",
             "relation_type": "dẫn_chiếu",
             "referenced_location": "điểm b Khoản 2 Điều 3",
-            "resolution_status": "resolved_section",
-            "target_document_id": "LAW_VBPL_56f94e74bd2946fd",
-            "target_section_ids": [
-              "LAW_VBPL_56f94e74bd2946fd/article:3/subsection:2/point:b"
-            ]
+            "resolution_status": "unresolved_document",
+            "reference_id": "LAWREF_2bd096821cae805f",
+            "document_type": "Nghị định",
+            "document_number": "152/2018/NĐ-CP"
           }
         ],
         "normalized_id": "LAW_VBPL_28f00c3d57bed5dd/article:3/subsection:1/point:d",
@@ -331,11 +319,10 @@
             "source_section_id": "LAW_VBPL_28f00c3d57bed5dd/article:5/subsection:2/point:b",
             "relation_type": "dẫn_chiếu",
             "referenced_location": "Điều 3",
-            "resolution_status": "resolved_section",
-            "target_document_id": "LAW_VBPL_56f94e74bd2946fd",
-            "target_section_ids": [
-              "LAW_VBPL_56f94e74bd2946fd/article:3"
-            ]
+            "resolution_status": "unresolved_document",
+            "reference_id": "LAWREF_2bd096821cae805f",
+            "document_type": "Nghị định",
+            "document_number": "152/2018/NĐ-CP"
           }
         ],
         "normalized_id": "LAW_VBPL_28f00c3d57bed5dd/article:5/subsection:2/point:b",

@@ -100,6 +100,7 @@ không phải các loại node tách biệt:
 | `article` | `LawArticle` |
 | `subsection` | `LawSubsection` |
 | `point` | `LawPoint` |
+| `subpoint` | `LawSubpoint` |
 
 ### 2.3. Cách tạo ID và cây section
 

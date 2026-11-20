@@ -1,7 +1,7 @@
 """Generate reviewable procedure-to-benefit candidates from normalized data.
 
-The pipeline uses lexical cues and Vietnamese SBERT/Qdrant for candidate recall,
-then Gemini Flash for evidence-grounded extraction and pair verification. It
+The pipeline uses broad legal-benefit cues for candidate recall, then Gemini
+Flash for evidence-grounded extraction and pair verification. It
 never writes to Neo4j. Review records are JSONL and remain pending until edited
 to ``approved``.
 
@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
 import unicodedata
@@ -23,16 +24,19 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from db.qdrant_client import QdrantVectorClient
-from rag.core.config import EmbeddingSettings, PROJECT_ROOT, load_env_file
-from rag.retrieval.embedding import QueryEmbedder
+from rag.core.config import PROJECT_ROOT, load_env_file
 
 
-PROMPT_VERSION = "benefit-discovery-v1"
-BENEFIT_CUES = (
-    "được hưởng", "trợ cấp", "hỗ trợ", "mức hưởng", "đối tượng hưởng",
-    "điều kiện hưởng", "chế độ", "quyền lợi", "bảo lưu", "thời hạn hưởng",
-)
+PROMPT_VERSION = "benefit-discovery-v2-cues-bm25"
+CUE_GROUPS = {
+    "entitlement": ("có quyền", "được hưởng", "được nhận", "được cấp", "được hưởng chế độ"),
+    "payment_support": ("trợ cấp", "được hỗ trợ", "được thanh toán", "được hoàn trả", "bồi thường"),
+    "exemption_reduction": ("được miễn", "được giảm", "không phải nộp", "miễn nộp", "giảm trừ"),
+    "priority_guarantee": ("được ưu tiên", "được bảo lưu", "được bố trí", "được bảo đảm"),
+    "benefit_details": ("đối tượng hưởng", "điều kiện hưởng", "mức hưởng", "thời gian hưởng", "thời hạn hưởng"),
+}
+STRONG_CUE_GROUPS = {"entitlement", "payment_support", "exemption_reduction", "priority_guarantee"}
+STOP_WORDS = set("và của là cho người các được trong với theo khi thì hoặc về tại từ một những đó này có phải như đến đã sẽ không nếu đối với".split())
 TOKEN_RE = re.compile(r"[\w]+", flags=re.UNICODE)
 
 
@@ -55,6 +59,7 @@ class BenefitSectionExtraction(StrictModel):
     conditions: list[str] = Field(default_factory=list)
     amount_or_duration: str | None = None
     evidence_quotes: list[str] = Field(default_factory=list)
+    field_evidence: dict[str, list[str]] = Field(default_factory=dict)
     rationale: str
 
 
@@ -129,9 +134,58 @@ def section_context(
     return " > ".join(reversed(ancestors))
 
 
-def has_benefit_cue(section: dict[str, Any]) -> bool:
-    text = f"{clean(section.get('heading'))}\n{clean(section.get('text'))}".casefold()
-    return any(cue in text for cue in BENEFIT_CUES)
+def normalize_text(value: str) -> str:
+    value = unicodedata.normalize("NFC", value or "").casefold()
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def matched_benefit_cues(section: dict[str, Any]) -> list[dict[str, str]]:
+    heading = normalize_text(clean(section.get("heading")))
+    body = normalize_text(clean(section.get("text")))
+    full = f"{heading}\n{body}"
+    matches = []
+    for group, cues in CUE_GROUPS.items():
+        for cue in cues:
+            if cue in full:
+                matches.append({"group": group, "cue": cue, "in_heading": cue in heading})
+    # Broad terms only recall a section when accompanied by another benefit
+    # signal in the heading/body, reducing matches on generic agency duties.
+    strong = any(item["group"] in STRONG_CUE_GROUPS for item in matches)
+    if not strong:
+        return [item for item in matches if item["in_heading"] and item["group"] == "benefit_details"]
+    return matches
+
+
+def bm25_tokens(value: str) -> list[str]:
+    return [token for token in TOKEN_RE.findall(normalize_text(value))
+            if len(token) > 1 and token not in STOP_WORDS]
+
+
+def bm25_scores(query: str, documents: dict[str, str], k1: float = 1.5, b: float = 0.75) -> dict[str, float]:
+    """Small dependency-free BM25 implementation over benefit candidates."""
+    query_terms = set(bm25_tokens(query))
+    tokenized = {key: bm25_tokens(value) for key, value in documents.items()}
+    if not tokenized:
+        return {}
+    average_length = sum(map(len, tokenized.values())) / len(tokenized)
+    frequencies: dict[str, int] = {}
+    for tokens in tokenized.values():
+        for term in set(tokens):
+            frequencies[term] = frequencies.get(term, 0) + 1
+    count = len(tokenized)
+    scores = {}
+    for key, tokens in tokenized.items():
+        length = len(tokens)
+        score = 0.0
+        for term in query_terms:
+            tf = tokens.count(term)
+            if not tf:
+                continue
+            df = frequencies.get(term, 0)
+            idf = math.log(1 + (count - df + 0.5) / (df + 0.5))
+            score += idf * (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * length / max(average_length, 1)))
+        scores[key] = round(score, 6)
+    return scores
 
 
 def load_cache(path: Path) -> tuple[dict[str, dict[str, Any]], Any]:
@@ -189,12 +243,16 @@ def section_batch_prompt(items: list[tuple[dict[str, Any], dict[str, Any], str]]
             "heading": clean(section.get("heading")),
             "parent_context": context,
             "section_text": clean(section.get("text")),
+            "matched_cues": section.get("matched_cues", []),
         })
     return f"""Bạn phân loại các section pháp luật tiếng Việt để xây danh mục chế độ quyền lợi.
-Mỗi item là một section độc lập. Chỉ căn cứ vào văn bản item đó; không dùng kiến thức ngoài,
-không suy diễn điều kiện. Phân biệt quy định xác lập quyền lợi với đoạn chỉ dẫn chiếu/thủ tục.
-Nếu không đủ căn cứ, chọn insufficient_context hoặc non_benefit. Mọi evidence_quotes phải là
-trích dẫn nguyên văn nằm trong section_text của chính item. Tên quyền lợi phải cụ thể.
+Mỗi item là một section độc lập. Chỉ căn cứ vào văn bản được cung cấp; không dùng kiến thức ngoài.
+Trả field_evidence cho beneficiaries, trigger, conditions, amount_or_duration, benefit_type:
+mỗi giá trị không rỗng phải có ít nhất một quote nguyên văn hỗ trợ từ section_text. Không có
+căn cứ thì để trường rỗng. benefit_title có thể diễn đạt ngắn gọn nhưng phải được evidence_quotes
+hỗ trợ trực tiếp. Có thể tách nhiều quyền lợi khác nhau; không lặp cùng một quyền lợi trong item.
+Phân biệt quyền lợi với trách nhiệm cơ quan, thủ tục và dẫn chiếu. Nếu không đủ căn cứ, chọn
+insufficient_context hoặc non_benefit. Trả đúng một kết quả cho mỗi section_id.
 Trả đúng một kết quả cho mỗi section_id được cung cấp, không bỏ và không tự thêm ID.
 
 SECTIONS: {json.dumps(payload, ensure_ascii=False)}
@@ -230,10 +288,30 @@ EVIDENCE: {json.dumps(evidence_payload, ensure_ascii=False)}
 """
 
 
-def lexical_overlap(procedure_text: str, benefit_text: str) -> int:
-    procedure_tokens = {token for token in TOKEN_RE.findall(norm(procedure_text)) if len(token) > 2}
-    benefit_tokens = {token for token in TOKEN_RE.findall(norm(benefit_text)) if len(token) > 2}
-    return len(procedure_tokens & benefit_tokens)
+def verified_field_values(result: BenefitSectionExtraction, section_text: str) -> dict[str, Any]:
+    """Keep extracted values only when their supplied quotes support them."""
+    fields = ("beneficiaries", "trigger", "conditions", "amount_or_duration", "benefit_type")
+    normalized_text = normalize_text(section_text)
+    values: dict[str, Any] = {}
+    field_quotes: dict[str, list[str]] = {}
+    for field_name in fields:
+        raw = getattr(result, field_name)
+        candidates = raw if isinstance(raw, list) else ([raw] if raw else [])
+        quotes = result.field_evidence.get(field_name, [])
+        valid_values = []
+        valid_quotes = []
+        for value in candidates:
+            value_norm = normalize_text(clean(value))
+            for quote in quotes:
+                quote_norm = normalize_text(clean(quote))
+                if quote_norm and quote_norm in normalized_text and value_norm and value_norm in quote_norm:
+                    valid_values.append(clean(value))
+                    valid_quotes.append(clean(quote))
+                    break
+        values[field_name] = list(dict.fromkeys(valid_values)) if isinstance(raw, list) else (valid_values[0] if valid_values else None)
+        field_quotes[field_name] = list(dict.fromkeys(valid_quotes))
+    values["field_evidence"] = field_quotes
+    return values
 
 
 def main() -> None:
@@ -242,7 +320,7 @@ def main() -> None:
     parser.add_argument("--law-dir", type=Path, default=PROJECT_ROOT / "data/law/normalized_records")
     parser.add_argument("--output", type=Path, default=PROJECT_ROOT / "data/benefit_relation/discovery_review.jsonl")
     parser.add_argument("--cache", type=Path, default=PROJECT_ROOT / "data/benefit_relation/discovery.cache.jsonl")
-    parser.add_argument("--top-k", type=int, default=30, help="Law chunks retrieved per procedure")
+    parser.add_argument("--top-k", type=int, default=30, help="Maximum BM25-ranked benefits per procedure")
     parser.add_argument("--max-sections", type=int, default=0, help="Optional cap for trial runs; 0 means no cap")
     args = parser.parse_args()
 
@@ -259,7 +337,6 @@ def main() -> None:
     sections: dict[str, dict[str, Any]] = {}
     law_by_section: dict[str, dict[str, Any]] = {}
     sections_by_law: dict[str, dict[str, dict[str, Any]]] = {}
-    sections_by_position: dict[tuple[str, int], str] = {}
     for law in laws:
         law_id = clean(law.get("id"))
         content = law.get("content") or {}
@@ -272,7 +349,6 @@ def main() -> None:
             sections[section_id] = item
             law_by_section[section_id] = law
             by_id[section_id] = item
-            sections_by_position[(law_id, index)] = section_id
         sections_by_law[law_id] = by_id
 
     try:
@@ -287,34 +363,30 @@ def main() -> None:
     cache, cache_handle = load_cache(args.cache)
     prior_reviews = load_existing_reviews(args.output)
     client = genai.Client(api_key=api_key)
-    embedder = QueryEmbedder(EmbeddingSettings.from_env())
-    retrieved_by_procedure: dict[str, dict[str, float]] = {}
-    section_candidates: set[str] = {sid for sid, section in sections.items() if has_benefit_cue(section)}
+    section_candidates: set[str] = set()
+    cue_provenance: dict[str, list[dict[str, str]]] = {}
+    for sid, section in sections.items():
+        cues = matched_benefit_cues(section)
+        if cues:
+            section_candidates.add(sid)
+            cue_provenance[sid] = cues
+    # If a parent heading announces a benefit, inspect its descendants too;
+    # eligibility and amounts are often stated in separate child sections.
+    for sid in list(section_candidates):
+        parent_heading_has_cue = cue_provenance[sid] and any(item["in_heading"] for item in cue_provenance[sid])
+        if parent_heading_has_cue:
+            for child_id, child in sections.items():
+                ancestor_id = clean(child.get("parent_section_id"))
+                seen: set[str] = set()
+                while ancestor_id and ancestor_id in sections and ancestor_id not in seen:
+                    if ancestor_id == sid:
+                        section_candidates.add(child_id)
+                        cue_provenance.setdefault(child_id, [{"group": "inherited_heading", "cue": sid, "in_heading": False}])
+                        break
+                    seen.add(ancestor_id)
+                    ancestor_id = clean(sections[ancestor_id].get("parent_section_id"))
 
     try:
-        with QdrantVectorClient.from_env() as qdrant:
-            if not qdrant.collection_exists("laws"):
-                raise SystemExit("Qdrant collection 'laws' is missing; build/import law chunks first")
-            for record in procedures:
-                procedure_id = clean(record.get("id"))
-                query = procedure_query(record)
-                if not procedure_id or not query:
-                    continue
-                points = qdrant.search("laws", embedder.encode(query), limit=args.top_k)
-                scores: dict[str, float] = {}
-                for point in points:
-                    payload = dict(point.payload or {})
-                    law_id = clean(payload.get("doc_id"))
-                    index = payload.get("section_index")
-                    try:
-                        section_id = sections_by_position.get((law_id, int(index)))
-                    except (TypeError, ValueError):
-                        section_id = None
-                    if section_id:
-                        scores[section_id] = max(scores.get(section_id, 0.0), float(point.score or 0.0))
-                        section_candidates.add(section_id)
-                retrieved_by_procedure[procedure_id] = scores
-
         if args.max_sections:
             section_candidates = set(sorted(section_candidates)[:args.max_sections])
 
@@ -363,13 +435,17 @@ def main() -> None:
             section = sections[section_id]
             result = BenefitSectionExtraction.model_validate(result_data)
             law = law_by_section[section_id]
-            valid_quotes = [quote.strip() for quote in result.evidence_quotes if quote.strip() and quote.strip() in clean(section.get("text"))]
+            section_text = clean(section.get("text"))
+            valid_quotes = [quote.strip() for quote in result.evidence_quotes
+                            if quote.strip() and normalize_text(quote.strip()) in normalize_text(section_text)]
             if not result.is_benefit_related or result.category in {"non_benefit", "insufficient_context"}:
                 continue
             if not result.benefit_title or not valid_quotes:
                 continue
+            verified_fields = verified_field_values(result, section_text)
             validated_extractions[section_id] = {
                 **result.model_dump(mode="json"),
+                **verified_fields,
                 "evidence_quotes": valid_quotes,
                 "section_id": section_id,
                 "law_id": section["law_id"],
@@ -377,6 +453,7 @@ def main() -> None:
                 "law_title": clean((law.get("content") or {}).get("title")),
                 "source_url": clean((law.get("source") or {}).get("url")),
                 "life_events": law.get("life_event") or [],
+                "cue_provenance": cue_provenance.get(section_id, []),
             }
         extracted = validated_extractions
 
@@ -407,6 +484,8 @@ def main() -> None:
                     "quote": quote,
                     "source_url": extracted_item["source_url"],
                     "category": extracted_item["category"],
+                    "field_evidence": extracted_item.get("field_evidence", {}),
+                    "cue_provenance": extracted_item.get("cue_provenance", []),
                 })
 
         procedure_lookup = {clean(record.get("id")): {"record": record, "query": procedure_query(record)} for record in procedures}
@@ -414,16 +493,24 @@ def main() -> None:
         for procedure_id, procedure in procedure_lookup.items():
             proc_record = procedure["record"]
             proc_events = {norm(clean(x)) for x in proc_record.get("life_event", []) if clean(x)}
-            for benefit in grouped.values():
+            benefit_documents = {
+                benefit_id: " ".join([
+                    benefit["benefit_title"], *benefit["beneficiaries"], *benefit["triggers"],
+                    *benefit["conditions"], *benefit["amount_or_duration"],
+                    " ".join(item["heading"] for item in benefit["evidence"]),
+                ])
+                for benefit_id, benefit in grouped.items()
+            }
+            scores = bm25_scores(procedure["query"], benefit_documents)
+            ranked_ids = sorted(scores, key=lambda item: (-scores[item], item))
+            selected_ids = set(sorted(
+                (item for item in ranked_ids if scores[item] > 0),
+                key=lambda item: (-scores[item], item),
+            )[:args.top_k])
+            for benefit_id, benefit in grouped.items():
                 benefit_events = {norm(clean(x)) for x in benefit["life_events"] if clean(x)}
-                best_vector = 0.0
-                for evidence_item in benefit["evidence"]:
-                    best_vector = max(best_vector, retrieved_by_procedure.get(procedure_id, {}).get(evidence_item["section_id"], 0.0))
-                overlap = lexical_overlap(procedure["query"], " ".join([
-                    benefit["benefit_title"], *benefit["beneficiaries"], *benefit["triggers"], *benefit["conditions"],
-                ]))
                 same_event = bool(proc_events & benefit_events)
-                if best_vector <= 0 and not same_event and overlap == 0:
+                if benefit_id not in selected_ids and not same_event:
                     continue
                 match_key = hash_key(
                     PROMPT_VERSION, model_name, procedure_id, procedure["query"],
@@ -441,7 +528,7 @@ def main() -> None:
                 supported_ids = [item for item in match.supporting_evidence_ids if item in valid_evidence_ids]
                 if not match.is_related or not supported_ids:
                     continue
-                rank = round((best_vector * 0.6) + (0.25 if same_event else 0) + min(overlap, 5) * 0.03, 4)
+                rank = scores.get(benefit_id, 0.0)
                 candidate_id = "CAND_" + hash_key(procedure_id, benefit["benefit_id"])[:16]
                 candidate_record = {
                     "candidate_id": candidate_id,
@@ -459,7 +546,9 @@ def main() -> None:
                     "reason": match.reason,
                     "supporting_evidence_ids": supported_ids,
                     "evidence": benefit["evidence"],
-                    "ranking": {"score": rank, "vector_similarity": round(best_vector, 4), "same_life_event": same_event, "lexical_overlap_tokens": overlap},
+                    "ranking": {"score": rank, "bm25_score": rank, "same_life_event": same_event,
+                                "matched_tokens": sorted(set(bm25_tokens(procedure["query"])) & set(bm25_tokens(benefit_documents[benefit_id]))),
+                                "candidate_sources": [*(["bm25"] if rank > 0 else []), *(["same_life_event"] if same_event else [])]},
                     "pipeline_version": PROMPT_VERSION,
                     "model": model_name,
                 }
@@ -485,7 +574,12 @@ def main() -> None:
                         (clean(item.get("evidence_id")), clean(item.get("quote")))
                         for item in prior_evidence
                     }
-                    evidence_unchanged = current_evidence == previous_evidence
+                    evidence_unchanged = (
+                        current_evidence == previous_evidence
+                        and prior.get("reason") == candidate_record["reason"]
+                        and prior.get("relation_basis") == candidate_record["relation_basis"]
+                        and prior.get("benefit_title") == candidate_record["benefit_title"]
+                    )
                     if evidence_unchanged:
                         candidate_record["status"] = prior.get("status", "pending")
                         candidate_record["evidence"] = prior_evidence

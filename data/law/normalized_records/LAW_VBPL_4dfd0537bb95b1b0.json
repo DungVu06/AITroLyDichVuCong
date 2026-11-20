@@ -1,0 +1,75 @@
+{
+  "id": "LAW_VBPL_4dfd0537bb95b1b0",
+  "life_event": [],
+  "domain": "Pháp luật",
+  "jurisdiction": {
+    "level": "Toàn quốc",
+    "location": "Việt Nam"
+  },
+  "source": {
+    "name": "Cơ sở dữ liệu quốc gia về văn bản pháp luật",
+    "url": "https://vbpl.vn/van-ban/chi-tiet/nghi-quyet-so-55-2021-nq-hdnd-ban-hanh-quy-dinh-ve-mot-so-co-che-chinh-sach-xa-hoi-hoa-cong-tac-dan-so-tren-dia-ban-tinh-cao-bang-den-nam-2030--148819",
+    "crawled_at": "2026-11-20T07:47:21.612308+00:00",
+    "search_matches": [
+      {
+        "query": "trợ cấp thai sản",
+        "rank": 3,
+        "issued_date": "2021-07-29"
+      }
+    ]
+  },
+  "content": {
+    "title": "Nghị quyết số 55/2021/NQ-HĐND Ban hành Quy định về một số cơ chế, chính sách xã hội hóa công tác dân số trên địa bàn tỉnh Cao Bằng đến năm 2030",
+    "document_type": "",
+    "document_number": "55/2021/NQ-HĐND",
+    "issuing_authority": "HĐND Tỉnh Cao Bằng",
+    "issued_date": "2021-07-29",
+    "effective_date": "2021-08-09",
+    "validity_checked_at": "2026-11-20T07:47:21.612308+00:00",
+    "section_validation": {
+      "is_lossless": true,
+      "full_text_length": 644,
+      "reconstructed_length": 644,
+      "section_count": 3
+    },
+    "full_text": "Điều 1. Ban hành kèm theo Nghị quyết này Quy định về một số cơ chế, chính sách xã hội hoá công tác dân số trên địa bàn tỉnh Cao Bằng đến năm 2030.\nĐiều 2. Hội đồng nhân dân tỉnh giao Ủy ban nhân dân tỉnh tổ chức triển khai thực hiện Nghị quyết này và báo cáo kết quả thực hiện với Hội đồng nhân dân tỉnh theo quy định.\nĐiều 3. Thường trực Hội đồng nhân dân tỉnh, các Ban của Hội đồng nhân dân tỉnh, các Tổ đại biểu và đại biểu Hội đồng nhân dân tỉnh giám sát việc thực hiện Nghị quyết.\nNghị quyết này đã được Hội đồng nhân dân tỉnh Cao Bằng khóa XVII kỳ họp thứ 2 thông qua ngày 29 tháng 7 năm 2021 và có hiệu lực từ ngày 09 tháng 8 năm 2021./.",
+    "sections": [
+      {
+        "heading": "Điều 1. Ban hành kèm theo Nghị quyết này Quy định về một số cơ chế, chính sách xã hội hoá công tác dân số trên địa bàn tỉnh Cao Bằng đến năm 2030",
+        "level": "article",
+        "text": "",
+        "related_laws": [],
+        "normalized_id": "LAW_VBPL_4dfd0537bb95b1b0/article:1",
+        "parent_section_id": null,
+        "structural_path": "article:1",
+        "marker": "1"
+      },
+      {
+        "heading": "Điều 2. Hội đồng nhân dân tỉnh giao Ủy ban nhân dân tỉnh tổ chức triển khai thực hiện Nghị quyết này và báo cáo kết quả thực hiện với Hội đồng nhân dân tỉnh theo quy định",
+        "level": "article",
+        "text": "",
+        "related_laws": [],
+        "normalized_id": "LAW_VBPL_4dfd0537bb95b1b0/article:2",
+        "parent_section_id": null,
+        "structural_path": "article:2",
+        "marker": "2"
+      },
+      {
+        "heading": "Điều 3. Thường trực Hội đồng nhân dân tỉnh, các Ban của Hội đồng nhân dân tỉnh, các Tổ đại biểu và đại biểu Hội đồng nhân dân tỉnh giám sát việc thực hiện Nghị quyết",
+        "level": "article",
+        "text": "Nghị quyết này đã được Hội đồng nhân dân tỉnh Cao Bằng khóa XVII kỳ họp thứ 2 thông qua ngày 29 tháng 7 năm 2021 và có hiệu lực từ ngày 09 tháng 8 năm 2021./",
+        "related_laws": [],
+        "normalized_id": "LAW_VBPL_4dfd0537bb95b1b0/article:3",
+        "parent_section_id": null,
+        "structural_path": "article:3",
+        "marker": "3"
+      }
+    ],
+    "attachments": [],
+    "document_number_normalized": "55/2021/NQ-HĐND",
+    "document_number_key": "55|2021|HĐND|NQ",
+    "document_id": "55/2021/NQ-HĐND"
+  },
+  "document_id": "55/2021/NQ-HĐND",
+  "normalization_version": "law-normalize-v2"
+}
