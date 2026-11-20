@@ -87,14 +87,14 @@ Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
 | **Xử lý giấy tờ thiếu (Missing Doc)** | Hướng dẫn thay thế Giấy chứng sinh bằng: **Văn bản của người làm chứng** hoặc **Giấy cam đoan về việc sinh**. | `Thay vì Giấy chứng sinh, bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo thiếu giấy chứng sinh thì không giải quyết được.* |
 | **Cơ quan thẩm quyền (Authority)** | **Ủy ban nhân dân cấp xã** (Bộ phận Một cửa cấp xã hoặc Cổng DVCQG/VNeID). | `Nộp hồ sơ trực tuyến, qua dịch vụ bưu chính hoặc trực tiếp tại Ủy ban nhân dân cấp xã ` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu hướng dẫn lên cấp huyện hoặc sai cơ quan.* |
 | **Thời hạn giải quyết (Processing Time)** | **01 ngày làm việc** (theo `execution_methods` của bản ghi local). | `Giải quyết trong 1 ngày` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu nêu thời hạn > 01 ngày làm việc đối với hồ sơ thường.* |
-| **Căn cứ pháp lý (Legal Citation)** | Luật Hộ tịch (60/2014/QH13), Thông tư 04/2020/TT-BTP, Nghị định 123/2015/NĐ-CP. | `Như trên text kia` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu trích dẫn văn bản không có trong legal_bases của thủ tục.* |
+| **Căn cứ pháp lý (Legal Citation)** | Luật Hộ tịch (60/2014/QH13), Thông tư 04/2020/TT-BTP, Nghị định 123/2015/NĐ-CP. | `Như trên text kia` | `x ] Đạt`<br>`[] Không đạt` | *Trượt nếu trích dẫn văn bản không có trong legal_bases của thủ tục.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
 * **Hệ thống có chủ động hỏi người dùng về người làm chứng hay giấy cam đoan không?**: `[ ] Có  |  [x] Không`
 * **Nội dung phản hồi làm rõ của AI**:
 ```text
 [=== ĐIỀN CÂU HỎI LÀM RÕ CỦA AI NẾU CÓ ===]
-
+Không có
 ```
 
 ---
@@ -154,11 +154,11 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_1_116788`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Cơ quan tiếp nhận (Authority)** | **Công an Xã** (Cơ quan đăng ký cư trú cấp xã). | `[Điền cơ quan AI chỉ dẫn]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bảo nộp UBND xã.* |
-| **Yêu cầu sự đồng ý của chủ sở hữu** | Bắt buộc có **ý kiến đồng ý bằng văn bản của chủ sở hữu chỗ ở hợp pháp** trong mẫu CT01. | `[Điền AI có yêu cầu chủ nhà ký]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu cho phép người thuê tự đăng ký mà không cần chủ nhà đồng ý.* |
-| **Yêu cầu tính hợp pháp của hợp đồng** | Hợp đồng thuê nhà phải **được công chứng hoặc chứng thực**; Hợp đồng viết tay không đủ điều kiện. | `[Điền AI xử lý HĐ viết tay]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu chấp nhận hợp đồng viết tay không chứng thực.* |
-| **Chứng minh diện tích nhà ở** | Phải có thông tin/giấy tờ chứng minh đủ diện tích nhà ở tối thiểu (theo Điều 5 NĐ 154/2024/NĐ-CP). | `[Điền AI có nhắc diện tích nhà]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bỏ qua yêu cầu chứng minh diện tích.* |
-| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu **CT01** (theo Thông tư 116/2026/TT-BCA). | `[Điền thời hạn và mẫu AI nêu]` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu sai thời hạn 7 ngày làm việc hoặc dùng mẫu sổ giấy cũ.* |
+| **Cơ quan tiếp nhận (Authority)** | **Công an Xã** (Cơ quan đăng ký cư trú cấp xã). | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bảo nộp UBND xã.* |
+| **Yêu cầu sự đồng ý của chủ sở hữu** | Bắt buộc có **ý kiến đồng ý bằng văn bản của chủ sở hữu chỗ ở hợp pháp** trong mẫu CT01. | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu cho phép người thuê tự đăng ký mà không cần chủ nhà đồng ý.* |
+| **Yêu cầu tính hợp pháp của hợp đồng** | Hợp đồng thuê nhà phải **được công chứng hoặc chứng thực**; Hợp đồng viết tay không đủ điều kiện. | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu chấp nhận hợp đồng viết tay không chứng thực.* |
+| **Chứng minh diện tích nhà ở** | Phải có thông tin/giấy tờ chứng minh đủ diện tích nhà ở tối thiểu (theo Điều 5 NĐ 154/2024/NĐ-CP). | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bỏ qua yêu cầu chứng minh diện tích.* |
+| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu **CT01** (theo Thông tư 116/2026/TT-BCA). | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu sai thời hạn 7 ngày làm việc hoặc dùng mẫu sổ giấy cũ.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
 * **Hệ thống có hỏi làm rõ về việc chủ nhà có đồng ý hay hợp đồng đã công chứng chưa?**: `[x] Có  |  [ ] Không`
@@ -211,8 +211,21 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 ```text
 [=== BẮT ĐẦU ĐIỀN KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
+Thủ tục liên thông điện tử đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ em dưới 6 tuổi (PROC_3_000722 【PROC_3_000722】) được thực hiện trực tuyến qua ứng dụng VNeID hoặc Cổng dịch vụ công quốc gia.
+Thứ tự nên làm
+1. Truy cập ứng dụng VNeID, kê khai tờ khai điện tử tích hợp để thực hiện đồng thời nhóm thủ tục liên thông PROC_3_000722.
+Giấy tờ và cách thực hiện
+- Cơ quan tiếp nhận: Công an cấp Xã 【PROC_3_000722_c185_s0】.
+- Hình thức thực hiện: Trực tuyến 【PROC_3_000722_c185_s0】.
+- Thời gian giải quyết: 03 ngày làm việc kể từ khi cơ quan có thẩm quyền nhận đủ hồ sơ hợp lệ; trường hợp cần xác minh thì không quá 05 ngày làm việc. Nếu tiếp nhận hồ sơ sau - 15 giờ, thời gian được tính từ ngày làm việc tiếp theo 【PROC_3_000722_c185_s0】.
+- Lệ phí: Theo quy định của các thủ tục hành chính tương ứng 【PROC_3_000722_c185_s0】.
 
+Nguồn tham khảo (4)
 
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi — PROC_3_000722
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item — PROC_3_000722_c183_s0
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item — PROC_3_000722_c180_s0
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – execution_methods — PROC_3_000722_c185_s0
 
 [=== KẾT THÚC KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
 ```
@@ -223,18 +236,18 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_3_000722`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Tính liên thông 1 cửa điện tử** | Thực hiện trên **Cổng DVCQG / VNeID**, nộp 01 lần duy nhất, dữ liệu tự luân chuyển. | `[Điền cách thức AI chỉ dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bắt người dân đi nộp giấy riêng lẻ ở từng cơ quan.* |
-| **Thứ tự luân chuyển hồ sơ** | UBND xã cấp Khai sinh trước (24h) -> chuyển sang Công an xã (Thường trú) và BHXH (BHYT) -> Căn cước dưới 6 tuổi. | `[Điền thứ tự các bước AI nêu]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu đảo lộn thứ tự giải quyết khi chưa có khai sinh.* |
-| **Đặc thù căn cước dưới 6 tuổi** | Cấp thẻ căn cước cho trẻ dưới 6 tuổi làm **trực tuyến**, không thu nhận vân tay, mống mắt. | `[Điền AI có bắt thu nhận vân tay/mống mắt không]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bắt trẻ dưới 6 tuổi đi chụp ảnh mống mắt, lấy vân tay.* |
-| **Thời hạn giải quyết toàn trình** | **Không quá 03 ngày làm việc** (xác minh không quá 05 ngày). | `[Điền tổng số ngày AI trả lời]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu cộng dồn cơ học các thủ tục đơn lẻ thành 7 - 15 ngày.* |
-| **Căn cứ pháp lý (Legal Citation)** | Nghị định số 301/2026/NĐ-CP (hoặc Nghị định số 63/2024/NĐ-CP). | `[Điền văn bản AI trích dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu không trích dẫn văn bản liên thông trong data.* |
+| **Tính liên thông 1 cửa điện tử** | Thực hiện trên **Cổng DVCQG / VNeID**, nộp 01 lần duy nhất, dữ liệu tự luân chuyển. | `Thực hiện trực tuyến qua ứng dụng VNeID hoặc Cổng dịch vụ công quốc gia` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bắt người dân đi nộp giấy riêng lẻ ở từng cơ quan.* |
+| **Thứ tự luân chuyển hồ sơ** | UBND xã cấp Khai sinh trước (24h) -> chuyển sang Công an xã (Thường trú) và BHXH (BHYT) -> Căn cước dưới 6 tuổi. | `AI chỉ ghi chung "Cơ quan tiếp nhận: Công an cấp Xã", nhầm lẫn cơ quan bóc tách hồ sơ hộ tịch ban đầu.` | `[] Đạt`<br>`[x] Không đạt` | *Trượt nếu đảo lộn thứ tự giải quyết khi chưa có khai sinh.* |
+| **Đặc thù căn cước dưới 6 tuổi** | Cấp thẻ căn cước cho trẻ dưới 6 tuổi làm **trực tuyến**, không thu nhận vân tay, mống mắt. | `Nêu hình thức thực hiện trực tuyến hoàn toàn, không yêu cầu đi thu nhận sinh trắc.` | `[ ] Đạt`<br>`[] Không đạt` | *Trượt nếu bắt trẻ dưới 6 tuổi đi chụp ảnh mống mắt, lấy vân tay.* |
+| **Thời hạn giải quyết toàn trình** | **Không quá 03 ngày làm việc** (xác minh không quá 05 ngày). | `03 ngày làm việc (xác minh không quá 05 ngày làm việc).` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu cộng dồn cơ học các thủ tục đơn lẻ thành 7 - 15 ngày.* |
+| **Căn cứ pháp lý (Legal Citation)** | Nghị định số 301/2026/NĐ-CP (hoặc Nghị định số 63/2024/NĐ-CP). | `Trích dẫn các chunk mã PROC_3_000722 trong cơ sở dữ liệu local.` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu không trích dẫn văn bản liên thông trong data.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
-* **Hệ thống có hỏi rõ người dùng đã có tài khoản VNeID mức 2 và Giấy chứng sinh điện tử chưa?**: `[ ] Có  |  [ ] Không`
+* **Hệ thống có hỏi rõ người dùng đã có tài khoản VNeID mức 2 và Giấy chứng sinh điện tử chưa?**: `[ ] Có  |  [x] Không`
 * **Nội dung phản hồi làm rõ của AI**:
 ```text
 [=== ĐIỀN CÂU HỎI LÀM RÕ CỦA AI NẾU CÓ ===]
-
+Không có
 ```
 
 ---
@@ -283,9 +296,11 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 ```text
 [=== BẮT ĐẦU ĐIỀN KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
+Dữ liệu hiện tại chưa có thông tin cụ thể về thủ tục đính chính ngày sinh trên VNeID khi đi làm thẻ Căn cước. Bạn có thể trực tiếp mang theo Giấy khai sinh gốc và căn cước của con đến cơ quan công an nơi tiếp nhận hồ sơ cấp thẻ Căn cước để được cán bộ kiểm tra, hướng dẫn xử lý trực tiếp.
 
+Bạn có thể cung cấp thêm:
 
-
+Cơ quan công an nơi bạn đến làm thủ tục đã hướng dẫn cụ thể ra sao về việc sai ngày sinh trên VNeID?
 [=== KẾT THÚC KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
 ```
 
@@ -295,18 +310,18 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_1_116410`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Thứ tự tiên quyết (Prerequisite Order)** | **Bắt buộc điều chỉnh thông tin trong CSDLQG về dân cư trước**, sau đó mới thu nhận hồ sơ cấp thẻ căn cước. | `[Điền AI có bắt sửa CSDL trước không]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo cứ đến làm thẻ căn cước rồi đưa giấy khai sinh sửa luôn.* |
-| **Thẩm quyền địa phương (Authority)** | Điểm cấp thẻ căn cước: **Công an cấp xã trong cả nước không phụ thuộc nơi cư trú**. | `[Điền cơ quan AI chỉ dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bắt buộc phải về nơi thường trú mới được làm thẻ căn cước.* |
-| **Thu nhận sinh trắc học độ tuổi** | Người từ đủ 14 tuổi: Bắt buộc thu nhận **ảnh khuôn mặt, vân tay và ảnh mống mắt**. | `[Điền AI nêu các yếu tố sinh trắc nào]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bỏ quên sinh trắc học mống mắt theo Luật Căn cước.* |
-| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu Phiếu **CC01**, Giấy hẹn **CC02** (Thông tư 118/2026/TT-BCA). | `[Điền thời hạn và mẫu AI nêu]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu nêu sai thời hạn 7 ngày làm việc.* |
-| **Căn cứ pháp lý (Legal Citation)** | Luật Căn cước (26/2023/QH15), Nghị định 70/2024/NĐ-CP, Thông tư 118/2026/TT-BCA. | `[Điền căn cứ AI trích dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu trích dẫn Luật CCCD 2014 cũ đã hết hiệu lực.* |
+| **Thứ tự tiên quyết (Prerequisite Order)** | **Bắt buộc điều chỉnh thông tin trong CSDLQG về dân cư trước**, sau đó mới thu nhận hồ sơ cấp thẻ căn cước. | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bảo cứ đến làm thẻ căn cước rồi đưa giấy khai sinh sửa luôn.* |
+| **Thẩm quyền địa phương (Authority)** | Điểm cấp thẻ căn cước: **Công an cấp xã trong cả nước không phụ thuộc nơi cư trú**. | `Nêu chung "cơ quan công an nơi tiếp nhận hồ sơ cấp thẻ Căn cước".` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bắt buộc phải về nơi thường trú mới được làm thẻ căn cước.* |
+| **Thu nhận sinh trắc học độ tuổi** | Người từ đủ 14 tuổi: Bắt buộc thu nhận **ảnh khuôn mặt, vân tay và ảnh mống mắt**. | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu bỏ quên sinh trắc học mống mắt theo Luật Căn cước.* |
+| **Thời hạn & Biểu mẫu** | Thời hạn **07 ngày làm việc**; Mẫu Phiếu **CC01**, Giấy hẹn **CC02** (Thông tư 118/2026/TT-BCA). | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu nêu sai thời hạn 7 ngày làm việc.* |
+| **Căn cứ pháp lý (Legal Citation)** | Luật Căn cước (26/2023/QH15), Nghị định 70/2024/NĐ-CP, Thông tư 118/2026/TT-BCA. | `x` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu trích dẫn Luật CCCD 2014 cũ đã hết hiệu lực.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
-* **Hệ thống có hỏi về việc công dân đã cầm Giấy khai sinh bản gốc đến Công an xã để chỉnh sửa thông tin chưa?**: `[ ] Có  |  [ ] Không`
+* **Hệ thống có hỏi về việc công dân đã cầm Giấy khai sinh bản gốc đến Công an xã để chỉnh sửa thông tin chưa?**: `[ ] Có  |  [x] Không`
 * **Nội dung phản hồi làm rõ của AI**:
 ```text
 [=== ĐIỀN CÂU HỎI LÀM RÕ CỦA AI NẾU CÓ ===]
-
+Cơ quan công an nơi bạn đến làm thủ tục đã hướng dẫn cụ thể ra sao về việc sai ngày sinh trên VNeID?
 ```
 
 ---
@@ -352,9 +367,32 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 ```text
 [=== BẮT ĐẦU ĐIỀN KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
+Trường hợp con bạn 1 tháng tuổi chưa có giấy khai sinh và đang bị ốm cần đi viện, bạn cần thực hiện thủ tục đăng ký khai sinh trước tại Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】. Hiện tại dữ liệu chưa ghi nhận cơ quan Bảo hiểm xã hội cấp thẻ BHYT trực tiếp trước khi có khai sinh trong tình huống này.
 
+Thứ tự nên làm
+- PROC_1_001193: Thực hiện Thủ tục đăng ký khai sinh 【PROC_1_001193】 tại Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】 để làm cơ sở cấp thẻ BHYT và giải quyết các chế độ cho trẻ.
+Giấy tờ và cách thực hiện
+- Hồ sơ phổ biến 【PROC_1_001193_c11_s0】:
++ Giấy chứng sinh (hoặc văn bản của người làm chứng/giấy cam đoan về việc sinh nếu không có giấy chứng sinh) 【PROC_1_001193_c5_s0】.
++ Giấy tờ tùy thân (Hộ chiếu, Thẻ căn cước công dân, Thẻ căn cước hoặc giấy tờ khác có dán ảnh) của người đi đăng ký 【PROC_1_001193_c11_s0】.
+- Cách thực hiện và thời gian 【PROC_1_001193_c48_s0】:
++ Cơ quan tiếp nhận: Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】.
++ Hình thức: Nộp trực tuyến, trực tiếp hoặc qua dịch vụ bưu chính 【PROC_1_001193_c48_s0】.
++ Thời gian giải quyết: 1 ngày 【PROC_1_001193_c48_s0】.
++ Lệ phí: Miễn phí 【PROC_1_001193_c48_s0】.
 
+Bạn có thể cung cấp thêm:
 
+Bạn đã có Giấy chứng sinh của cháu tại cơ sở y tế nơi sinh chưa?
+
+Nguồn tham khảo (7)
+Thủ tục đăng ký khai sinh — PROC_1_001193
+Thủ tục đăng ký khai sinh – step_item — PROC_1_001193_c43_s0
+Thủ tục đăng ký khai sinh – step_item — PROC_1_001193_c44_s0
+Thủ tục đăng ký khai sinh – document_item — PROC_1_001193_c17_s0
+Thủ tục đăng ký khai sinh – document_item — PROC_1_001193_c11_s0
+Thủ tục đăng ký khai sinh – document_item — PROC_1_001193_c5_s0
+Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
 [=== KẾT THÚC KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
 ```
 
@@ -364,18 +402,18 @@ Hợp đồng thuê nhà viết tay của bạn đã có xác nhận của cơ q
 
 | Tiêu chí kiểm chứng | Lộ trình chuẩn (Ground Truth từ `PROC_1_014137`) | Kết quả AI thể hiện | Đánh giá (Đạt / Không đạt) | Ghi chú của chuyên gia |
 | :--- | :--- | :--- | :---: | :--- |
-| **Nhận diện điều kiện tiên quyết (Prerequisite)** | Khẳng định **không thể cấp thẻ BHYT khi chưa khai sinh**; Khai sinh là thủ tục tiên quyết bắt buộc. | `[Điền AI có nhận diện tiên quyết không]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo công dân cứ ra cơ quan BHXH xin cấp thẻ BHYT ngay khi chưa khai sinh.* |
-| **Cơ quan thẩm quyền cấp thẻ BHYT** | **Bảo hiểm xã hội tỉnh / cơ quan BHXH** (không phải UBND xã cấp thẻ BHYT). | `[Điền cơ quan AI chỉ dẫn]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo UBND xã có thẩm quyền cấp thẻ BHYT.* |
-| **Thời hạn giải quyết BHYT đơn lẻ** | **05 ngày làm việc** kể từ ngày nhận đủ hồ sơ (theo `execution_methods` của `PROC_1_014137`). | `[Điền thời hạn AI nêu]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu nêu sai thời hạn 5 ngày làm việc của thủ tục BHYT.* |
-| **Biểu mẫu tờ khai BHYT chuẩn** | **Mẫu số 2** Phụ lục ban hành kèm theo **Nghị định số 188/2025/NĐ-CP**. | `[Điền mẫu tờ khai AI trích]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Trượt nếu trích dẫn mẫu tờ khai cũ không có trong data local.* |
-| **Định hướng giải pháp liên thông** | Hướng dẫn công dân phương án tối ưu: nộp DVC liên thông trên VNeID để có cả 2 giấy tờ trong 03 ngày làm việc. | `[Điền AI có gợi ý DVC liên thông]` | `[ ] Đạt`<br>`[ ] Không đạt` | *Đánh giá tính chủ động tối ưu lộ trình của trợ lý AI.* |
+| **Nhận diện điều kiện tiên quyết (Prerequisite)** | Khẳng định **không thể cấp thẻ BHYT khi chưa khai sinh**; Khai sinh là thủ tục tiên quyết bắt buộc. | `Khẳng định cần làm thủ tục đăng ký khai sinh trước để làm cơ sở cấp thẻ BHYT.` | `[x] Đạt`<br>`[ ] Không đạt` | *Trượt nếu bảo công dân cứ ra cơ quan BHXH xin cấp thẻ BHYT ngay khi chưa khai sinh.* |
+| **Cơ quan thẩm quyền cấp thẻ BHYT** | **Bảo hiểm xã hội tỉnh / cơ quan BHXH** (không phải UBND xã cấp thẻ BHYT). | `AI hướng dẫn làm khai sinh tại UBND xã, chưa chỉ rõ quy định thủ tục cấp BHYT tại cơ quan BHXH.` | `[] Đạt`<br>`[x] Không đạt` | *Trượt nếu bảo UBND xã có thẩm quyền cấp thẻ BHYT.* |
+| **Thời hạn giải quyết BHYT đơn lẻ** | **05 ngày làm việc** kể từ ngày nhận đủ hồ sơ (theo `execution_methods` của `PROC_1_014137`). | `Bỏ sót thời hạn giải quyết 05 ngày làm việc của thủ tục cấp thẻ BHYT (chỉ nêu thời hạn khai sinh 1 ngày).` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu nêu sai thời hạn 5 ngày làm việc của thủ tục BHYT.* |
+| **Biểu mẫu tờ khai BHYT chuẩn** | **Mẫu số 2** Phụ lục ban hành kèm theo **Nghị định số 188/2025/NĐ-CP**. | `Chưa liệt kê được Mẫu số 2 tờ khai tham gia BHYT.` | `[ ] Đạt`<br>`[x] Không đạt` | *Trượt nếu trích dẫn mẫu tờ khai cũ không có trong data local.* |
+| **Định hướng giải pháp liên thông** | Hướng dẫn công dân phương án tối ưu: nộp DVC liên thông trên VNeID để có cả 2 giấy tờ trong 03 ngày làm việc. | `[Điền AI có gợi ý DVC liên thông]` | `[ ] Đạt`<br>`[x] Không đạt` | *Đánh giá tính chủ động tối ưu lộ trình của trợ lý AI.* |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
-* **Hệ thống có hỏi rõ về việc gia đình có Giấy chứng sinh hay chưa và hướng dẫn làm khai sinh trước không?**: `[ ] Có  |  [ ] Không`
+* **Hệ thống có hỏi rõ về việc gia đình có Giấy chứng sinh hay chưa và hướng dẫn làm khai sinh trước không?**: `[x] Có  |  [x] Không`
 * **Nội dung phản hồi làm rõ của AI**:
 ```text
 [=== ĐIỀN CÂU HỎI LÀM RÕ CỦA AI NẾU CÓ ===]
-
+Bạn đã có Giấy chứng sinh của cháu tại cơ sở y tế nơi sinh chưa?
 ```
 
 ---
