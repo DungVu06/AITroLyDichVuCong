@@ -10,6 +10,18 @@ from sentence_transformers import SentenceTransformer
 # This file lives in db/vector; data remains at the project root.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
+def load_dotenv(path: Path = PROJECT_ROOT / ".env") -> None:
+    if not path.exists():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+load_dotenv()
+
 qdrant_url = os.getenv("QDRANT_URL")
 qdrant_api_key = os.getenv("QDRANT_API_KEY")
 if not qdrant_url or not qdrant_api_key:
@@ -18,7 +30,7 @@ if not qdrant_url or not qdrant_api_key:
         "Hãy cấu hình hai biến môi trường trước khi chạy."
     )
 
-client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key, timeout=60.0)
 
 model = SentenceTransformer('keepitreal/vietnamese-sbert')
 vector_size = model.get_embedding_dimension()
@@ -40,16 +52,18 @@ def reset_collection(collection_name: str) -> None:
         print(f"Đã xóa collection cũ: {collection_name}")
 
 
-def embed_and_upsert(jsonl_file: str, collection_name: str) -> None:
+def embed_and_upsert(jsonl_file: str, collection_name: str, batch_size: int = 50) -> None:
     input_file = Path(jsonl_file)
     if not input_file.exists():
         print(f"Bỏ qua {collection_name}: không tìm thấy {jsonl_file}")
         return
 
     ensure_collection(collection_name)
-    points = []
 
-    print(f"Đang đọc và embedding {jsonl_file}...")
+    print(f"\n--- Đang xử lý {jsonl_file} -> Collection '{collection_name}' ---")
+    batch_points = []
+    total_upserted = 0
+
     with input_file.open("r", encoding="utf-8") as file:
         for point_id, line in enumerate(file):
             chunk = json.loads(line)
@@ -57,7 +71,7 @@ def embed_and_upsert(jsonl_file: str, collection_name: str) -> None:
             metadata = chunk.get("metadata", {})
 
             vector = model.encode(text).tolist()
-            points.append(
+            batch_points.append(
                 PointStruct(
                     id=point_id,
                     vector=vector,
@@ -65,12 +79,18 @@ def embed_and_upsert(jsonl_file: str, collection_name: str) -> None:
                 )
             )
 
-    if not points:
-        print(f"Bỏ qua {collection_name}: file không có chunk")
-        return
+            if len(batch_points) >= batch_size:
+                client.upsert(collection_name=collection_name, points=batch_points)
+                total_upserted += len(batch_points)
+                print(f"[{collection_name}] Đã đẩy {total_upserted} chunks...")
+                batch_points = []
 
-    client.upsert(collection_name=collection_name, points=points)
-    print(f"Đã đưa thành công {len(points)} chunks vào collection {collection_name}!")
+    if batch_points:
+        client.upsert(collection_name=collection_name, points=batch_points)
+        total_upserted += len(batch_points)
+        print(f"[{collection_name}] Đã đẩy {total_upserted} chunks...")
+
+    print(f"==> Hoàn tất: Đã đưa thành công {total_upserted} chunks vào collection '{collection_name}'!")
 
 
 def main() -> None:
@@ -85,8 +105,8 @@ def main() -> None:
     args = parser.parse_args()
 
     collections = [
-        (PROJECT_ROOT / "data" / "procedure_chunks.jsonl", "procedures"),
-        (PROJECT_ROOT / "data" / "law_chunks.jsonl", "laws"),
+        (PROJECT_ROOT / "data" / "chunks" / "procedure_chunks.jsonl", "procedures"),
+        (PROJECT_ROOT / "data" / "chunks" / "law_chunks.jsonl", "laws"),
     ]
 
     if args.reset:
