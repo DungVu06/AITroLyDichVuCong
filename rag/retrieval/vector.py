@@ -146,6 +146,7 @@ class VectorRetriever:
                     doc_id=str(payload.get("doc_id", "")),
                     chunk_id=payload.get("chunk_id"),
                     chunk_type=payload.get("chunk_type"),
+                step_number=payload.get("step_number"),
                     text=text,
                     score=float(point.score) if point.score is not None else None,
                     metadata=payload,
@@ -193,6 +194,7 @@ class VectorRetriever:
         chunk_types: list[str],
         per_type_limit: int = 3,
         required_evidence: list[EvidenceRequirement] | None = None,
+        preserve_step_sequence: bool = False,
     ) -> list[ProcedureEvidence]:
         """Xếp hạng chi tiết theo tình huống rồi lọc đúng procedure ID."""
         procedure_ids = {procedure.procedure_id for procedure in procedures}
@@ -223,6 +225,7 @@ class VectorRetriever:
                         doc_id=procedure_id,
                         chunk_id=payload.get("chunk_id"),
                         chunk_type=actual_type,
+                        step_number=payload.get("step_number"),
                         text=text,
                         score=float(point.score) if point.score is not None else None,
                         metadata=payload,
@@ -253,10 +256,30 @@ class VectorRetriever:
                 matches = [
                     item for item in available
                     if all(term.casefold() in item.text.casefold() for term in requirement.required_terms)
+                    and (requirement.step_number is None or item.step_number == requirement.step_number)
+                    and not any(term.casefold() in item.text.casefold() for term in requirement.excluded_terms)
                 ]
                 if matches:
-                    result.append(matches[0])
+                    # Prefer substantive text over a split chunk which repeats
+                    # only a step title or procedure name.
+                    result.append(max(matches, key=lambda item: len(item.text)))
             return list({item.point_id: item for item in result}.values())
+
+        def sequence_representatives(available: list[RetrievedChunk]) -> list[RetrievedChunk]:
+            """Keep one meaningful source chunk for every numbered step."""
+            grouped_steps: dict[int, list[RetrievedChunk]] = {}
+            for item in available:
+                if item.step_number is not None:
+                    grouped_steps.setdefault(item.step_number, []).append(item)
+            result = []
+            for number in sorted(grouped_steps):
+                candidates = grouped_steps[number]
+                explicit = [
+                    item for item in candidates
+                    if re.search(rf"bước\s*{number}(?:\s*[:.])", item.text, re.IGNORECASE)
+                ]
+                result.append(max(explicit or candidates, key=lambda item: len(item.text)))
+            return result
 
         enriched = []
         for procedure in procedures:
@@ -264,8 +287,13 @@ class VectorRetriever:
             for chunk_type in chunk_types:
                 available = grouped[procedure.procedure_id][chunk_type]
                 forced = required_chunks(procedure.procedure_id, chunk_type, available)
+                sequence = (
+                    sequence_representatives(available)
+                    if preserve_step_sequence and chunk_type == "step_item"
+                    else []
+                )
                 ranked = _rank_detail_chunks(available, chunk_type, per_type_limit, query)
-                merged = list({item.point_id: item for item in [*forced, *ranked]}.values())
+                merged = list({item.point_id: item for item in [*sequence, *forced, *ranked]}.values())
                 if chunk_type == "step_item":
                     merged.sort(key=lambda item: item.chunk_id or "")
                 chunks.extend(merged)

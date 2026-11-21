@@ -8,6 +8,8 @@ evidence đó được trích dẫn trong câu trả lời.
 
 from __future__ import annotations
 
+import re
+
 from rag.core.schemas import AnswerContract, EvidenceRequirement, QueryState, UserQuery
 
 
@@ -24,6 +26,8 @@ def _requirement(
     procedure_id: str,
     chunk_type: str,
     *terms: str,
+    step_number: int | None = None,
+    excluded_terms: tuple[str, ...] = (),
 ) -> EvidenceRequirement:
     return EvidenceRequirement(
         claim_id=claim_id,
@@ -31,6 +35,8 @@ def _requirement(
         procedure_id=procedure_id,
         chunk_type=chunk_type,
         required_terms=list(terms),
+        step_number=step_number,
+        excluded_terms=list(excluded_terms),
     )
 
 
@@ -41,6 +47,13 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
     questions: list[str] = []
     submission_channel: str | None = None
     processing_flow: list[str] = []
+    sequence_markers = (
+        "các bước", "trình tự", "quy trình", "hệ thống xử lý",
+        "thứ tự", "thực hiện như thế nào",
+    )
+    enforce_step_sequence = "steps" in state.topics or any(
+        marker in text for marker in sequence_markers
+    )
 
     birth_at_home = "giấy chứng sinh" in text and ("tại nhà" in text or "không có" in text)
     if birth_at_home:
@@ -89,11 +102,17 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
     mismatch_case = "vneid" in text and any(term in text for term in ("ngày sinh", "sai", "không khớp", "sai lệch"))
     if mismatch_case:
         procedure_ids.append(CARD)
+        age_match = re.search(r"\b(\d{1,2})\s*tuổi\b", text)
+        age = int(age_match.group(1)) if age_match else None
+        # The source contains separate numbered branches for under-14 and for
+        # general/from-14 cases. Select from the stated age instead of mixing
+        # semantic matches from incompatible branches.
+        initial_card_steps = (21, 25, 27) if age is not None and age < 14 else (8, 11, 13)
         requirements += [
-            _requirement("card_correct_first", "Xử lý điều chỉnh dữ liệu trước", CARD, "step_item", "điều chỉnh thông tin", "trước khi thực hiện thủ tục cấp thẻ căn cước"),
+            _requirement("card_correct_first", "Xử lý điều chỉnh dữ liệu trước", CARD, "step_item", "điều chỉnh thông tin", "trước khi thực hiện thủ tục cấp thẻ căn cước", step_number=initial_card_steps[0]),
             _requirement("card_cc01", "Phiếu thu nhận thông tin căn cước", CARD, "document_item", "Mẫu CC01"),
-            _requirement("card_cc02", "Phiếu thu thập thông tin dân cư", CARD, "step_item", "Mẫu CC02"),
-            _requirement("card_biometrics", "Thu nhận sinh trắc học", CARD, "step_item", "mống mắt"),
+            _requirement("card_cc02", "Giấy hẹn trả kết quả căn cước", CARD, "step_item", "Mẫu CC02", step_number=initial_card_steps[2]),
+            _requirement("card_biometrics", "Thu nhận sinh trắc học", CARD, "step_item", "mống mắt", step_number=initial_card_steps[1]),
         ]
         questions.append("Thông tin ngày sinh đã được điều chỉnh trong Cơ sở dữ liệu quốc gia về dân cư chưa?")
 
@@ -129,4 +148,5 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
         required_follow_up_questions=list(dict.fromkeys(questions))[:3],
         submission_channel=submission_channel,
         processing_flow=processing_flow,
+        enforce_step_sequence=enforce_step_sequence,
     )

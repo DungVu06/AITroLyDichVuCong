@@ -100,6 +100,9 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
                     if chunk.chunk_id
                     and procedure.procedure_id == requirement.procedure_id
                     and chunk.chunk_type == requirement.chunk_type
+                    and (requirement.step_number is None or chunk.step_number == requirement.step_number)
+                    and not any(term.casefold() in chunk.text.casefold()
+                                for term in requirement.excluded_terms)
                     and all(term.casefold() in chunk.text.casefold()
                             for term in requirement.required_terms)
                 }
@@ -121,6 +124,30 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
                     ),
                     excerpt=requirement.claim_id,
                 ))
+
+        for procedure_id, expected_steps in context.contract.required_step_numbers.items():
+            for step_number in expected_steps:
+                candidates = {
+                    chunk.chunk_id
+                    for procedure in context.procedure_evidence
+                    for chunk in procedure.chunks
+                    if procedure.procedure_id == procedure_id
+                    and chunk.chunk_type == "step_item"
+                    and chunk.step_number == step_number
+                    and chunk.chunk_id
+                }
+                if not candidates:
+                    issues.append(ValidationIssue(
+                        code="missing_step_evidence",
+                        severity="error",
+                        message=(f"Thiếu evidence cho bước {step_number} của {procedure_id}."),
+                    ))
+                elif candidates.isdisjoint(cited_ids):
+                    issues.append(ValidationIssue(
+                        code="missing_step_citation",
+                        severity="error",
+                        message=(f"Câu trả lời chưa nêu bước {step_number} của {procedure_id}."),
+                    ))
 
     for source_id in unknown_ids:
         issues.append(

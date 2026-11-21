@@ -63,9 +63,17 @@ def build_context(
         return AnswerContext(query=user_query, query_state=state)
     catalog = procedure_catalog()
     contract = build_answer_contract(user_query, state)
-    requested = list(dict.fromkeys(
-        i for i in [*state.procedure_ids, *contract.procedure_ids] if i in catalog
-    ))
+    # A deterministic contract is derived only from explicit facts in the
+    # current message. When it resolves a procedure, do not let an LLM infer
+    # extra procedures merely because their documents are mentioned (for
+    # example, a birth certificate cited as evidence in a card-correction case).
+    contract_resolved = bool(contract.requirements)
+    requested_candidates = (
+        contract.procedure_ids
+        if contract_resolved
+        else [*state.procedure_ids, *contract.procedure_ids]
+    )
+    requested = list(dict.fromkeys(i for i in requested_candidates if i in catalog))
     with QdrantVectorClient.from_env() as qdrant:
         retriever = VectorRetriever(qdrant, embedder=embedder)
         vector_result = retriever.retrieve_from_plan(
@@ -83,7 +91,7 @@ def build_context(
 
         def read_graph(client):
             graph_retriever = GraphRetriever(client)
-            if (plan.use_graph_traversal or state.asks_about_dependencies
+            if (plan.use_graph_traversal or (state.asks_about_dependencies and not contract_resolved)
                     or any(item.relation_type for item in contract.requirements)
                     or len(seed_ids) > 1):
                 graph = graph_retriever.retrieve(seed_ids, include_benefits=plan.include_benefits)
@@ -104,7 +112,7 @@ def build_context(
         if plan.strategy == RetrievalStrategy.PROCEDURE_DETAIL:
             # Retain the linked one-stop alternative for a multi-procedure request.
             focus = set(seed_ids)
-            if state.asks_about_dependencies:
+            if state.asks_about_dependencies and not contract_resolved:
                 focus.update(r.target.procedure_id for r in graph.procedure_relations
                              if r.relationship_type == "REQUIRES" and r.source_id in seed_ids)
             if len(focus) > 1:
@@ -135,7 +143,25 @@ def build_context(
             chunk_types=detail_types if graph.procedures else [],
             per_type_limit=8,
             required_evidence=contract.requirements,
+            preserve_step_sequence=contract.enforce_step_sequence,
         )
+
+    if contract.enforce_step_sequence:
+        required_step_numbers = {
+            procedure.procedure_id: sorted({
+                chunk.step_number
+                for chunk in procedure.chunks
+                if chunk.chunk_type == "step_item" and chunk.step_number is not None
+            })
+            for procedure in procedures
+        }
+        contract = contract.model_copy(update={
+            "required_step_numbers": {
+                procedure_id: numbers
+                for procedure_id, numbers in required_step_numbers.items()
+                if numbers
+            }
+        })
 
     metadata = source_metadata()
     benefits = resolve_benefits(graph)

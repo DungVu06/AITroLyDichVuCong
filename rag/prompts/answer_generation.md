@@ -42,6 +42,13 @@ phải trích chính `chunk_id` đó. Nếu requirement có `relation_type`, dù
 18. Khi `contract.submission_channel` có giá trị, phân biệt rõ: đây là kênh người
 dân nộp hồ sơ; các dòng trong `contract.processing_flow` là luồng xử lý nội bộ
 của cơ quan/hệ thống, không gọi nhầm là nơi người dân phải đến nộp.
+19. Khi `contract.required_step_numbers` có dữ liệu, người dùng đang hỏi quy
+trình. Phải nêu đủ từng bước được đánh số của từng thủ tục, theo thứ tự tăng dần,
+và mỗi bước có citation của chính chunk mang số bước đó.
+20. Khi facts người dùng đã cho thấy một giấy tờ/chứng thực/điều kiện chưa có,
+trong khi evidence yêu cầu điều kiện đó, phải kết luận rõ là cần hoàn thiện
+điều kiện trước khi nộp; không làm nhẹ thành câu “cần lưu ý”. Quy tắc này áp
+dụng chung cho mọi thủ tục có điều kiện, không suy đoán điều kiện ngoài context.
 
 ## Đánh giá quyền lợi và hỏi tiếp
 

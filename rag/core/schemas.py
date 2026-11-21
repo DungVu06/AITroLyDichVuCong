@@ -115,6 +115,7 @@ class RetrievedChunk(StrictModel):
     doc_id: str
     chunk_id: str | None = None
     chunk_type: str | None = None
+    step_number: int | None = None
     text: str
     score: float | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -209,6 +210,8 @@ class EvidenceRequirement(StrictModel):
     procedure_id: str | None = None
     chunk_type: str | None = None
     required_terms: list[str] = Field(default_factory=list)
+    step_number: int | None = None
+    excluded_terms: list[str] = Field(default_factory=list)
     relation_type: str | None = None
 
 
@@ -220,6 +223,8 @@ class AnswerContract(StrictModel):
     required_follow_up_questions: list[str] = Field(default_factory=list)
     submission_channel: str | None = None
     processing_flow: list[str] = Field(default_factory=list)
+    enforce_step_sequence: bool = False
+    required_step_numbers: dict[str, list[int]] = Field(default_factory=dict)
 
 
 class RelationEvidence(StrictModel):

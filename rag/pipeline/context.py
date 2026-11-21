@@ -74,10 +74,26 @@ def _shorten_chunk(chunk: RetrievedChunk, max_chars: int = 1_500) -> RetrievedCh
     return chunk.model_copy(update={"text": text, "metadata": {}})
 
 
-def _compact_procedure(procedure: ProcedureEvidence) -> ProcedureEvidence:
+def _compact_procedure(
+    procedure: ProcedureEvidence,
+    required_step_numbers: list[int] | None = None,
+) -> ProcedureEvidence:
     counts: dict[str, int] = defaultdict(int)
-    chunks = []
+    chunks: list[RetrievedChunk] = []
+    required_steps = set(required_step_numbers or [])
+    if required_steps:
+        for step_number in sorted(required_steps):
+            candidates = [
+                chunk for chunk in procedure.chunks
+                if chunk.chunk_type == "step_item" and chunk.step_number == step_number
+            ]
+            if candidates:
+                chosen = max(candidates, key=lambda chunk: len(chunk.text))
+                chunks.append(_shorten_chunk(chosen))
+                counts["step_item"] += 1
     for chunk in procedure.chunks:
+        if any(existing.point_id == chunk.point_id for existing in chunks):
+            continue
         chunk_type = chunk.chunk_type or ""
         limit = PROCEDURE_CHUNK_LIMITS.get(chunk_type, 0)
         if counts[chunk_type] >= limit:
@@ -116,7 +132,14 @@ def build_answer_context(
 ) -> AnswerContext:
     """Build the only structured payload passed to answer generation."""
     journey_order = {item.procedure_id: index for index, item in enumerate(journey)}
-    compact_procedures = [_compact_procedure(item) for item in procedure_evidence]
+    active_contract = contract or AnswerContract()
+    compact_procedures = [
+        _compact_procedure(
+            item,
+            active_contract.required_step_numbers.get(item.procedure_id),
+        )
+        for item in procedure_evidence
+    ]
     compact_procedures.sort(
         key=lambda item: journey_order.get(item.procedure_id, len(journey_order))
     )
@@ -129,9 +152,9 @@ def build_answer_context(
         benefits=[_compact_benefit(item) for item in benefits],
         legal_evidence=legal_evidence or [],
         required_follow_up_questions=list(dict.fromkeys([
-            *((contract or AnswerContract()).required_follow_up_questions),
+            *active_contract.required_follow_up_questions,
             *derive_decision_questions(query, compact_procedures),
         ]))[:3],
-        contract=contract or AnswerContract(),
+        contract=active_contract,
         response_rules=response_rules or ResponseRules(),
     )
