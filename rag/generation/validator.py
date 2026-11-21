@@ -1,10 +1,10 @@
-﻿"""Kiểm tra citation và các ràng buộc an toàn của câu trả lời."""
+"""Kiểm tra citation và các ràng buộc an toàn của câu trả lời."""
 
 from __future__ import annotations
 
 import re
 
-from rag.core.schemas import AnswerValidationResult, RAGResponse, ValidationIssue
+from rag.core.schemas import AnswerContext, AnswerValidationResult, RAGResponse, ValidationIssue
 
 
 CITATION_PATTERN = re.compile(r"【([^】]+)】")
@@ -56,7 +56,7 @@ def _uncited_claim_issues(answer: str) -> list[ValidationIssue]:
     return issues
 
 
-def validate_answer(response: RAGResponse) -> AnswerValidationResult:
+def validate_answer(response: RAGResponse, context: AnswerContext | None = None) -> AnswerValidationResult:
     answer = response.answer_markdown
     cited_ids = list(dict.fromkeys(CITATION_PATTERN.findall(answer)))
     allowed_ids = {source.source_id for source in response.sources}
@@ -67,6 +67,60 @@ def validate_answer(response: RAGResponse) -> AnswerValidationResult:
         if item.procedure_id not in cited_ids
     )
     issues = _uncited_claim_issues(answer)
+
+    if context:
+        topic_types = {"steps": "step_item", "documents": "document_item",
+                       "processing_time": "execution_methods", "fees": "execution_methods"}
+        requested = set(context.query_state.procedure_ids)
+        topics = context.query_state.topics
+        for procedure in context.procedure_evidence:
+            if procedure.procedure_id not in requested:
+                continue
+            for kind in {topic_types[t] for t in topics if t in topic_types}:
+                candidates = {c.chunk_id for c in procedure.chunks if c.chunk_type == kind}
+                if candidates and candidates.isdisjoint(cited_ids):
+                    issues.append(ValidationIssue(
+                        code="missing_requested_evidence", severity="error",
+                        message=f"Trả lời ý được hỏi về {procedure.name} bằng nguồn {kind} phù hợp.",
+                    ))
+
+        for requirement in context.contract.requirements:
+            if requirement.relation_type:
+                candidates = {
+                    relation.citation_id
+                    for relation in context.relation_evidence
+                    if relation.source_id == requirement.procedure_id
+                    and relation.relationship_type == requirement.relation_type
+                }
+            else:
+                candidates = {
+                    chunk.chunk_id
+                    for procedure in context.procedure_evidence
+                    for chunk in procedure.chunks
+                    if chunk.chunk_id
+                    and procedure.procedure_id == requirement.procedure_id
+                    and chunk.chunk_type == requirement.chunk_type
+                    and all(term.casefold() in chunk.text.casefold()
+                            for term in requirement.required_terms)
+                }
+            if candidates and candidates.isdisjoint(cited_ids):
+                issues.append(ValidationIssue(
+                    code="missing_contract_evidence",
+                    severity="error",
+                    message=(
+                        f"Thiếu evidence bắt buộc cho: {requirement.label}."
+                    ),
+                    excerpt=requirement.claim_id,
+                ))
+            elif not candidates:
+                issues.append(ValidationIssue(
+                    code="unavailable_contract_evidence",
+                    severity="warning",
+                    message=(
+                        f"Không truy xuất được evidence bắt buộc cho: {requirement.label}."
+                    ),
+                    excerpt=requirement.claim_id,
+                ))
 
     for source_id in unknown_ids:
         issues.append(
@@ -97,7 +151,7 @@ def validate_answer(response: RAGResponse) -> AnswerValidationResult:
             )
         )
 
-    if response.benefits and not any(value.startswith("LAW_") for value in cited_ids):
+    if any(b.legal_evidence for b in response.benefits) and not any(value.startswith("LAW_") for value in cited_ids):
         issues.append(
             ValidationIssue(
                 code="missing_legal_citation",

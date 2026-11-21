@@ -78,6 +78,9 @@ class QueryState(StrictModel):
     intent: Intent = Intent.UNKNOWN
     topics: list[str] = Field(default_factory=list)
     target: str | None = None
+    procedure_ids: list[str] = Field(default_factory=list)
+    asks_about_dependencies: bool = False
+    completed_ids: list[str] = Field(default_factory=list)
     facts: dict[str, Any] = Field(default_factory=dict)
     missing_facts: list[MissingFact] = Field(default_factory=list)
 
@@ -187,17 +190,64 @@ class ResponseRules(StrictModel):
     must_mark_uncertain_benefits: bool = True
 
 
+class SourceMetadata(StrictModel):
+    url: str | None = None
+    version: str
+    effective_date: str | None = None
+    observed_at: str | None = None
+    scope: str | None = None
+    validity: str | None = None
+    legal_bases: list[str] = Field(default_factory=list)
+    review: list[str] = Field(default_factory=list)
+
+
+class EvidenceRequirement(StrictModel):
+    """Một claim bắt buộc phải có đúng mảnh evidence để được nêu ra."""
+
+    claim_id: str
+    label: str
+    procedure_id: str | None = None
+    chunk_type: str | None = None
+    required_terms: list[str] = Field(default_factory=list)
+    relation_type: str | None = None
+
+
+class AnswerContract(StrictModel):
+    """Các điều kiện kỹ thuật của câu trả lời, do Python xác định."""
+
+    procedure_ids: list[str] = Field(default_factory=list)
+    requirements: list[EvidenceRequirement] = Field(default_factory=list)
+    required_follow_up_questions: list[str] = Field(default_factory=list)
+    submission_channel: str | None = None
+    processing_flow: list[str] = Field(default_factory=list)
+
+
+class RelationEvidence(StrictModel):
+    source_id: str
+    relationship_type: str
+    target_id: str
+    citation_id: str
+    text: str
+
+
 class AnswerContext(StrictModel):
+    used_local_graph: bool = False
+    used_local_vector_index: bool = False
     query: UserQuery
     query_state: QueryState
     journey: list[JourneyItem] = Field(default_factory=list)
     procedure_evidence: list[ProcedureEvidence] = Field(default_factory=list)
     benefits: list[BenefitEvidence] = Field(default_factory=list)
     legal_evidence: list[LegalEvidence] = Field(default_factory=list)
+    source_metadata: dict[str, SourceMetadata] = Field(default_factory=dict)
+    required_follow_up_questions: list[str] = Field(default_factory=list)
+    contract: AnswerContract = Field(default_factory=AnswerContract)
+    relation_evidence: list[RelationEvidence] = Field(default_factory=list)
     response_rules: ResponseRules = Field(default_factory=ResponseRules)
 
 
 class SourceReference(StrictModel):
+    metadata: SourceMetadata | None = None
     source_type: str
     source_id: str
     title: str

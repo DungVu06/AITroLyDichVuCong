@@ -1,23 +1,31 @@
-﻿"""Điều phối pipeline RAG hoàn chỉnh từ câu hỏi đến response cho UI."""
+"""Điều phối pipeline RAG hoàn chỉnh từ câu hỏi đến response cho UI."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
+import socket
+
+from neo4j.exceptions import ServiceUnavailable, SessionExpired
+from rag.retrieval.local_graph import SnapshotGraph
 import uuid
 
 from db.neo4j_client import Neo4jClient
 from db.qdrant_client import QdrantVectorClient
 from rag.pipeline.benefits import resolve_benefits
 from rag.pipeline.context import build_answer_context
+from rag.pipeline.answer_contract import build_answer_contract
 from rag.core.conversation import InMemoryConversationStore
-from rag.generation.answer import generate_answer, repair_answer_with_gemini
+from rag.core.transcript import ConversationTranscriptStore
+from rag.generation.answer import filter_sources_to_citations, generate_answer, repair_answer_with_gemini
 from rag.generation.validator import repair_procedure_citations, validate_answer
 from rag.pipeline.journey import build_journey
 from rag.pipeline.preprocessing import preprocess_query
 from rag.pipeline.query_understanding import understand_query
 from rag.retrieval.graph import GraphRetriever
+from rag.retrieval.catalog import procedure_catalog, source_metadata
 from rag.retrieval.embedding import QueryEmbedder
 from rag.retrieval.vector import VectorRetriever
 from rag.pipeline.routing import route_query
@@ -27,6 +35,7 @@ from rag.core.schemas import (
     QueryState,
     RAGResponse,
     ResponseRules,
+    RelationEvidence,
     RetrievalStrategy,
     UserQuery,
 )
@@ -50,6 +59,13 @@ def build_context(
     )
     plan = route_query(query, state)
 
+    if plan.strategy in {RetrievalStrategy.OUT_OF_SCOPE, RetrievalStrategy.CLARIFICATION}:
+        return AnswerContext(query=user_query, query_state=state)
+    catalog = procedure_catalog()
+    contract = build_answer_contract(user_query, state)
+    requested = list(dict.fromkeys(
+        i for i in [*state.procedure_ids, *contract.procedure_ids] if i in catalog
+    ))
     with QdrantVectorClient.from_env() as qdrant:
         retriever = VectorRetriever(qdrant, embedder=embedder)
         vector_result = retriever.retrieve_from_plan(
@@ -60,65 +76,178 @@ def build_context(
         seed_ids = list(
             dict.fromkeys(chunk.doc_id for chunk in vector_result["procedures"])
         )
-        if plan.strategy in {
-            RetrievalStrategy.PROCEDURE_DETAIL,
-            RetrievalStrategy.GRAPH_NEXT_STEPS,
-        }:
+        if requested and plan.use_procedure_vector_search:
+            seed_ids = requested
+        elif plan.strategy in {RetrievalStrategy.PROCEDURE_DETAIL, RetrievalStrategy.GRAPH_NEXT_STEPS}:
             seed_ids = seed_ids[:1]
 
-        with Neo4jClient.from_env() as neo4j:
-            graph_retriever = GraphRetriever(neo4j)
-            if plan.use_graph_traversal:
-                graph = graph_retriever.retrieve(
-                    seed_ids,
-                    include_benefits=plan.include_benefits,
-                )
+        def read_graph(client):
+            graph_retriever = GraphRetriever(client)
+            if (plan.use_graph_traversal or state.asks_about_dependencies
+                    or any(item.relation_type for item in contract.requirements)
+                    or len(seed_ids) > 1):
+                graph = graph_retriever.retrieve(seed_ids, include_benefits=plan.include_benefits)
             else:
                 graph = graph_retriever.retrieve_procedure_nodes(seed_ids)
-            legal_evidence = graph_retriever.retrieve_law_evidence(
-                vector_result["laws"]
-            )
+            return graph, graph_retriever.retrieve_law_evidence(vector_result["laws"])
 
+        used_local_graph = False
+        try:
+            with Neo4jClient.from_env() as neo4j:
+                graph, legal_evidence = read_graph(neo4j)
+        except (ServiceUnavailable, SessionExpired, ValueError) as exc:
+            if isinstance(exc, ValueError) and not isinstance(exc.__cause__, socket.gaierror):
+                raise
+            graph, legal_evidence = read_graph(SnapshotGraph())
+            used_local_graph = True
+
+        if plan.strategy == RetrievalStrategy.PROCEDURE_DETAIL:
+            # Retain the linked one-stop alternative for a multi-procedure request.
+            focus = set(seed_ids)
+            if state.asks_about_dependencies:
+                focus.update(r.target.procedure_id for r in graph.procedure_relations
+                             if r.relationship_type == "REQUIRES" and r.source_id in seed_ids)
+            if len(focus) > 1:
+                focus.update(r.target.procedure_id for r in graph.procedure_relations
+                             if r.relationship_type == "PART_OF" and r.source_id in seed_ids)
+            graph = graph.model_copy(update={
+                "procedures": [p for p in graph.procedures if p.procedure_id in focus],
+                "procedure_relations": [r for r in graph.procedure_relations
+                                        if r.source_id in focus and r.target.procedure_id in focus],
+            })
         journey = build_journey(
             graph,
             seed_ids,
             completed_procedure_ids=(
-                seed_ids if state.intent.value == "next_step" else []
+                [i for i in state.completed_ids if i in seed_ids]
             ),
         )
-        journey_ids = {item.procedure_id for item in journey}
+        detail_types = list(plan.procedure_chunk_types)
+        if state.asks_about_dependencies:
+            detail_types.extend(("step_item", "execution_methods"))
+        detail_types.extend(
+            item.chunk_type for item in contract.requirements if item.chunk_type
+        )
+        detail_types = list(dict.fromkeys(detail_types))
         procedures = retriever.retrieve_procedure_details(
-            [item for item in graph.procedures if item.procedure_id in journey_ids],
+            graph.procedures,
             query=plan.procedure_query or query.normalized_text,
-            chunk_types=plan.procedure_chunk_types,
-            per_type_limit=3,
+            chunk_types=detail_types if graph.procedures else [],
+            per_type_limit=8,
+            required_evidence=contract.requirements,
         )
 
-    return build_answer_context(
+    metadata = source_metadata()
+    benefits = resolve_benefits(graph)
+    all_legal = [*legal_evidence, *(item for b in benefits for item in b.legal_evidence)]
+    for item in all_legal:
+        meta = metadata.get(item.law_id)
+        if meta:
+            item.source_url = meta.url or item.source_url
+            item.validity = meta.validity or "Chưa xác minh"
+            if meta.review:
+                item.text = None
+    context = build_answer_context(
         query=user_query,
         query_state=state,
         journey=journey,
         procedure_evidence=procedures,
-        benefits=resolve_benefits(graph),
+        benefits=benefits,
         legal_evidence=legal_evidence,
+        contract=contract,
         response_rules=ResponseRules(
             demo_scope="Demo sự kiện sinh con; trạng thái hiệu lực luật có thể thiếu."
         ),
     )
 
+    context.used_local_graph = used_local_graph
+    context.used_local_vector_index = retriever.used_local
+    used = {p.procedure_id for p in procedures} | {item.law_id for item in all_legal}
+    context.source_metadata = {k: metadata[k] for k in sorted(used) if k in metadata}
+    required_relation_types = {
+        requirement.relation_type
+        for requirement in contract.requirements
+        if requirement.relation_type
+    }
+    context.relation_evidence = [
+        RelationEvidence(
+            source_id=relation.source_id,
+            relationship_type=relation.relationship_type,
+            target_id=relation.target.procedure_id,
+            citation_id=(
+                f"REL:{relation.source_id}:{relation.relationship_type}:"
+                f"{relation.target.procedure_id}"
+            ),
+            text=(
+                f"{relation.source_id} {relation.relationship_type} "
+                f"{relation.target.procedure_id}"
+            ),
+        )
+        for relation in graph.procedure_relations
+        if relation.relationship_type in required_relation_types
+    ]
+    return context
 
-def _fallback_response(response: RAGResponse) -> RAGResponse:
-    lines = ["## Thứ tự thủ tục"]
+
+def _fallback_response(response: RAGResponse, context: AnswerContext) -> RAGResponse:
+    lines = ["## Hướng dẫn theo thông tin đã kiểm chứng", "", "### Thứ tự thủ tục"]
     for item in response.journey:
         lines.append(
             f"- Ưu tiên {item.priority}: **{item.name}** 【{item.procedure_id}】"
         )
+
+    chunk_index = {
+        chunk.chunk_id: chunk
+        for procedure in context.procedure_evidence
+        for chunk in procedure.chunks
+        if chunk.chunk_id
+    }
+    lines.append("\n### Nội dung đã đối chiếu")
+    rendered = set()
+    for requirement in context.contract.requirements:
+        if requirement.relation_type:
+            relation = next((item for item in context.relation_evidence
+                             if item.relationship_type == requirement.relation_type
+                             and item.source_id == requirement.procedure_id), None)
+            if relation:
+                lines.append(f"- **{requirement.label}:** {relation.text}. 【{relation.citation_id}】")
+                rendered.add(requirement.claim_id)
+            continue
+        candidates = [
+            chunk for chunk in chunk_index.values()
+            if chunk.doc_id == requirement.procedure_id
+            and chunk.chunk_type == requirement.chunk_type
+            and all(term.casefold() in chunk.text.casefold() for term in requirement.required_terms)
+        ]
+        if candidates:
+            chunk = candidates[0]
+            lines.append(f"- **{requirement.label}:** {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
+            rendered.add(requirement.claim_id)
+
+    # There may be no formal contract for a normal question. Keep a restrained
+    # answer based on the best retrieved evidence in that case only.
+    if not rendered:
+        for procedure in context.procedure_evidence:
+            selected = [c for c in procedure.chunks if c.chunk_id]
+            if selected:
+                lines.append(f"### {procedure.name} 【{procedure.procedure_id}】")
+                for chunk in selected[:4]:
+                    lines.append(f"- {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
+    for item in context.legal_evidence:
+        if not item.text:
+            lines.append(f"- {item.heading or item.law_id}: chưa có nội dung đã xác minh để áp dụng. 【{item.section_id}】")
+        else:
+            lines.append(f"- {' '.join(item.text.split())[:800]} 【{item.section_id}】")
+    if len(lines) == 1:
+        lines = ["Chưa có nội dung đã xác minh để hướng dẫn cho tình huống này."]
 
     if response.benefits:
         lines.extend(["", "## Quyền lợi có thể liên quan"])
     for benefit in response.benefits:
         evidence = benefit.legal_evidence[0] if benefit.legal_evidence else None
         citation = f" 【{evidence.section_id}】" if evidence else ""
+        if not citation and benefit.related_procedure_id in {s.source_id for s in response.sources}:
+            citation = f" 【{benefit.related_procedure_id}】"
         lines.append(
             f"- **{benefit.title}** có thể liên quan, nhưng chưa đủ dữ kiện "
             f"để kết luận điều kiện hưởng.{citation}"
@@ -140,20 +269,29 @@ def _fallback_response(response: RAGResponse) -> RAGResponse:
 
 
 def _generate_validated_response(context: AnswerContext) -> RAGResponse:
+    if not (context.procedure_evidence or context.legal_evidence or context.benefits):
+        questions = [f.question for f in context.query_state.missing_facts if f.question]
+        outside = context.query_state.intent.value == "out_of_scope"
+        return RAGResponse(
+            answer_markdown=("Câu hỏi nằm ngoài phạm vi trợ lý thủ tục hành chính."
+                             if outside else "Chưa xác định được thủ tục từ thông tin hiện có."),
+            follow_up_questions=[] if outside else questions[:3] or ["Bạn muốn tra cứu thủ tục cụ thể nào?"],
+        )
     response = generate_answer(context)
-    validation = validate_answer(response)
+    validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_procedure_citations(response, validation)
-        validation = validate_answer(response)
+        validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_answer_with_gemini(response, validation, context)
-        validation = validate_answer(response)
+        validation = validate_answer(response, context)
 
     if not validation.is_valid:
-        response = _fallback_response(response)
-        validation = validate_answer(response)
+        logging.getLogger(__name__).warning("Answer fallback after repair: %s", [i.code for i in validation.issues])
+        response = _fallback_response(response, context)
+        validation = validate_answer(response, context)
         if not validation.is_valid:
             raise RuntimeError("Không thể tạo câu trả lời vượt qua hậu kiểm.")
     return response
@@ -163,8 +301,10 @@ class RAGEngine:
     def __init__(
         self,
         conversation_store: InMemoryConversationStore | None = None,
+        transcript_store: ConversationTranscriptStore | None = None,
     ) -> None:
         self.conversation_store = conversation_store or InMemoryConversationStore()
+        self.transcript_store = transcript_store or ConversationTranscriptStore()
         self.embedder = QueryEmbedder()
 
     def clear_conversation(self, conversation_id: str) -> None:
@@ -191,6 +331,11 @@ class RAGEngine:
             embedder=self.embedder,
         )
         response = _generate_validated_response(context)
+        if context.used_local_graph:
+            response.warnings.append("Không kết nối được Neo4j. Lượt này dùng quan hệ từ bộ dữ liệu local của dự án.")
+        if context.used_local_vector_index:
+            response.warnings.append("Không kết nối được Qdrant Cloud. Lượt này dùng chỉ mục Qdrant từ dữ liệu local của dự án.")
+        response = filter_sources_to_citations(response)
 
         if conversation_id:
             self.conversation_store.put(
@@ -201,6 +346,12 @@ class RAGEngine:
                     turn_count=(previous.turn_count + 1) if previous else 1,
                 )
             )
+            try:
+                self.transcript_store.append(conversation_id, text, response)
+            except OSError:
+                logging.getLogger(__name__).exception(
+                    "Could not save conversation transcript: %s", conversation_id
+                )
         return response
 
 
@@ -222,6 +373,8 @@ def run_rag(
 
 def _print_readable(response: RAGResponse) -> None:
     print(response.answer_markdown)
+    for warning in response.warnings:
+        print(f"Lưu ý: {warning}")
     if response.follow_up_questions:
         print("\n## Cần bạn cung cấp thêm")
         for question in response.follow_up_questions:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from rag.core.config import GeminiSettings
+from rag.retrieval.catalog import procedure_catalog
 from rag.core.schemas import PreprocessedQuery, QueryState
 
 
@@ -17,6 +18,7 @@ def build_prompt(
     pending_questions: list[str] | None = None,
 ) -> str:
     instructions = PROMPT_PATH.read_text(encoding="utf-8").strip()
+    instructions += "\nDanh mục thủ tục hiện có (ID và tên):\n" + str(procedure_catalog())
     conversation_context = ""
     if previous_state:
         conversation_context = (
@@ -60,7 +62,10 @@ def understand_query(
     if not interaction.output_text:
         raise RuntimeError("Gemini không trả về nội dung phân tích câu hỏi.")
     result = QueryState.model_validate_json(interaction.output_text)
-    if previous_state and pending_questions:
+    changed_target = previous_state and previous_state.procedure_ids and result.procedure_ids and (
+        set(previous_state.procedure_ids).isdisjoint(result.procedure_ids)
+    )
+    if previous_state and pending_questions and not changed_target:
         merged_facts = dict(previous_state.facts)
         merged_facts.update(result.facts)
         result = result.model_copy(
@@ -75,6 +80,7 @@ def understand_query(
                     dict.fromkeys([*previous_state.topics, *result.topics])
                 ),
                 "target": result.target or previous_state.target,
+                "procedure_ids": result.procedure_ids or previous_state.procedure_ids,
                 "facts": merged_facts,
             }
         )

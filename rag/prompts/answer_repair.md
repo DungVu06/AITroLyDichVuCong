@@ -11,3 +11,6 @@ Quy tắc:
 5. Claim về thủ tục, số liệu, thời hạn và lệ phí phải có citation cùng dòng.
 6. Quyền lợi có trạng thái `unknown` phải được diễn đạt là chưa chắc chắn.
 7. Chỉ trả về Markdown đã sửa theo JSON schema do API cung cấp.
+8. Không được bỏ qua `contract.requirements`: với mỗi requirement còn có evidence
+trong context, bổ sung một câu ngắn có đúng citation của evidence đó. Với
+requirement quan hệ, citation dùng `relation_evidence.citation_id`.

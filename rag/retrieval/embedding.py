@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from rag.core.config import EmbeddingSettings
+from rag.retrieval.local_chunks import LocalChunkIndex
 
 
 class QueryEmbedder:
@@ -12,6 +13,7 @@ class QueryEmbedder:
 
     def __init__(self, settings: EmbeddingSettings | None = None) -> None:
         self.settings = settings or EmbeddingSettings.from_env()
+        self.local_index = LocalChunkIndex()
         self._model: Any = None
 
     def _load_model(self) -> Any:
@@ -40,3 +42,6 @@ class QueryEmbedder:
             raise ValueError("Không thể embedding câu truy vấn rỗng.")
         vector = self._load_model().encode(text)
         return vector.tolist()
+
+    def encode_documents(self, texts: list[str]) -> list[list[float]]:
+        return self._load_model().encode(texts, show_progress_bar=False).tolist()

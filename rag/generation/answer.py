@@ -19,6 +19,7 @@ from rag.core.schemas import (
 
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "answer_generation.md"
+CITATION_PATTERN = re.compile(r"【([^】]+)】")
 
 
 def build_answer_prompt(context: AnswerContext) -> str:
@@ -32,6 +33,7 @@ def _collect_sources(context: AnswerContext) -> list[SourceReference]:
     for procedure in context.procedure_evidence:
         key = ("procedure", procedure.procedure_id)
         sources[key] = SourceReference(
+            metadata=context.source_metadata.get(procedure.procedure_id),
             source_type="procedure",
             source_id=procedure.procedure_id,
             title=procedure.name,
@@ -54,10 +56,21 @@ def _collect_sources(context: AnswerContext) -> list[SourceReference]:
     for item in legal_items:
         key = ("law_section", item.section_id)
         sources[key] = SourceReference(
+            metadata=context.source_metadata.get(item.law_id),
             source_type="law_section",
             source_id=item.section_id,
             title=item.heading or item.law_title or item.section_id,
             url=item.source_url,
+        )
+    for relation in context.relation_evidence:
+        key = ("procedure_relation", relation.citation_id)
+        sources[key] = SourceReference(
+            source_type="procedure_relation",
+            source_id=relation.citation_id,
+            title=(
+                f"Quan hệ thủ tục: {relation.source_id} "
+                f"{relation.relationship_type} {relation.target_id}"
+            ),
         )
     return list(sources.values())
 
@@ -70,7 +83,12 @@ def _build_warnings(
     for benefit in benefits:
         legal_items.extend(benefit.legal_evidence)
 
-    warnings = []
+    warnings = [
+        f"{key} — {notice}"
+        for key, meta in context.source_metadata.items()
+        for notice in meta.review
+        if "phiên bản nguồn khác" in notice or "hết hiệu lực" in notice.casefold()
+    ]
     if legal_items and any(not (item.validity or "").strip() for item in legal_items):
         warnings.append(
             "Dữ liệu nguồn chưa cung cấp trạng thái hiệu lực của một số văn bản pháp luật."
@@ -87,7 +105,7 @@ def _apply_benefit_assessments(
     assessments = {
         item.title.casefold().strip(): item for item in draft.benefit_assessments
     }
-    questions = list(draft.follow_up_questions)
+    questions = [*context.required_follow_up_questions, *draft.follow_up_questions]
     benefits = []
 
     for benefit in context.benefits:
@@ -100,7 +118,13 @@ def _apply_benefit_assessments(
                 for item in benefit.legal_evidence
             )
             reason = assessment.reason
-            if missing_validity and status == EligibilityStatus.ELIGIBLE:
+            if not benefit.legal_evidence or any(
+                context.source_metadata.get(item.law_id) and context.source_metadata[item.law_id].review
+                for item in benefit.legal_evidence
+            ):
+                status = EligibilityStatus.UNKNOWN
+                reason = "Căn cứ của quyền lợi cần được kiểm tra lại."
+            elif missing_validity and status == EligibilityStatus.ELIGIBLE:
                 status = EligibilityStatus.POSSIBLY_ELIGIBLE
                 reason += " Chưa thể kết luận chắc chắn vì thiếu trạng thái hiệu lực văn bản."
             elif missing_validity and status == EligibilityStatus.NOT_ELIGIBLE:
@@ -133,9 +157,18 @@ def _apply_benefit_assessments(
     return benefits, list(dict.fromkeys(questions))[:3]
 
 
+def filter_sources_to_citations(response: RAGResponse) -> RAGResponse:
+    """The UI shows only source records that the answer actually cites."""
+    cited = set(CITATION_PATTERN.findall(response.answer_markdown))
+    return response.model_copy(
+        update={"sources": [source for source in response.sources if source.source_id in cited]}
+    )
+
+
 def _ensure_procedure_citations(markdown: str, context: AnswerContext) -> str:
-    """Gắn citation xác định nếu model chỉ hiển thị procedure ID dạng code."""
+    """Ensure every journey procedure has a deterministic source citation."""
     result = markdown
+    uncited = []
     for item in context.journey:
         citation = f"【{item.procedure_id}】"
         if citation in result:
@@ -150,6 +183,12 @@ def _ensure_procedure_citations(markdown: str, context: AnswerContext) -> str:
             result,
             count=1,
         )
+        if citation not in result:
+            uncited.append(item)
+    if uncited:
+        lines = ["", "### Thủ tục áp dụng"]
+        lines.extend(f"- {item.name} 【{item.procedure_id}】" for item in uncited)
+        result += "\n".join(lines)
     return result
 
 

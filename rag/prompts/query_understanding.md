@@ -55,3 +55,8 @@ Nếu prompt chứa `PREVIOUS_QUERY_STATE` và `PENDING_QUESTIONS`:
 - “Luật quy định chế độ thai sản như thế nào?” → `legal_question`, target “chế độ thai sản”, topic `legal_basis`.
 
 Không kết luận người dùng đủ điều kiện hưởng quyền lợi. Không tự tạo mã thủ tục, mã luật hoặc căn cứ pháp luật. Chỉ xuất JSON đúng schema được cung cấp, không thêm lời giải thích.
+- procedure_ids: chọn các ID trong danh mục cho những thủ tục trực tiếp được hỏi, kể cả thủ tục tiên quyết người dùng nhắc rõ. Với yêu cầu làm liên thông, ưu tiên ID gói liên thông. Chỉ chọn ID khớp nội dung. Với câu hỏi mơ hồ hoặc ngoài phạm vi, để trống.
+- completed_ids: chỉ ghi ID mà người dùng xác nhận đã hoàn thành. Phân biệt "chưa làm" với "đã làm".
+- Khi người dùng trả lời câu hỏi bổ sung ngắn, giữ thủ tục đang hỏi và ghép dữ kiện mới. Nếu chuyển chủ đề, phân tích yêu cầu mới.
+
+- asks_about_dependencies: true nếu câu hỏi phụ thuộc việc đã hoàn tất hay còn thiếu một thủ tục khác, hoặc hỏi quan hệ trước/sau giữa các thủ tục.

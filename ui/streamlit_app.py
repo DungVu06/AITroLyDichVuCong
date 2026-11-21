@@ -70,6 +70,27 @@ def render_metadata(message: dict[str, Any]) -> None:
                 else:
                     st.markdown(f"- **{title}** — `{source_id}`")
 
+    procedure_sources = [
+        source for source in sources
+        if source.get("source_type") == "procedure"
+        and (source.get("metadata") or {}).get("legal_bases")
+    ]
+    if procedure_sources:
+        with st.expander("Căn cứ pháp lý của thủ tục"):
+            for source in procedure_sources:
+                meta = source["metadata"]
+                st.markdown(f"**{source['title']}** · {len(meta['legal_bases'])} văn bản")
+                st.caption(" · ".join(filter(None, (
+                    meta.get("scope"),
+                    "Hiệu lực từ " + (meta.get("effective_date") or "chưa rõ"),
+                    "Ghi nhận " + (meta.get("observed_at") or "chưa rõ"),
+                    "Phiên bản " + meta["version"][:12],
+                ))))
+                for basis in meta["legal_bases"]:
+                    st.markdown(f"- {basis}")
+                for notice in meta.get("review", []):
+                    st.caption(notice)
+
 
 def render_message(message: dict[str, Any]) -> None:
     with st.chat_message(message["role"]):

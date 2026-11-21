@@ -26,6 +26,8 @@ TOPIC_TO_CHUNK_TYPE = {
     "online_method": "execution_methods",
     "execution_methods": "execution_methods",
     "notes": "note_item",
+    "eligibility": "eligibility",
+    "authority": "execution_methods",
 }
 
 
@@ -47,13 +49,14 @@ def route_query(query: PreprocessedQuery, state: QueryState) -> RetrievalPlan:
     if intent == Intent.UNKNOWN and state.life_event:
         intent = Intent.PROCEDURE_JOURNEY
 
-    base_filters = {"life_event": state.life_event} if state.life_event else {}
+    base_filters = {"life_event": "sinh_con"}
     needs_clarification = bool(state.missing_facts)
     retrieval_query = " ".join(
         value
         for value in (
             query.normalized_text,
             state.target,
+            " ".join(str(v) for v in state.facts.values()),
             state.life_event.replace("_", " ") if state.life_event else None,
         )
         if value
