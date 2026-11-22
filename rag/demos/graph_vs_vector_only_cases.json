@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TC01",
+    "title": "Khai sinh tại nhà không có Giấy chứng sinh",
+    "question": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
+    "required_citations": ["PROC_1_001193_c5_s0", "PROC_1_001193_c48_s0"],
+    "required_term_groups": [["người làm chứng", "cam đoan"], ["ủy ban nhân dân cấp xã"], ["1 ngày"]],
+    "forbidden_citations": []
+  },
+  {
+    "id": "TC02",
+    "title": "Thường trú tại nhà thuê",
+    "question": "Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?",
+    "required_citations": ["PROC_1_116788_c127_s0", "PROC_1_116788_c142_s2", "PROC_1_116788_c128_s0", "PROC_1_116788_c174_s0"],
+    "required_term_groups": [["công chứng", "chứng thực"], ["chủ sở hữu"], ["diện tích"], ["công an xã"], ["07 ngày"]],
+    "forbidden_citations": []
+  },
+  {
+    "id": "TC03",
+    "title": "Liên thông VNeID bốn thủ tục",
+    "question": "Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?",
+    "required_citations": ["PROC_3_000722_c180_s1", "PROC_3_000722_c181_s0", "PROC_3_000722_c182_s1", "PROC_3_000722_c183_s1", "PROC_3_000722_c184_s0", "PROC_3_000722_c185_s0"],
+    "required_term_groups": [["bước 1"], ["bước 2"], ["bước 3"], ["bước 4"], ["bước 5"], ["03", "3 ngày"]],
+    "forbidden_citations": []
+  },
+  {
+    "id": "TC04",
+    "title": "Sai ngày sinh trước khi cấp Căn cước",
+    "question": "Con tôi 15 tuổi (sinh năm 2011) đi làm thẻ Căn cước, nhưng trên VNeID ngày sinh của cháu bị sai so với Giấy khai sinh gốc. Gia đình có thể đến điểm cấp căn cước đưa giấy khai sinh để cán bộ làm thẻ luôn được không, hay phải làm thế nào?",
+    "required_citations": ["PROC_1_116410_c73_s0", "PROC_1_116410_c63_s0", "PROC_1_116410_c76_s0", "PROC_1_116410_c78_s0"],
+    "required_term_groups": [["điều chỉnh"], ["trước"], ["mống mắt"], ["cc01"], ["cc02"]],
+    "forbidden_citations": ["PROC_1_116410_c86_s0", "PROC_1_116410_c90_s0"]
+  },
+  {
+    "id": "TC05",
+    "title": "BHYT khi chưa đăng ký khai sinh",
+    "question": "Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?",
+    "required_citations": ["REL:PROC_1_014137:REQUIRES:PROC_1_001193", "PROC_1_014137_c50_s0", "PROC_1_014137_c61_s0"],
+    "required_term_groups": [["khai sinh", "trước"], ["bảo hiểm xã hội"], ["05 ngày", "5 ngày"]],
+    "forbidden_citations": []
+  }
+]
