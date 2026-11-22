@@ -7,6 +7,7 @@ import json
 import logging
 import sys
 import socket
+from typing import Literal
 
 from neo4j.exceptions import ServiceUnavailable, SessionExpired
 from rag.retrieval.local_graph import SnapshotGraph
@@ -25,13 +26,16 @@ from rag.pipeline.journey import build_journey
 from rag.pipeline.preprocessing import preprocess_query
 from rag.pipeline.query_understanding import understand_query
 from rag.retrieval.graph import GraphRetriever
-from rag.retrieval.catalog import procedure_catalog, source_metadata
+from rag.retrieval.catalog import DATA, procedure_catalog, records, source_metadata
 from rag.retrieval.embedding import QueryEmbedder
 from rag.retrieval.vector import VectorRetriever
 from rag.pipeline.routing import route_query
 from rag.core.schemas import (
     AnswerContext,
     ConversationState,
+    GraphRetrievalResult,
+    LegalEvidence,
+    ProcedureEvidence,
     QueryState,
     RAGResponse,
     ResponseRules,
@@ -49,7 +53,10 @@ def build_context(
     previous_state: QueryState | None = None,
     pending_questions: list[str] | None = None,
     embedder: QueryEmbedder | None = None,
+    retrieval_mode: Literal["graph", "vector_only"] = "graph",
 ) -> AnswerContext:
+    if retrieval_mode not in {"graph", "vector_only"}:
+        raise ValueError("retrieval_mode must be 'graph' or 'vector_only'.")
     user_query = UserQuery(text=text, conversation_id=conversation_id)
     query = preprocess_query(user_query)
     state = understand_query(
@@ -100,14 +107,55 @@ def build_context(
             return graph, graph_retriever.retrieve_law_evidence(vector_result["laws"])
 
         used_local_graph = False
-        try:
-            with Neo4jClient.from_env() as neo4j:
-                graph, legal_evidence = read_graph(neo4j)
-        except (ServiceUnavailable, SessionExpired, ValueError) as exc:
-            if isinstance(exc, ValueError) and not isinstance(exc.__cause__, socket.gaierror):
-                raise
-            graph, legal_evidence = read_graph(SnapshotGraph())
-            used_local_graph = True
+        if retrieval_mode == "vector_only":
+            # This branch intentionally does not instantiate Neo4jClient or
+            # SnapshotGraph. It is the control arm for the Graph-RAG demo:
+            # semantic retrieval, contract, prompt and validator stay equal,
+            # while relations and graph-expanded law sections are absent.
+            raw_procedures = {
+                record["id"]: record
+                for record in records("procedure", DATA)
+            }
+            procedures = []
+            for procedure_id in seed_ids:
+                raw = raw_procedures.get(procedure_id)
+                if not raw:
+                    continue
+                matching_chunks = [
+                    chunk for chunk in vector_result["procedures"]
+                    if chunk.doc_id == procedure_id
+                ]
+                procedures.append(
+                    ProcedureEvidence(
+                        procedure_id=procedure_id,
+                        name=raw["procedure"]["name"],
+                        authority=raw["procedure"].get("authority"),
+                        eligibility=raw["procedure"].get("eligibility"),
+                        source_url=raw.get("source", {}).get("url"),
+                        vector_score=(matching_chunks[0].score if matching_chunks else None),
+                    )
+                )
+            graph = GraphRetrievalResult(procedures=procedures)
+            legal_evidence = [
+                LegalEvidence(
+                    law_id=chunk.doc_id,
+                    section_id=chunk.chunk_id or chunk.point_id,
+                    heading=chunk.metadata.get("heading"),
+                    text=chunk.text,
+                    source_url=chunk.metadata.get("source_url"),
+                    retrieval_score=chunk.score,
+                )
+                for chunk in vector_result["laws"]
+            ]
+        else:
+            try:
+                with Neo4jClient.from_env() as neo4j:
+                    graph, legal_evidence = read_graph(neo4j)
+            except (ServiceUnavailable, SessionExpired, ValueError) as exc:
+                if isinstance(exc, ValueError) and not isinstance(exc.__cause__, socket.gaierror):
+                    raise
+                graph, legal_evidence = read_graph(SnapshotGraph())
+                used_local_graph = True
 
         if plan.strategy == RetrievalStrategy.PROCEDURE_DETAIL:
             # Retain the linked one-stop alternative for a multi-procedure request.
@@ -164,7 +212,7 @@ def build_context(
         })
 
     metadata = source_metadata()
-    benefits = resolve_benefits(graph)
+    benefits = resolve_benefits(graph) if retrieval_mode == "graph" else []
     all_legal = [*legal_evidence, *(item for b in benefits for item in b.legal_evidence)]
     for item in all_legal:
         meta = metadata.get(item.law_id)
@@ -328,10 +376,15 @@ class RAGEngine:
         self,
         conversation_store: InMemoryConversationStore | None = None,
         transcript_store: ConversationTranscriptStore | None = None,
+        *,
+        retrieval_mode: Literal["graph", "vector_only"] = "graph",
     ) -> None:
+        if retrieval_mode not in {"graph", "vector_only"}:
+            raise ValueError("retrieval_mode must be 'graph' or 'vector_only'.")
         self.conversation_store = conversation_store or InMemoryConversationStore()
         self.transcript_store = transcript_store or ConversationTranscriptStore()
         self.embedder = QueryEmbedder()
+        self.retrieval_mode = retrieval_mode
 
     def clear_conversation(self, conversation_id: str) -> None:
         self.conversation_store.clear(conversation_id)
@@ -355,6 +408,7 @@ class RAGEngine:
             previous_state=previous.query_state if previous else None,
             pending_questions=previous.pending_questions if previous else None,
             embedder=self.embedder,
+            retrieval_mode=self.retrieval_mode,
         )
         response = _generate_validated_response(context)
         if context.used_local_graph:
