@@ -1,0 +1,401 @@
+{
+  "test_cases": [
+    {
+      "id": "TC-PROC-01",
+      "title": "ĐĂNG KÝ KHAI SINH KHI THIẾU GIẤY CHỨNG SINH Y TẾ (PROC_1_001193)",
+      "question": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
+      "ground_truth": {
+        "authority": [
+          "Ủy ban nhân dân cấp xã nơi cư trú của cha hoặc mẹ."
+        ],
+        "legal_bases": [
+          "Luật Hộ tịch (Luật 60/2014/QH13).",
+          "Thông tư 04/2020/TT-BTP (hướng dẫn Luật Hộ tịch và Nghị định 123/2015/NĐ-CP).",
+          "Thông tư 04/2024/TT-BTP sửa đổi, bổ sung Thông tư 04/2020/TT-BTP.",
+          "Nghị định 123/2015/NĐ-CP và Nghị định 104/2022/NĐ-CP."
+        ],
+        "steps": [
+          {
+            "step": 1,
+            "title": "Bước 1 (Chuẩn bị hồ sơ thay thế theo quy định data local)",
+            "details": [
+              "Giấy tờ thay thế Giấy chứng sinh: Nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì nộp giấy cam đoan về việc sinh.",
+              "Tờ khai đăng ký khai sinh theo mẫu (trường hợp trực tuyến kê khai trên biểu mẫu điện tử tương tác).",
+              "Giấy tờ tùy thân/cư trú: Được đối chiếu, khai thác qua kết nối Cơ sở dữ liệu quốc gia về dân cư."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Bước 2 (Nộp hồ sơ)",
+            "details": [
+              "Nộp trực tiếp tại Bộ phận tiếp nhận và trả kết quả (Một cửa) UBND cấp xã, HOẶC nộp trực tuyến qua Cổng Dịch vụ công quốc gia / Ứng dụng định danh quốc gia VNeID."
+            ]
+          },
+          {
+            "step": 3,
+            "title": "Bước 3 (Thẩm tra & Giải quyết)",
+            "details": [
+              "Công chức tư pháp - hộ tịch thẩm tra tính hợp lệ của giấy cam đoan/văn bản người làm chứng."
+            ]
+          },
+          {
+            "step": 4,
+            "title": "Bước 4 (Nhận kết quả)",
+            "details": [
+              "Cấp Giấy khai sinh (bản chính).",
+              "Thời hạn giải quyết: Trong 01 ngày làm việc kể từ khi nhận đủ hồ sơ hợp lệ."
+            ]
+          }
+        ],
+        "additional_information": []
+      },
+      "evaluation_criteria": [
+        {
+          "criterion": "Xử lý giấy tờ thiếu (Missing Doc)",
+          "expected": "Hướng dẫn thay thế Giấy chứng sinh bằng: Văn bản của người làm chứng hoặc Giấy cam đoan về việc sinh.",
+          "notes": "Trượt nếu bảo thiếu giấy chứng sinh thì không giải quyết được."
+        },
+        {
+          "criterion": "Cơ quan thẩm quyền (Authority)",
+          "expected": "Ủy ban nhân dân cấp xã (Bộ phận Một cửa cấp xã hoặc Cổng DVCQG/VNeID).",
+          "notes": "Trượt nếu hướng dẫn lên cấp huyện hoặc sai cơ quan."
+        },
+        {
+          "criterion": "Thời hạn giải quyết (Processing Time)",
+          "expected": "01 ngày làm việc (theo execution_methods của bản ghi local).",
+          "notes": "Trượt nếu nêu thời hạn > 01 ngày làm việc đối với hồ sơ thường."
+        },
+        {
+          "criterion": "Căn cứ pháp lý (Legal Citation)",
+          "expected": "Luật Hộ tịch (60/2014/QH13), Thông tư 04/2020/TT-BTP, Nghị định 123/2015/NĐ-CP.",
+          "notes": "Trượt nếu trích dẫn văn bản không có trong legal_bases của thủ tục."
+        }
+      ],
+      "source_procedure_ids": [
+        "PROC_1_001193"
+      ]
+    },
+    {
+      "id": "TC-PROC-02",
+      "title": "ĐĂNG KÝ THƯỜNG TRÚ VÀO CHỖ Ở HỢP PHÁP DO THUÊ, MƯỢN, Ở NHỜ (PROC_1_116788)",
+      "question": "Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?",
+      "ground_truth": {
+        "authority": [
+          "Công an Xã (nộp trực tiếp tại Công an xã hoặc trực tuyến qua Cổng DVC Bộ Công an/VNeID)."
+        ],
+        "legal_bases": [
+          "Luật Cư trú 2020 (Luật số 68/2020/QH14).",
+          "Nghị định số 154/2024/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Cư trú.",
+          "Thông tư số 116/2026/TT-BCA quy định chi tiết thi hành Luật Cư trú.",
+          "Thông tư số 54/2025/TT-BCA về quy trình đăng ký cư trú."
+        ],
+        "steps": [
+          {
+            "step": 1,
+            "title": "Bước 1 (Kiểm tra điều kiện & Chuẩn bị hồ sơ theo data local)",
+            "details": [
+              "Tờ khai thay đổi thông tin cư trú (mẫu CT01) ban hành kèm Thông tư 116/2026/TT-BCA: Bắt buộc phải có ý kiến đồng ý cho đăng ký thường trú của chủ hộ, chủ sở hữu chỗ ở hợp pháp.",
+              "Hợp đồng cho thuê, cho mượn, cho ở nhờ: Phải được công chứng hoặc chứng thực theo quy định của pháp luật (hợp đồng viết tay không công chứng/chứng thực là chưa đủ điều kiện).",
+              "Giấy tờ chứng minh đủ diện tích nhà ở: Khai thác trong căn cước điện tử, tài khoản định danh điện tử hoặc giấy tờ theo Điều 5 Nghị định 154/2024/NĐ-CP / xác nhận của UBND cấp xã về diện tích bình quân bảo đảm quy định."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Bước 2 (Nộp hồ sơ)",
+            "details": [
+              "Nộp đến Công an cấp xã (hoặc nộp trực tuyến qua Cổng dịch vụ công / ứng dụng VNeID)."
+            ]
+          },
+          {
+            "step": 3,
+            "title": "Bước 3 (Tiếp nhận & Đối chiếu)",
+            "details": [
+              "Cán bộ đăng ký đối chiếu thông tin kê khai với CSDLQG về dân cư. Nếu đủ điều kiện thì cấp Phiếu tiếp nhận và hẹn trả kết quả (mẫu CT04)."
+            ]
+          },
+          {
+            "step": 4,
+            "title": "Bước 4 (Nhận kết quả)",
+            "details": [
+              "Trong thời hạn 07 ngày làm việc, nhận thông báo kết quả giải quyết cư trú cập nhật trên hệ thống (không cấp sổ hộ khẩu giấy)."
+            ]
+          }
+        ],
+        "additional_information": []
+      },
+      "evaluation_criteria": [
+        {
+          "criterion": "Cơ quan tiếp nhận (Authority)",
+          "expected": "Công an Xã (Cơ quan đăng ký cư trú cấp xã).",
+          "notes": "Trượt nếu bảo nộp UBND xã."
+        },
+        {
+          "criterion": "Yêu cầu sự đồng ý của chủ sở hữu",
+          "expected": "Bắt buộc có ý kiến đồng ý bằng văn bản của chủ sở hữu chỗ ở hợp pháp trong mẫu CT01.",
+          "notes": "Trượt nếu cho phép người thuê tự đăng ký mà không cần chủ nhà đồng ý."
+        },
+        {
+          "criterion": "Yêu cầu tính hợp pháp của hợp đồng",
+          "expected": "Hợp đồng thuê nhà phải được công chứng hoặc chứng thực; Hợp đồng viết tay không đủ điều kiện.",
+          "notes": "Trượt nếu chấp nhận hợp đồng viết tay không chứng thực."
+        },
+        {
+          "criterion": "Chứng minh diện tích nhà ở",
+          "expected": "Phải có thông tin/giấy tờ chứng minh đủ diện tích nhà ở tối thiểu (theo Điều 5 NĐ 154/2024/NĐ-CP).",
+          "notes": "Trượt nếu bỏ qua yêu cầu chứng minh diện tích."
+        },
+        {
+          "criterion": "Thời hạn & Biểu mẫu",
+          "expected": "Thời hạn 07 ngày làm việc; Mẫu CT01 (theo Thông tư 116/2026/TT-BCA).",
+          "notes": "Trượt nếu sai thời hạn 7 ngày làm việc hoặc dùng mẫu sổ giấy cũ."
+        }
+      ],
+      "source_procedure_ids": [
+        "PROC_1_116788"
+      ]
+    },
+    {
+      "id": "TC-PROC-03",
+      "title": "DỊCH VỤ CÔNG LIÊN THÔNG ĐIỆN TỬ 4 TRONG 1 CHO TRẺ EM DƯỚI 6 TUỔI (PROC_3_000722)",
+      "question": "Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?",
+      "ground_truth": {
+        "authority": [
+          "Tiếp nhận: Cổng Dịch vụ công quốc gia hoặc Ứng dụng VNeID.",
+          "Phối hợp giải quyết: UBND cấp xã (khai sinh) -> Công an cấp xã (thường trú, căn cước) -> Cơ quan BHXH (thẻ BHYT)."
+        ],
+        "legal_bases": [
+          "Nghị định số 301/2026/NĐ-CP (sửa đổi, bổ sung một số điều của Nghị định số 63/2024/NĐ-CP quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính)."
+        ],
+        "steps": [
+          {
+            "step": 1,
+            "title": "Bước 1",
+            "details": [
+              "Người yêu cầu truy cập Cổng DVCQG hoặc ứng dụng VNeID, lựa chọn dịch vụ công liên thông 4 thủ tục, kê khai biểu mẫu điện tử tương tác, đính kèm giấy tờ và nộp lệ phí trực tuyến."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Bước 2",
+            "details": [
+              "Cổng DVCQG tiếp nhận thanh toán thành công, bóc tách thành phần hồ sơ chuyển sang Hệ thống đăng ký hộ tịch của Bộ Tư pháp."
+            ]
+          },
+          {
+            "step": 3,
+            "title": "Bước 3 (Giải quyết khai sinh)",
+            "details": [
+              "Công chức tư pháp - hộ tịch UBND cấp xã thực hiện nghiệp vụ đăng ký khai sinh trong 24 giờ kể từ khi nhận đủ hồ sơ hợp lệ, phát hành bản điện tử Giấy khai sinh."
+            ]
+          },
+          {
+            "step": 4,
+            "title": "Bước 4 (Giải quyết thường trú & BHYT)",
+            "details": [
+              "Sau khi có bản điện tử Giấy khai sinh, Cổng DVCQG tự động phân tách chuyển tiếp hồ sơ sang:",
+              "Công an cấp xã: Giải quyết đăng ký thường trú.",
+              "Cơ quan Bảo hiểm xã hội: Giải quyết cấp thẻ BHYT cho trẻ dưới 6 tuổi."
+            ]
+          },
+          {
+            "step": 5,
+            "title": "Bước 5 (Giải quyết thẻ Căn cước cho trẻ dưới 6 tuổi)",
+            "details": [
+              "Sau khi có kết quả đăng ký thường trú, hệ thống chuyển hồ sơ sang cơ quan Công an giải quyết cấp thẻ căn cước cho trẻ dưới 6 tuổi (thực hiện hoàn toàn trực tuyến, không thu nhận sinh trắc học mống mắt, vân tay đối với trẻ dưới 6 tuổi theo quy định PROC_1_116410)."
+            ]
+          }
+        ],
+        "additional_information": [
+          "Thời hạn giải quyết toàn trình: Không quá 03 ngày làm việc kể từ khi các cơ quan nhận đầy đủ hồ sơ (trường hợp phải xác minh thì không quá 05 ngày làm việc)."
+        ]
+      },
+      "evaluation_criteria": [
+        {
+          "criterion": "Tính liên thông 1 cửa điện tử",
+          "expected": "Thực hiện trên Cổng DVCQG / VNeID, nộp 01 lần duy nhất, dữ liệu tự luân chuyển.",
+          "notes": "Trượt nếu bắt người dân đi nộp giấy riêng lẻ ở từng cơ quan."
+        },
+        {
+          "criterion": "Thứ tự luân chuyển hồ sơ",
+          "expected": "UBND xã cấp Khai sinh trước (24h) -> chuyển sang Công an xã (Thường trú) và BHXH (BHYT) -> Căn cước dưới 6 tuổi.",
+          "notes": "Trượt nếu đảo lộn thứ tự giải quyết khi chưa có khai sinh."
+        },
+        {
+          "criterion": "Đặc thù căn cước dưới 6 tuổi",
+          "expected": "Cấp thẻ căn cước cho trẻ dưới 6 tuổi làm trực tuyến, không thu nhận vân tay, mống mắt.",
+          "notes": "Trượt nếu bắt trẻ dưới 6 tuổi đi chụp ảnh mống mắt, lấy vân tay."
+        },
+        {
+          "criterion": "Thời hạn giải quyết toàn trình",
+          "expected": "Không quá 03 ngày làm việc (xác minh không quá 05 ngày).",
+          "notes": "Trượt nếu cộng dồn cơ học các thủ tục đơn lẻ"
+        },
+        {
+          "criterion": "Căn cứ pháp lý (Legal Citation)",
+          "expected": "Nghị định số 301/2026/NĐ-CP (hoặc Nghị định số 63/2024/NĐ-CP).",
+          "notes": "Trượt nếu không trích dẫn văn bản liên thông trong data."
+        }
+      ],
+      "source_procedure_ids": [
+        "PROC_3_000722",
+        "PROC_1_001193",
+        "PROC_1_116788",
+        "PROC_1_014137",
+        "PROC_1_116410"
+      ]
+    },
+    {
+      "id": "TC-PROC-04",
+      "title": "CẤP THẺ CĂN CƯỚC KHI DỮ LIỆU CSDL DÂN CƯ BỊ SAI LỆCH (PROC_1_116410)",
+      "question": "Con tôi 15 tuổi (sinh năm 2011) đi làm thẻ Căn cước, nhưng trên VNeID ngày sinh của cháu bị sai so với Giấy khai sinh gốc. Gia đình có thể đến điểm cấp căn cước đưa giấy khai sinh để cán bộ làm thẻ luôn được không, hay phải làm thế nào?",
+      "ground_truth": {
+        "authority": [
+          "Điểm thu nhận: Công an cấp xã hoặc Bộ phận một cửa cấp xã trong cả nước nếu đã triển khai, không phụ thuộc nơi cư trú. Có thể đăng ký thời gian và địa điểm trên Cổng DVCQG/VNeID khi thông tin chính xác."
+        ],
+        "legal_bases": [
+          "Luật Căn cước (Luật số 26/2023/QH15).",
+          "Luật số 118/2025/QH15.",
+          "Nghị định 70/2024/NĐ-CP quy định chi tiết Luật Căn cước.",
+          "Thông tư số 61/2025/TT-BCA và Thông tư 118/2026/TT-BCA quy định về quy trình cấp thẻ căn cước."
+        ],
+        "steps": [
+          {
+            "step": 1,
+            "title": "Bước 1 (Bước tiên quyết bắt buộc - Điều chỉnh thông tin dân cư)",
+            "details": [
+              "Đối chiếu ngày sinh trong CSDL quốc gia về dân cư. Nếu dữ liệu cần sửa, cán bộ hướng dẫn điều chỉnh trước khi cấp thẻ.",
+              "Nếu chưa có dữ liệu nhân thân, cán bộ đề nghị xuất trình một trong các giấy tờ pháp lý chứng minh thông tin nhân thân và hướng dẫn cập nhật dữ liệu."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Kiểm tra dữ liệu sau khi điều chỉnh",
+            "details": [
+              "Dùng ngày sinh đã điều chỉnh trong cơ sở dữ liệu để lập hồ sơ cấp thẻ."
+            ]
+          },
+          {
+            "step": 3,
+            "title": "Bước 3 (Thu nhận hồ sơ Căn cước)",
+            "details": [
+              "Sau khi dữ liệu đã chuẩn hóa, công dân đến Công an cấp xã hoặc Bộ phận một cửa cấp xã đề nghị cấp thẻ.",
+              "Thu nhận vân tay, ảnh khuôn mặt và ảnh mống mắt khi cấp thẻ cho công dân từ đủ 06 tuổi, bao gồm người 15 tuổi trong ca kiểm thử.",
+              "In Phiếu thu nhận thông tin căn cước (Mẫu CC01), kiểm tra và ký xác nhận."
+            ]
+          },
+          {
+            "step": 4,
+            "title": "Bước 4 (Nhận kết quả)",
+            "details": [
+              "Nhận Giấy hẹn trả kết quả (Mẫu CC02). Nhận thẻ Căn cước trong thời hạn 07 ngày làm việc."
+            ]
+          }
+        ],
+        "additional_information": [
+          "Ngoại lệ theo bản ghi: Khi cấp đổi do sắp xếp đơn vị hành chính làm thay đổi thông tin trên thẻ, cán bộ dùng lại sinh trắc lần cấp gần nhất."
+        ]
+      },
+      "evaluation_criteria": [
+        {
+          "criterion": "Thứ tự tiên quyết (Prerequisite Order)",
+          "expected": "Đối chiếu ngày sinh và hướng dẫn điều chỉnh dữ liệu dân cư nếu cần trước khi cấp thẻ.",
+          "notes": "Trượt nếu hứa cấp thẻ ngay khi dữ liệu cần sửa hoặc mặc định phải nộp Giấy khai sinh bản gốc khi điều chỉnh."
+        },
+        {
+          "criterion": "Thẩm quyền địa phương (Authority)",
+          "expected": "Điểm cấp thẻ căn cước: Công an cấp xã trong cả nước không phụ thuộc nơi cư trú.",
+          "notes": "Trượt nếu bắt buộc phải về nơi thường trú mới được làm thẻ căn cước."
+        },
+        {
+          "criterion": "Thu nhận sinh trắc học độ tuổi",
+          "expected": "Khi cấp thẻ cho người từ đủ 06 tuổi, thu nhận ảnh khuôn mặt, vân tay và ảnh mống mắt.",
+          "notes": "Trượt nếu bỏ quên sinh trắc học mống mắt theo Luật Căn cước."
+        },
+        {
+          "criterion": "Thời hạn & Biểu mẫu",
+          "expected": "Thời hạn 07 ngày làm việc; Mẫu Phiếu CC01, Giấy hẹn CC02 (Thông tư 118/2026/TT-BCA).",
+          "notes": "Trượt nếu nêu sai thời hạn 7 ngày làm việc."
+        },
+        {
+          "criterion": "Căn cứ pháp lý (Legal Citation)",
+          "expected": "Luật Căn cước (26/2023/QH15), Nghị định 70/2024/NĐ-CP, Thông tư 118/2026/TT-BCA.",
+          "notes": "Trượt nếu trích dẫn Luật CCCD 2014 cũ đã hết hiệu lực."
+        }
+      ],
+      "source_procedure_ids": [
+        "PROC_1_116410"
+      ]
+    },
+    {
+      "id": "TC-PROC-05",
+      "title": "CẤP THẺ BHYT VÀ QUAN HỆ ĐIỀU KIỆN TIÊN QUYẾT VỚI KHAI SINH (PROC_1_014137)",
+      "question": "Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?",
+      "ground_truth": {
+        "authority": [
+          "UBND cấp xã đăng ký khai sinh.",
+          "Cơ quan BHXH nhận hồ sơ liên thông và cấp thẻ BHYT."
+        ],
+        "legal_bases": [
+          "Nghị định số 188/2025/NĐ-CP quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm y tế.",
+          "Luật Bảo hiểm y tế (Luật 25/2008/QH12, sửa đổi bởi Luật 46/2014/QH13 và Luật số 51/2024/QH15).",
+          "Quy định liên thông tại PROC_3_000722 (Nghị định 301/2026/NĐ-CP)."
+        ],
+        "steps": [
+          {
+            "step": 1,
+            "title": "Bước 1 (Nộp hồ sơ liên thông)",
+            "details": [
+              "Nộp hồ sơ liên thông cho trẻ dưới 6 tuổi trên Cổng DVCQG hoặc VNeID ngay khi trẻ chưa có Giấy khai sinh.",
+              "Tờ khai điện tử Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Bước 2 (Đăng ký khai sinh rồi chuyển hồ sơ sang BHXH)",
+            "details": [
+              "UBND cấp xã đăng ký khai sinh trước. Cổng DVCQG chuyển hồ sơ kèm bản điện tử Giấy khai sinh sang hệ thống BHXH để cấp thẻ.",
+              "Toàn trình 03 ngày làm việc từ khi cơ quan có thẩm quyền nhận đủ hồ sơ, tối đa 05 ngày nếu phải xác minh.",
+              "Khâu cấp thẻ BHYT không quá 02 ngày làm việc kể từ khi BHXH nhận được hồ sơ điện tử liên thông."
+            ]
+          }
+        ],
+        "additional_information": [
+          "(Lưu ý cấp cứu khám chữa bệnh): Trong thời gian chờ cấp thẻ BHYT, trẻ dưới 6 tuổi đi khám chữa bệnh có thể xuất trình Giấy chứng sinh theo quy định của pháp luật về BHYT.",
+          "Thủ tục cấp thẻ BHYT riêng lẻ PROC_1_014137 ghi thời hạn 05 ngày làm việc kể từ khi nhận đủ hồ sơ và dùng Mẫu số 2 kèm theo Nghị định số 188/2025/NĐ-CP."
+        ]
+      },
+      "evaluation_criteria": [
+        {
+          "criterion": "Nhận diện điều kiện tiên quyết (Prerequisite)",
+          "expected": "Đăng ký khai sinh hoàn tất trước khi chuyển hồ sơ sang BHXH để cấp thẻ. Gia đình có thể nộp hồ sơ liên thông ngay.",
+          "notes": "Trượt nếu hướng dẫn xin thẻ trước khi đăng ký khai sinh hoặc yêu cầu phải có sẵn Giấy khai sinh mới được nộp hồ sơ liên thông."
+        },
+        {
+          "criterion": "Cơ quan thẩm quyền cấp thẻ BHYT",
+          "expected": "Bảo hiểm xã hội tỉnh / cơ quan BHXH (không phải UBND xã cấp thẻ BHYT).",
+          "notes": "Trượt nếu bảo UBND xã có thẩm quyền cấp thẻ BHYT."
+        },
+        {
+          "criterion": "Thời hạn liên thông và khâu cấp thẻ BHYT",
+          "expected": "Toàn trình 03 ngày làm việc từ khi cơ quan có thẩm quyền nhận đủ hồ sơ, tối đa 05 ngày nếu phải xác minh. Khâu cấp thẻ BHYT không quá 02 ngày làm việc kể từ khi BHXH nhận được hồ sơ điện tử liên thông.",
+          "notes": "Trượt nếu nhầm thời hạn cấp riêng hoặc thời hạn của riêng khâu BHYT với thời hạn toàn trình."
+        },
+        {
+          "criterion": "Biểu mẫu tờ khai liên thông",
+          "expected": "Tờ khai điện tử Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP.",
+          "notes": "Trượt nếu dùng Mẫu số 2 của thủ tục cấp thẻ BHYT riêng lẻ cho hồ sơ liên thông."
+        },
+        {
+          "criterion": "Định hướng giải pháp liên thông",
+          "expected": "Nộp hồ sơ liên thông cho trẻ dưới 6 tuổi trên Cổng DVCQG hoặc VNeID ngay khi trẻ chưa có Giấy khai sinh.",
+          "notes": "Trượt nếu chỉ hướng dẫn thực hiện các thủ tục riêng lẻ."
+        }
+      ],
+      "source_procedure_ids": [
+        "PROC_1_014137",
+        "PROC_1_001193",
+        "PROC_3_000722"
+      ]
+    }
+  ]
+}
