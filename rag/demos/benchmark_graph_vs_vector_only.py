@@ -18,7 +18,7 @@ import statistics
 import sys
 import time
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -41,6 +41,7 @@ class BenchmarkCase:
     required_citations: list[str]
     required_term_groups: list[list[str]]
     forbidden_citations: list[str]
+    forbidden_term_groups: list[list[str]] = field(default_factory=list)
 
 
 @dataclass
@@ -152,12 +153,22 @@ def evaluate(case: BenchmarkCase, answer: str, warnings: list[str]) -> dict[str,
         group for group, matched in zip(case.required_term_groups, matched_groups) if matched is None
     ]
     forbidden_citations = [item for item in case.forbidden_citations if item in citations]
+    matched_forbidden_groups = [
+        next((term for term in group if term.casefold() in normalized), None)
+        for group in case.forbidden_term_groups
+    ]
+    forbidden_terms = [
+        group for group, matched in zip(case.forbidden_term_groups, matched_forbidden_groups)
+        if matched is not None
+    ]
     fallback = any("câu trả lời dự phòng" in warning.casefold() for warning in warnings)
-    checks = len(case.required_citations) + len(case.required_term_groups) + len(case.forbidden_citations)
+    checks = (len(case.required_citations) + len(case.required_term_groups)
+              + len(case.forbidden_citations) + len(case.forbidden_term_groups))
     passed = (
         len(case.required_citations) - len(missing_citations)
         + len(case.required_term_groups) - len(missing_term_groups)
         + len(case.forbidden_citations) - len(forbidden_citations)
+        + len(case.forbidden_term_groups) - len(forbidden_terms)
     )
     return {
         "score": round(100 * passed / checks, 1) if checks else 100.0,
@@ -165,6 +176,7 @@ def evaluate(case: BenchmarkCase, answer: str, warnings: list[str]) -> dict[str,
         "missing_citations": missing_citations,
         "missing_term_groups": missing_term_groups,
         "forbidden_citations": forbidden_citations,
+        "forbidden_terms": forbidden_terms,
         "fallback": fallback,
         "passed_checks": passed,
         "total_checks": checks,
@@ -202,9 +214,11 @@ def run_case(
             "missing_citations": case.required_citations,
             "missing_term_groups": case.required_term_groups,
             "forbidden_citations": [],
+            "forbidden_terms": [],
             "fallback": False,
             "passed_checks": 0,
-            "total_checks": len(case.required_citations) + len(case.required_term_groups) + len(case.forbidden_citations),
+            "total_checks": (len(case.required_citations) + len(case.required_term_groups)
+                             + len(case.forbidden_citations) + len(case.forbidden_term_groups)),
         }
     result["usage"] = recorder.summary_since(mark)
     return result
@@ -241,6 +255,8 @@ def errors_by_mode(results: dict[str, list[dict[str, Any]]]) -> dict[str, Counte
                 counter[f"missing_content: {' | '.join(terms)}"] += 1
             for citation in row["forbidden_citations"]:
                 counter[f"forbidden_citation: {citation}"] += 1
+            for terms in row.get("forbidden_terms", []):
+                counter[f"forbidden_content: {' | '.join(terms)}"] += 1
             if row["fallback"]:
                 counter["fallback_answer"] += 1
         grouped[mode] = counter
@@ -341,6 +357,7 @@ def render_answer_log(payload: dict[str, Any]) -> str:
             f"- Citation bắt buộc: {', '.join(f'`{item}`' for item in case['required_citations']) or 'Không có'}.",
             f"- Nội dung cần có: {'; '.join(' / '.join(group) for group in case['required_term_groups']) or 'Không có'}.",
             f"- Citation không được xuất hiện: {', '.join(f'`{item}`' for item in case['forbidden_citations']) or 'Không có'}.",
+            f"- Nội dung không được khẳng định: {'; '.join(' / '.join(group) for group in case.get('forbidden_term_groups', [])) or 'Không có'}.",
             "",
         ])
         for mode in MODES:

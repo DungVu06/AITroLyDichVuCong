@@ -120,8 +120,16 @@ def build_context(
                 record["id"]: record
                 for record in records("procedure", DATA)
             }
+            # The control arm has no relationship traversal, but it may still
+            # retrieve records explicitly named by the same deterministic
+            # contract. Otherwise a graph-only child detail would be confused
+            # with a retrieval advantage rather than an ordering advantage.
+            vector_procedure_ids = list(dict.fromkeys([
+                *seed_ids,
+                *contract.procedure_ids,
+            ]))
             procedures = []
-            for procedure_id in seed_ids:
+            for procedure_id in vector_procedure_ids:
                 raw = raw_procedures.get(procedure_id)
                 if not raw:
                     continue
@@ -204,9 +212,21 @@ def build_context(
             item.chunk_type for item in contract.requirements if item.chunk_type
         )
         detail_types = list(dict.fromkeys(detail_types))
-        detail_procedures = [
-            item for item in graph.procedures if not workflow_id or item.procedure_id == workflow_id
-        ]
+        if workflow_id:
+            # A graph edge proves ordering, while the evidence for documents
+            # and time may live on a component procedure. Keep the workflow
+            # parent and every procedure demanded by the deterministic
+            # contract in the detail retrieval set.
+            required_detail_ids = {workflow_id}
+            required_detail_ids.update(
+                requirement.procedure_id for requirement in contract.requirements
+            )
+            detail_procedures = [
+                item for item in graph.procedures
+                if item.procedure_id in required_detail_ids
+            ]
+        else:
+            detail_procedures = list(graph.procedures)
         procedures = retriever.retrieve_procedure_details(
             detail_procedures,
             query=plan.procedure_query or query.normalized_text,

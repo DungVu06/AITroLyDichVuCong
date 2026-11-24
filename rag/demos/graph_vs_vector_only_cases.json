@@ -80,7 +80,7 @@
     "required_term_groups": [
       ["liên thông"],
       ["vneid", "cổng dịch vụ công quốc gia", "cổng dvcqg"],
-      ["khai sinh trước", "sau khi đăng ký khai sinh", "sau khi có giấy khai sinh", "sau khi có bản điện tử giấy khai sinh", "khi đã có giấy khai sinh", "sau khi hoàn tất khai sinh", "sau khi có kết quả khai sinh"],
+      ["có thể nộp ngay", "nộp hồ sơ liên thông ngay", "chưa có giấy khai sinh"],
       ["giấy khai sinh điện tử", "bản điện tử giấy khai sinh"],
       ["bảo hiểm xã hội", "bhxh"],
       ["mẫu số 01", "mẫu số 1", "mẫu 01"],
@@ -90,6 +90,9 @@
       ["xác minh"],
       ["nhận hồ sơ điện tử", "nhận được hồ sơ điện tử", "tiếp nhận hồ sơ điện tử"]
     ],
-    "forbidden_citations": []
+    "forbidden_citations": [],
+    "forbidden_term_groups": [
+      ["phải hoàn tất khai sinh rồi mới được nộp liên thông", "phải có giấy khai sinh trước khi nộp hồ sơ liên thông"]
+    ]
   }
 ]

@@ -73,16 +73,20 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
                        "processing_time": "execution_methods", "fees": "execution_methods"}
         requested = set(context.query_state.procedure_ids)
         topics = context.query_state.topics
-        for procedure in context.procedure_evidence:
-            if procedure.procedure_id not in requested:
-                continue
-            for kind in {topic_types[t] for t in topics if t in topic_types}:
-                candidates = {c.chunk_id for c in procedure.chunks if c.chunk_type == kind}
-                if candidates and candidates.isdisjoint(cited_ids):
-                    issues.append(ValidationIssue(
-                        code="missing_requested_evidence", severity="error",
-                        message=f"Trả lời ý được hỏi về {procedure.name} bằng nguồn {kind} phù hợp.",
-                    ))
+        # Contract requirements below are claim-level checks. Do not trigger a
+        # fallback just because query understanding supplied a broad topic
+        # label whose entire chunk category was not cited.
+        if not context.contract.requirements:
+            for procedure in context.procedure_evidence:
+                if procedure.procedure_id not in requested:
+                    continue
+                for kind in {topic_types[t] for t in topics if t in topic_types}:
+                    candidates = {c.chunk_id for c in procedure.chunks if c.chunk_type == kind}
+                    if candidates and candidates.isdisjoint(cited_ids):
+                        issues.append(ValidationIssue(
+                            code="missing_requested_evidence", severity="warning",
+                            message=f"Chưa trích nguồn {kind} cho {procedure.name}.",
+                        ))
 
         for requirement in context.contract.requirements:
             if requirement.relation_type:

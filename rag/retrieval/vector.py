@@ -274,11 +274,22 @@ class VectorRetriever:
             result = []
             for number in sorted(grouped_steps):
                 candidates = grouped_steps[number]
-                explicit = [
+                substantive = [
                     item for item in candidates
+                    if not (item.text.rstrip().endswith(":") and "\n" not in item.text.strip())
+                ]
+                explicit = [
+                    item for item in substantive
                     if re.search(rf"bước\s*{number}(?:\s*[:.])", item.text, re.IGNORECASE)
                 ]
-                result.append(max(explicit or candidates, key=lambda item: len(item.text)))
+                # A split step often starts with the substantive rule and is
+                # followed by long exception paragraphs. Prefer that opening
+                # source fragment (for example, the 24-hour rule) instead of
+                # blindly selecting the longest tail fragment.
+                def source_order(item: RetrievedChunk) -> tuple[int, int]:
+                    match = re.search(r"_c(\d+)_s(\d+)$", item.chunk_id or "")
+                    return (int(match[1]), int(match[2])) if match else (0, 0)
+                result.append(sorted(explicit or substantive or candidates, key=source_order)[0])
             return result
 
         enriched = []
