@@ -140,7 +140,7 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
                              "Bảo hiểm xã hội", step_number=4),
                 _requirement("linked_health_time", "Thời hạn khâu BHYT liên thông",
                              LINKED, "step_item", "không quá 02 ngày làm việc",
-                             "hồ sơ điện tử", step_number=4),
+                             "Phần mềm dịch vụ công liên thông", step_number=4),
             ]
         submission_channel = "Người dân nộp hồ sơ liên thông trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia."
 

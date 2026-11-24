@@ -71,6 +71,7 @@ def workflow_transfer_evidence(graph: GraphRetrievalResult) -> list[RelationEvid
             text=text,
             evidence_record_id=edge.evidence_record_id,
             evidence_step=edge.evidence_step,
+            transferred_result=edge.transferred_result,
         ))
     return evidence
 

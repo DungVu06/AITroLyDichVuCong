@@ -5,7 +5,8 @@
     "question": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
     "required_citations": ["PROC_1_001193_c5_s0", "PROC_1_001193_c48_s0"],
     "required_term_groups": [
-      ["người làm chứng", "người chứng kiến"],
+      ["văn bản của người làm chứng", "người làm chứng xác nhận"],
+      ["nếu không có người làm chứng", "nếu không có người chứng kiến"],
       ["cam đoan"],
       ["ủy ban nhân dân cấp xã", "ubnd cấp xã", "ubnd xã"],
       ["1 ngày", "một ngày"]
@@ -46,26 +47,14 @@
       ["3 ngày làm việc", "ba ngày làm việc", "ba (03) ngày làm việc"],
       ["5 ngày làm việc", "năm ngày làm việc", "năm (05) ngày làm việc"]
     ],
-    "forbidden_citations": []
-  },
-  {
-    "id": "TC04",
-    "title": "Sai ngày sinh trước khi cấp Căn cước",
-    "question": "Con tôi 15 tuổi (sinh năm 2011) đi làm thẻ Căn cước, nhưng trên VNeID ngày sinh của cháu bị sai so với Giấy khai sinh gốc. Gia đình có thể đến điểm cấp căn cước đưa giấy khai sinh để cán bộ làm thẻ luôn được không, hay phải làm thế nào?",
-    "required_citations": ["PROC_1_116410_c73_s0", "PROC_1_116410_c63_s0", "PROC_1_116410_c76_s0", "PROC_1_116410_c78_s0"],
-    "required_term_groups": [
-      ["điều chỉnh", "sửa", "đính chính"],
-      ["cơ sở dữ liệu quốc gia về dân cư", "csdl quốc gia về dân cư", "cơ sở dữ liệu dân cư", "csdl dân cư"],
-      ["trước khi cấp", "trước khi làm", "trước khi thực hiện thủ tục cấp", "sau khi điều chỉnh", "sau khi thông tin đã được cập nhật"],
-      ["công an cấp xã", "công an xã", "bộ phận một cửa cấp xã"],
-      ["vân tay"],
-      ["ảnh khuôn mặt", "chụp ảnh mặt"],
-      ["mống mắt"],
-      ["cc01"],
-      ["cc02"],
-      ["7 ngày làm việc", "bảy ngày làm việc"]
-    ],
-    "forbidden_citations": ["PROC_1_116410_c86_s0", "PROC_1_116410_c90_s0"]
+    "forbidden_citations": [],
+    "ordered_citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c184_s0"
+    ]
   },
   {
     "id": "TC05",
@@ -80,7 +69,7 @@
     "required_term_groups": [
       ["liên thông"],
       ["vneid", "cổng dịch vụ công quốc gia", "cổng dvcqg"],
-      ["có thể nộp ngay", "nộp hồ sơ liên thông ngay", "chưa có giấy khai sinh"],
+      ["có thể nộp hồ sơ liên thông ngay", "có thể nộp ngay qua vneid", "có thể nộp ngay qua cổng dịch vụ công quốc gia"],
       ["giấy khai sinh điện tử", "bản điện tử giấy khai sinh"],
       ["bảo hiểm xã hội", "bhxh"],
       ["mẫu số 01", "mẫu số 1", "mẫu 01"],

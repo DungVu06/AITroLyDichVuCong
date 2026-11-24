@@ -1,0 +1,612 @@
+{
+  "created_at": "2026-11-24T05:01:31+00:00",
+  "model": "gemini-3.5-flash-lite",
+  "cases": [
+    {
+      "id": "TC01",
+      "title": "Khai sinh tại nhà không có Giấy chứng sinh",
+      "question": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
+      "required_citations": [
+        "PROC_1_001193_c5_s0",
+        "PROC_1_001193_c48_s0"
+      ],
+      "required_term_groups": [
+        [
+          "người làm chứng",
+          "người chứng kiến"
+        ],
+        [
+          "cam đoan"
+        ],
+        [
+          "ủy ban nhân dân cấp xã",
+          "ubnd cấp xã",
+          "ubnd xã"
+        ],
+        [
+          "1 ngày",
+          "một ngày"
+        ]
+      ],
+      "forbidden_citations": [],
+      "forbidden_term_groups": []
+    },
+    {
+      "id": "TC02",
+      "title": "Thường trú tại nhà thuê",
+      "question": "Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?",
+      "required_citations": [
+        "PROC_1_116788_c126_s0",
+        "PROC_1_116788_c127_s0",
+        "PROC_1_116788_c128_s0",
+        "PROC_1_116788_c174_s0"
+      ],
+      "required_term_groups": [
+        [
+          "tờ khai thay đổi thông tin cư trú",
+          "ct01"
+        ],
+        [
+          "công chứng",
+          "chứng thực"
+        ],
+        [
+          "chủ sở hữu",
+          "chủ nhà"
+        ],
+        [
+          "diện tích"
+        ],
+        [
+          "công an xã",
+          "công an cấp xã",
+          "cơ quan đăng ký cư trú cấp xã"
+        ],
+        [
+          "7 ngày làm việc",
+          "bảy ngày làm việc"
+        ]
+      ],
+      "forbidden_citations": [],
+      "forbidden_term_groups": []
+    },
+    {
+      "id": "TC03",
+      "title": "Liên thông VNeID bốn thủ tục",
+      "question": "Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?",
+      "required_citations": [
+        "PROC_3_000722_c180_s1",
+        "PROC_3_000722_c181_s0",
+        "PROC_3_000722_c182_s1",
+        "PROC_3_000722_c183_s1",
+        "PROC_3_000722_c184_s0",
+        "PROC_3_000722_c185_s0"
+      ],
+      "required_term_groups": [
+        [
+          "vneid",
+          "cổng dịch vụ công quốc gia",
+          "cổng dvcqg"
+        ],
+        [
+          "24 giờ",
+          "24h",
+          "24 h"
+        ],
+        [
+          "giấy khai sinh điện tử",
+          "bản điện tử giấy khai sinh"
+        ],
+        [
+          "kết quả đăng ký thường trú",
+          "kết quả thường trú"
+        ],
+        [
+          "theo yêu cầu",
+          "có đề nghị",
+          "đã đề nghị",
+          "nếu đề nghị",
+          "đã yêu cầu"
+        ],
+        [
+          "3 ngày làm việc",
+          "ba ngày làm việc",
+          "ba (03) ngày làm việc"
+        ],
+        [
+          "5 ngày làm việc",
+          "năm ngày làm việc",
+          "năm (05) ngày làm việc"
+        ]
+      ],
+      "forbidden_citations": [],
+      "forbidden_term_groups": []
+    },
+    {
+      "id": "TC05",
+      "title": "BHYT khi chưa đăng ký khai sinh",
+      "question": "Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?",
+      "required_citations": [
+        "PROC_3_000722_c180_s1",
+        "PROC_3_000722_c176_s0",
+        "PROC_3_000722_c183_s2",
+        "PROC_3_000722_c185_s0"
+      ],
+      "required_term_groups": [
+        [
+          "liên thông"
+        ],
+        [
+          "vneid",
+          "cổng dịch vụ công quốc gia",
+          "cổng dvcqg"
+        ],
+        [
+          "có thể nộp ngay",
+          "nộp hồ sơ liên thông ngay",
+          "chưa có giấy khai sinh"
+        ],
+        [
+          "giấy khai sinh điện tử",
+          "bản điện tử giấy khai sinh"
+        ],
+        [
+          "bảo hiểm xã hội",
+          "bhxh"
+        ],
+        [
+          "mẫu số 01",
+          "mẫu số 1",
+          "mẫu 01"
+        ],
+        [
+          "2 ngày làm việc",
+          "hai ngày làm việc",
+          "hai (02) ngày làm việc"
+        ],
+        [
+          "3 ngày làm việc",
+          "ba ngày làm việc",
+          "ba (03) ngày làm việc"
+        ],
+        [
+          "5 ngày làm việc",
+          "năm ngày làm việc",
+          "năm (05) ngày làm việc"
+        ],
+        [
+          "xác minh"
+        ],
+        [
+          "nhận hồ sơ điện tử",
+          "nhận được hồ sơ điện tử",
+          "tiếp nhận hồ sơ điện tử"
+        ]
+      ],
+      "forbidden_citations": [],
+      "forbidden_term_groups": [
+        [
+          "phải hoàn tất khai sinh rồi mới được nộp liên thông",
+          "phải có giấy khai sinh trước khi nộp hồ sơ liên thông"
+        ]
+      ]
+    }
+  ],
+  "results": {
+    "graph": [
+      {
+        "status": "ok",
+        "latency_seconds": 25.005,
+        "answer": "Trường hợp sinh cháu tại nhà không có Giấy chứng sinh của bệnh viện hoàn toàn có thể làm được thủ tục đăng ký khai sinh 【PROC_1_001193_c5_s0】. Cụ thể thủ tục cần thực hiện như sau:\n\n### Thứ tự nên làm và Giấy tờ, cách thực hiện\n- **Thủ tục đăng ký khai sinh** 【PROC_1_001193】:\n  - **Lý do cần làm:** Ghi nhận khai sinh cho trẻ em.\n  - **Hồ sơ phổ biến:** Trường hợp không có Giấy chứng sinh, bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh (số lượng: 1 bản chính) 【PROC_1_001193_c5_s0】.\n  - **Cách thực hiện:** Bạn có thể nộp hồ sơ trực tuyến, qua dịch vụ bưu chính hoặc nộp trực tiếp tại **Ủy ban nhân dân cấp xã** (tại xã An Phú) 【PROC_1_001193_c48_s0】.\n  - **Thời gian giải quyết:** 1 ngày 【PROC_1_001193_c48_s0】.\n  - **Lệ phí:** Miễn phí 【PROC_1_001193_c48_s0】.",
+        "warnings": [],
+        "sources": [
+          "PROC_1_001193",
+          "PROC_1_001193_c5_s0",
+          "PROC_1_001193_c48_s0"
+        ],
+        "score": 100.0,
+        "citations": [
+          "PROC_1_001193",
+          "PROC_1_001193_c48_s0",
+          "PROC_1_001193_c5_s0"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 6,
+        "total_checks": 6,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 8.792,
+          "input_tokens": 6446,
+          "output_tokens": 564,
+          "total_tokens": 7010
+        },
+        "case_id": "TC01",
+        "case_title": "Khai sinh tại nhà không có Giấy chứng sinh"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 16.821,
+        "answer": "Để đăng ký thường trú tại chỗ ở thuê tại xã Tân Triều, bạn cần thực hiện thủ tục **Đăng ký thường trú 【PROC_1_116788】** (Mã: PROC_1_116788)【PROC_1_116788_c121_s0】.\n\n### Thứ tự nên làm và cơ quan giải quyết\n- **Cơ quan tiếp nhận và giải quyết:** Nộp hồ sơ trực tiếp hoặc trực tuyến tại **Công an Xã** 【PROC_1_116788_c174_s0】, 【PROC_1_116788_c174_s3】.\n- Bạn cần hoàn thiện các điều kiện còn thiếu trước khi nộp hồ sơ, cụ thể hợp đồng thuê nhà viết tay hiện tại chưa đáp ứng quy định (yêu cầu phải được công chứng hoặc chứng thực) 【PROC_1_116788_c127_s0】.\n\n### Giấy tờ và cách thực hiện\n- **Thành phần hồ sơ:**\n  - Tờ khai thay đổi thông tin cư trú (mẫu CT01), trong đó có ý kiến đồng ý cho đăng ký thường trú của chủ sở hữu chỗ ở hợp pháp 【PROC_1_116788_c124_s0】.\n  - Hợp đồng hoặc văn bản về việc cho thuê chỗ ở hợp pháp được **công chứng hoặc chứng thực** theo quy định của pháp luật 【PROC_1_116788_c127_s0】.\n  - Thông tin chứng minh đủ diện tích nhà ở để đăng ký thường trú được khai thác trên hệ thống điện tử hoặc giấy tờ/xác nhận của Ủy ban nhân dân cấp xã về điều kiện diện tích bình quân 【PROC_1_116788_c128_s0】.\n- **Cách thức thực hiện và thời gian:**\n  - Hình thức: Trực tuyến hoặc trực tiếp 【PROC_1_116788_c174_s3】.\n  - Thời gian giải quyết: 07 ngày làm việc kể từ ngày nhận được hồ sơ đầy đủ và chính xác 【PROC_1_116788_c174_s3】.\n  - Lệ phí: 20.000 đồng/lần đăng ký khi nộp trực tiếp hoặc 10.000 đồng/lần khi nộp qua Cổng dịch vụ công quốc gia 【PROC_1_116788_c174_s3】.",
+        "warnings": [],
+        "sources": [
+          "PROC_1_116788",
+          "PROC_1_116788_c121_s0",
+          "PROC_1_116788_c124_s0",
+          "PROC_1_116788_c127_s0",
+          "PROC_1_116788_c128_s0",
+          "PROC_1_116788_c174_s0",
+          "PROC_1_116788_c174_s3"
+        ],
+        "score": 90.0,
+        "citations": [
+          "PROC_1_116788",
+          "PROC_1_116788_c121_s0",
+          "PROC_1_116788_c124_s0",
+          "PROC_1_116788_c127_s0",
+          "PROC_1_116788_c128_s0",
+          "PROC_1_116788_c174_s0",
+          "PROC_1_116788_c174_s3"
+        ],
+        "missing_citations": [
+          "PROC_1_116788_c126_s0"
+        ],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 9,
+        "total_checks": 10,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 7.82,
+          "input_tokens": 8903,
+          "output_tokens": 842,
+          "total_tokens": 9745
+        },
+        "case_id": "TC02",
+        "case_title": "Thường trú tại nhà thuê"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 28.341,
+        "answer": "Để thực hiện gói liên thông điện tử bao gồm đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ em dưới 6 tuổi, bạn có thể thực hiện theo các bước xử lý của hệ thống và thông tin chi tiết như sau 【PROC_3_000722_c180_s1】.\n\n### Kênh nộp hồ sơ\n- Người dân nộp hồ sơ liên thông trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia 【PROC_3_000722_c180_s1】.\n\n### Thành phần hồ sơ phổ biến\n- Tờ khai điện tử (Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP) 【PROC_3_000722_c176_s0】.\n- Dữ liệu điện tử có ký số của Giấy chứng sinh được liên thông từ cơ sở khám bệnh, chữa bệnh hoặc bản điện tử Giấy chứng sinh do người yêu cầu đính kèm 【PROC_3_000722_c177_s0】.\n- Trường hợp đăng ký thường trú cho trẻ em khác nơi thường trú của cha, mẹ thì đính kèm các thành phần hồ sơ theo quy định pháp luật về cư trú 【PROC_3_000722_c178_s0】.\n\n### Các bước hệ thống xử lý\n- Bước 1: Người yêu cầu truy cập vào Cổng Dịch vụ công quốc gia hoặc trên ứng dụng VNeID, lựa chọn dịch vụ công liên thông để thực hiện nộp hồ sơ trực tuyến và lệ phí theo quy định 【PROC_3_000722_c180_s1】.\n- Bước 2: Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công, bóc tách thành phần hồ sơ và chuyển sang Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp, sau đó đồng bộ về Hệ thống đăng ký, quản lý hộ tịch điện tử 【PROC_3_000722_c181_s0】.\n- Bước 3: Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện nghiệp vụ đăng ký khai sinh trong 24 giờ kể từ khi nhận đủ hồ sơ hợp lệ 【PROC_3_000722_c182_s1】.\n- Bước 4: Sau khi chuyển bản điện tử Giấy khai sinh, hệ thống tiếp tục chuyển dữ liệu đến Hệ thống thông tin quản lý cư trú để đăng ký thường trú và Hệ thống thông tin ngành Bảo hiểm xã hội để thực hiện cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi 【PROC_3_000722_c183_s1】.\n- Bước 5: Sau khi có kết quả đăng ký thường trú, hệ thống chuyển hồ sơ đến Hệ thống sản xuất, cấp và quản lý căn cước của Bộ Công an để thực hiện cấp thẻ căn cước (khi người đại diện hợp pháp có đề nghị) 【PROC_3_000722_c184_s0】.\n- Hệ thống tự chuyển Giấy khai sinh điện tử để xử lý thủ tục đăng ký thường trú. Người dân không phải tự chuyển giấy tờ này giữa các cơ quan trong gói liên thông 【REL:PROC_1_001193:NEXT_STEP:PROC_1_116788】.\n- Hệ thống tự chuyển Giấy khai sinh điện tử để xử lý thủ tục thủ tục cấp thẻ bảo hiểm y tế. Người dân không phải tự chuyển giấy tờ này giữa các cơ quan trong gói liên thông 【REL:PROC_1_001193:NEXT_STEP:PROC_1_014137】.\n- Hệ thống tự chuyển Thông báo kết quả đăng ký thường trú để xử lý thủ tục cấp, cấp đổi, cấp lại thẻ căn cước. Nhánh này chỉ áp dụng khi người đại diện hợp pháp đề nghị cấp thẻ lúc nộp hồ sơ trực tuyến 【REL:PROC_1_116788:NEXT_STEP:PROC_1_116410】.\n\n### Thời gian và lệ phí giải quyết\n- Thời gian giải quyết: Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền giải quyết nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc 【PROC_3_000722_c185_s0】.\n- Lệ phí: Miễn phí (phí, lệ phí theo quy định của các thủ tục hành chính tương ứng) 【PROC_3_000722_c185_s0】.\n\n### Thủ tục áp dụng\n- Thủ tục đăng ký khai sinh 【PROC_1_001193】\n- Thủ tục cấp thẻ bảo hiểm y tế 【PROC_1_014137】\n- Đăng ký thường trú 【PROC_1_116788】\n- Cấp, cấp đổi, cấp lại thẻ căn cước 【PROC_1_116410】",
+        "warnings": [
+          "Lượt này dùng quan hệ từ bộ dữ liệu cục bộ của dự án."
+        ],
+        "sources": [
+          "PROC_1_001193",
+          "PROC_1_014137",
+          "PROC_1_116788",
+          "PROC_1_116410",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c181_s0",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c184_s0",
+          "PROC_3_000722_c182_s1",
+          "PROC_3_000722_c185_s0",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c178_s0",
+          "PROC_3_000722_c177_s0",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_116788",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_014137",
+          "REL:PROC_1_116788:NEXT_STEP:PROC_1_116410"
+        ],
+        "score": 100.0,
+        "citations": [
+          "PROC_1_001193",
+          "PROC_1_014137",
+          "PROC_1_116410",
+          "PROC_1_116788",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0",
+          "PROC_3_000722_c178_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c181_s0",
+          "PROC_3_000722_c182_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c184_s0",
+          "PROC_3_000722_c185_s0",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_014137",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_116788",
+          "REL:PROC_1_116788:NEXT_STEP:PROC_1_116410"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 13,
+        "total_checks": 13,
+        "usage": {
+          "api_calls": 3,
+          "api_elapsed_seconds": 14.841,
+          "input_tokens": 27468,
+          "output_tokens": 2328,
+          "total_tokens": 29796
+        },
+        "case_id": "TC03",
+        "case_title": "Liên thông VNeID bốn thủ tục"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 26.794,
+        "answer": "Bạn không thể tự ý đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT riêng lẻ cho trẻ 1 tháng tuổi chưa làm giấy khai sinh. Theo quy định, đối với trẻ em dưới 6 tuổi, việc cấp thẻ BHYT được thực hiện liên thông cùng với thủ tục đăng ký khai sinh và đăng ký thường trú 【PROC_1_014137_c60_s0】.\n\n### Thứ tự nên làm\nBạn nên thực hiện gói thủ tục hành chính liên thông điện tử bao gồm đăng ký khai sinh, đăng ký thường trú và cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi 【PROC_3_000722】.\n\n### Giấy tờ và cách thực hiện\n1. **Kênh nộp hồ sơ:** Người dân nộp hồ sơ liên thông trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia 【PROC_3_000722_c180_s1】.\n2. **Hồ sơ cần chuẩn bị:**\n   - Tờ khai điện tử theo Mẫu số 01 【PROC_3_000722_c176_s0】.\n   - Dữ liệu điện tử có ký số của Giấy chứng sinh hoặc bản điện tử/bản chụp giấy tờ thay thế theo quy định 【PROC_3_000722_c177_s0】.\n3. **Thời gian giải quyết:** Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc 【PROC_3_000722_c185_s0】.\n4. **Lệ phí:** Miễn phí 【PROC_3_000722_c185_s0】.\n\n### Các bước chuyển đổi hồ sơ liên thông\n- Kết quả khai sinh chuyển sang thường trú 【REL:PROC_1_001193:NEXT_STEP:PROC_1_116788】.\n- Kết quả khai sinh chuyển sang BHYT 【REL:PROC_1_001193:NEXT_STEP:PROC_1_014137】.\n- Chuyển hồ sơ BHYT sau khai sinh qua hệ thống điện tử chứa bản điện tử Giấy khai sinh tới Bảo hiểm xã hội 【PROC_3_000722_c183_s1】.\n- Thời hạn khâu BHYT liên thông là không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử 【PROC_3_000722_c183_s2】.\n\n### Phương án đơn lẻ (tham khảo)\n- Tờ khai BHYT của phương án đơn lẻ sử dụng Mẫu số 2 【PROC_1_014137_c50_s0】.\n- Cách nộp BHYT của phương án đơn lẻ áp dụng hình thức trực tuyến 【PROC_1_014137_c61_s0】.\n- Thời hạn cấp thẻ BHYT của phương án đơn lẻ là 05 ngày làm việc 【PROC_1_014137_c61_s0】.\n\n### Thủ tục áp dụng\n- Thủ tục đăng ký khai sinh 【PROC_1_001193】\n- Thủ tục cấp thẻ bảo hiểm y tế 【PROC_1_014137】\n- Đăng ký thường trú 【PROC_1_116788】\n- Cấp, cấp đổi, cấp lại thẻ căn cước 【PROC_1_116410】",
+        "warnings": [
+          "Lượt này dùng quan hệ từ bộ dữ liệu cục bộ của dự án."
+        ],
+        "sources": [
+          "PROC_1_001193",
+          "PROC_1_014137",
+          "PROC_1_014137_c50_s0",
+          "PROC_1_014137_c61_s0",
+          "PROC_1_014137_c60_s0",
+          "PROC_1_116788",
+          "PROC_1_116410",
+          "PROC_3_000722",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0",
+          "PROC_3_000722_c185_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c183_s2",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_116788",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_014137"
+        ],
+        "score": 93.8,
+        "citations": [
+          "PROC_1_001193",
+          "PROC_1_014137",
+          "PROC_1_014137_c50_s0",
+          "PROC_1_014137_c60_s0",
+          "PROC_1_014137_c61_s0",
+          "PROC_1_116410",
+          "PROC_1_116788",
+          "PROC_3_000722",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c183_s2",
+          "PROC_3_000722_c185_s0",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_014137",
+          "REL:PROC_1_001193:NEXT_STEP:PROC_1_116788"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [
+          [
+            "có thể nộp ngay",
+            "nộp hồ sơ liên thông ngay",
+            "chưa có giấy khai sinh"
+          ]
+        ],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 15,
+        "total_checks": 16,
+        "usage": {
+          "api_calls": 3,
+          "api_elapsed_seconds": 13.293,
+          "input_tokens": 34007,
+          "output_tokens": 1516,
+          "total_tokens": 35523
+        },
+        "case_id": "TC05",
+        "case_title": "BHYT khi chưa đăng ký khai sinh"
+      }
+    ],
+    "vector_only": [
+      {
+        "status": "ok",
+        "latency_seconds": 22.339,
+        "answer": "Trường hợp sinh con tại nhà và không có Giấy chứng sinh của bệnh viện, anh/chị vẫn có thể thực hiện thủ tục đăng ký khai sinh 【PROC_1_001193_c5_s0】.\n\n### Thứ tự nên làm và Giấy tờ, cách thực hiện\n- **Thủ tục đăng ký khai sinh 【PROC_1_001193】 (Mã: PROC_1_001193):**\n  - **Lý do cần làm:** Đăng ký khai sinh cho trẻ mới sinh.\n  - **Hồ sơ cần chuẩn bị:** \n    - Trường hợp không có Giấy chứng sinh, anh/chị cần nộp **văn bản của người làm chứng xác nhận về việc sinh**; nếu không có người làm chứng thì phải có **giấy cam đoan về việc sinh** 【PROC_1_001193_c5_s0】.\n  - **Nơi nộp và cơ quan giải quyết:** Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】.\n  - **Cách thức thực hiện:** Nộp trực tuyến, qua dịch vụ bưu chính hoặc trực tiếp 【PROC_1_001193_c48_s0】.\n  - **Thời gian giải quyết:** 1 ngày 【PROC_1_001193_c48_s0】.\n  - **Lệ phí:** Miễn phí 【PROC_1_001193_c48_s0】.\n\n*Lưu ý về căn cứ pháp lý:* Các căn cứ pháp lý liệt kê trong dữ liệu chưa được đối chiếu đầy đủ hiệu lực hiện hành.",
+        "warnings": [],
+        "sources": [
+          "PROC_1_001193",
+          "PROC_1_001193_c5_s0",
+          "PROC_1_001193_c48_s0"
+        ],
+        "score": 100.0,
+        "citations": [
+          "PROC_1_001193",
+          "PROC_1_001193_c48_s0",
+          "PROC_1_001193_c5_s0"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 6,
+        "total_checks": 6,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 7.913,
+          "input_tokens": 6465,
+          "output_tokens": 619,
+          "total_tokens": 7084
+        },
+        "case_id": "TC01",
+        "case_title": "Khai sinh tại nhà không có Giấy chứng sinh"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 17.317,
+        "answer": "Để đăng ký thường trú tại nhà thuê ở xã Tân Triều, bạn cần thực hiện thủ tục đăng ký thường trú tại Công an Xã 【PROC_1_116788_c174_s0】.\n\n### Thứ tự nên làm và Giấy tờ cần chuẩn bị\n1. **Hoàn thiện điều kiện giấy tờ**: Vì bạn mới có hợp đồng thuê nhà viết tay, theo quy định, hợp đồng thuê nhà phải được công chứng hoặc chứng thực 【PROC_1_116788_c127_s0】. Bạn cần hoàn thiện việc công chứng hoặc chứng thực hợp đồng thuê nhà trước khi nộp hồ sơ.\n2. **Thành phần hồ sơ đăng ký thường trú (Mã: PROC_1_116788)**:\n   - Tờ khai thay đổi thông tin cư trú (mẫu CT01) có ý kiến đồng ý cho đăng ký thường trú của chủ hộ hoặc chủ sở hữu chỗ ở hợp pháp 【PROC_1_116788_c124_s0】.\n   - Hợp đồng cho thuê chỗ ở hợp pháp đã được công chứng hoặc chứng thực 【PROC_1_116788_c127_s0】.\n   - Thông tin chứng minh đủ diện tích nhà ở để đăng ký thường trú (khai thác trên ứng dụng định danh quốc gia hoặc giấy tờ, tài liệu thể hiện diện tích hoặc xác nhận của Ủy ban nhân dân cấp xã) 【PROC_1_116788_c128_s0】.\n\n### Cách thực hiện, thời gian và lệ phí\n- **Cơ quan tiếp nhận và giải quyết**: Công an Xã 【PROC_1_116788_c174_s0】.\n- **Hình thức và Lệ phí**:\n  - Nộp trực tuyến qua cổng dịch vụ công: 10.000 đồng/lần 【PROC_1_116788_c174_s3】.\n  - Nộp trực tiếp: 20.000 đồng/lần 【PROC_1_116788_c174_s3】.\n- **Thời gian giải quyết**: 07 ngày làm việc kể từ ngày nhận được hồ sơ đầy đủ và chính xác 【PROC_1_116788_c174_s3】.\n### Thủ tục áp dụng\n- Đăng ký thường trú 【PROC_1_116788】",
+        "warnings": [],
+        "sources": [
+          "PROC_1_116788",
+          "PROC_1_116788_c124_s0",
+          "PROC_1_116788_c127_s0",
+          "PROC_1_116788_c128_s0",
+          "PROC_1_116788_c174_s0",
+          "PROC_1_116788_c174_s3"
+        ],
+        "score": 90.0,
+        "citations": [
+          "PROC_1_116788",
+          "PROC_1_116788_c124_s0",
+          "PROC_1_116788_c127_s0",
+          "PROC_1_116788_c128_s0",
+          "PROC_1_116788_c174_s0",
+          "PROC_1_116788_c174_s3"
+        ],
+        "missing_citations": [
+          "PROC_1_116788_c126_s0"
+        ],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 9,
+        "total_checks": 10,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 8.316,
+          "input_tokens": 8941,
+          "output_tokens": 815,
+          "total_tokens": 9756
+        },
+        "case_id": "TC02",
+        "case_title": "Thường trú tại nhà thuê"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 17.096,
+        "answer": "Để thực hiện nhóm thủ tục hành chính liên thông (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ em dưới 6 tuổi), bạn có thể tiến hành trực tuyến qua ứng dụng VNeID hoặc Cổng Dịch vụ công quốc gia theo mã thủ tục 【PROC_3_000722_c180_s1】.\n\n### Thứ tự nên làm và các bước hệ thống xử lý (Mã: 【PROC_3_000722】)\n- **Bước 1:** Người yêu cầu truy cập vào Cổng Dịch vụ công quốc gia (dichvucong.gov.vn) hoặc trên ứng dụng VNeID, lựa chọn dịch vụ công liên thông để nộp hồ sơ trực tuyến và đóng lệ phí theo quy định 【PROC_3_000722_c180_s1】.\n- **Bước 2:** Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công, bóc tách thành phần hồ sơ và chuyển sang Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp 【PROC_3_000722_c181_s0】.\n- **Bước 3:** Cán bộ hộ tịch tại Ủy ban nhân dân cấp xã giải quyết hồ sơ đăng ký khai sinh trong 24 giờ kể từ khi Hệ thống đăng ký, quản lý hộ tịch điện tử nhận đủ hồ sơ hợp lệ 【PROC_3_000722_c182_s1】.\n- **Bước 4:** Sau khi chuyển bản điện tử Giấy khai sinh, hệ thống tiếp tục chuyển hồ sơ điện tử đến Hệ thống thông tin quản lý cư trú để đăng ký thường trú và Hệ thống ngành Bảo hiểm xã hội để cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi 【PROC_3_000722_c183_s1】.\n- **Bước 5:** Sau khi có thông báo kết quả đăng ký thường trú, hệ thống chuyển hồ sơ đến hệ thống sản xuất, cấp và quản lý căn cước của Bộ Công an để cấp thẻ căn cước theo yêu cầu 【PROC_3_000722_c184_s0】.\n\n### Giấy tờ và cách thực hiện\n- **Hồ sơ cần chuẩn bị:** Tờ khai điện tử (Mẫu số 01 theo Nghị định số 301/2026/NĐ-CP) 【PROC_3_000722_c176_s0】 và dữ liệu điện tử có ký số của Giấy chứng sinh (hoặc bản điện tử/bản chụp giấy tờ thay thế) 【PROC_3_000722_c177_s0】.\n- **Cách thức thực hiện:** Nộp hồ sơ trực tuyến tại cơ quan tiếp nhận và giải quyết là Công an cấp Xã 【PROC_3_000722_c185_s0】.\n- **Thời gian giải quyết:** Ba (03) ngày làm việc kể từ khi cơ quan có thẩm quyền nhận đầy đủ hồ sơ theo quy định; trường hợp phải xác minh thì không quá năm (05) ngày làm việc 【PROC_3_000722_c185_s0】.\n- **Lệ phí:** Miễn phí thủ tục (phí, lệ phí theo quy định của các thủ tục hành chính tương ứng) 【PROC_3_000722_c185_s0】.",
+        "warnings": [],
+        "sources": [
+          "PROC_3_000722",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c181_s0",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c184_s0",
+          "PROC_3_000722_c182_s1",
+          "PROC_3_000722_c185_s0",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0"
+        ],
+        "score": 100.0,
+        "citations": [
+          "PROC_3_000722",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c181_s0",
+          "PROC_3_000722_c182_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c184_s0",
+          "PROC_3_000722_c185_s0"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 13,
+        "total_checks": 13,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 8.094,
+          "input_tokens": 9181,
+          "output_tokens": 981,
+          "total_tokens": 10162
+        },
+        "case_id": "TC03",
+        "case_title": "Liên thông VNeID bốn thủ tục"
+      },
+      {
+        "status": "ok",
+        "latency_seconds": 16.952,
+        "answer": "Theo quy định, bạn không thể đến trực tiếp cơ quan Bảo hiểm xã hội để xin cấp thẻ BHYT riêng lẻ trước cho trẻ chưa có giấy khai sinh 【PROC_3_000722_c183_s1】 mà cần thực hiện đồng thời qua nhóm thủ tục hành chính liên thông điện tử (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi) 【PROC_3_000722_c185_s0】.\n\n### Thứ tự nên làm\n- Nộp hồ sơ trực tuyến qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID 【PROC_3_000722_c180_s1】.\n\n### Giấy tờ và cách thực hiện\n- **Hồ sơ cần chuẩn bị:** Tờ khai điện tử Mẫu số 01 và dữ liệu điện tử/bản điện tử Giấy chứng sinh 【PROC_3_000722_c176_s0】【PROC_3_000722_c177_s0】.\n- **Cách thực hiện:** Nộp hồ sơ trực tuyến 【PROC_3_000722_c185_s0】.\n- **Thời gian giải quyết:** Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền giải quyết nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc 【PROC_3_000722_c185_s0】; trong đó thời gian cấp thẻ BHYT cho trẻ em dưới 6 tuổi không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông 【PROC_3_000722_c183_s2】.\n- **Lệ phí:** Miễn phí 【PROC_3_000722_c185_s0】.\n### Thủ tục áp dụng\n- Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi 【PROC_3_000722】",
+        "warnings": [],
+        "sources": [
+          "PROC_3_000722",
+          "PROC_3_000722_c185_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c183_s2",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0"
+        ],
+        "score": 93.8,
+        "citations": [
+          "PROC_3_000722",
+          "PROC_3_000722_c176_s0",
+          "PROC_3_000722_c177_s0",
+          "PROC_3_000722_c180_s1",
+          "PROC_3_000722_c183_s1",
+          "PROC_3_000722_c183_s2",
+          "PROC_3_000722_c185_s0"
+        ],
+        "missing_citations": [],
+        "missing_term_groups": [
+          [
+            "giấy khai sinh điện tử",
+            "bản điện tử giấy khai sinh"
+          ]
+        ],
+        "forbidden_citations": [],
+        "forbidden_terms": [],
+        "fallback": false,
+        "passed_checks": 15,
+        "total_checks": 16,
+        "usage": {
+          "api_calls": 2,
+          "api_elapsed_seconds": 7.952,
+          "input_tokens": 9653,
+          "output_tokens": 694,
+          "total_tokens": 10347
+        },
+        "case_id": "TC05",
+        "case_title": "BHYT khi chưa đăng ký khai sinh"
+      }
+    ]
+  },
+  "summary": {
+    "graph": {
+      "completed_cases": 4,
+      "mean_score": 95.95,
+      "mean_latency_seconds": 24.24,
+      "total_api_calls": 10,
+      "total_input_tokens": 76824,
+      "total_output_tokens": 5250,
+      "total_tokens": 82074
+    },
+    "vector_only": {
+      "completed_cases": 4,
+      "mean_score": 95.95,
+      "mean_latency_seconds": 18.426,
+      "total_api_calls": 8,
+      "total_input_tokens": 34240,
+      "total_output_tokens": 3109,
+      "total_tokens": 37349
+    }
+  },
+  "typical_errors": {
+    "graph": [
+      [
+        "missing_citation: PROC_1_116788_c126_s0",
+        1
+      ],
+      [
+        "missing_content: có thể nộp ngay | nộp hồ sơ liên thông ngay | chưa có giấy khai sinh",
+        1
+      ]
+    ],
+    "vector_only": [
+      [
+        "missing_citation: PROC_1_116788_c126_s0",
+        1
+      ],
+      [
+        "missing_content: giấy khai sinh điện tử | bản điện tử giấy khai sinh",
+        1
+      ]
+    ]
+  }
+}

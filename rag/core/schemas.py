@@ -243,6 +243,7 @@ class RelationEvidence(StrictModel):
     text: str
     evidence_record_id: str | None = None
     evidence_step: int | None = None
+    transferred_result: str | None = None
 
 
 class AnswerContext(StrictModel):

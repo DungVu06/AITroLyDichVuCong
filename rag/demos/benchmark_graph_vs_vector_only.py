@@ -1,4 +1,4 @@
-"""CLI benchmark: Graph-RAG versus vector-only RAG on five fixed demo cases.
+"""CLI benchmark: Graph-RAG versus vector-only RAG on fixed demo cases.
 
 Run from repository root:
     .\\.venv\\Scripts\\python.exe -m rag.demos.benchmark_graph_vs_vector_only
@@ -42,6 +42,7 @@ class BenchmarkCase:
     required_term_groups: list[list[str]]
     forbidden_citations: list[str]
     forbidden_term_groups: list[list[str]] = field(default_factory=list)
+    ordered_citations: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -143,6 +144,9 @@ def load_cases(path: Path) -> list[BenchmarkCase]:
 
 def evaluate(case: BenchmarkCase, answer: str, warnings: list[str]) -> dict[str, Any]:
     citations = set(CITATION.findall(answer))
+    citation_positions: dict[str, int] = {}
+    for match in CITATION.finditer(answer):
+        citation_positions.setdefault(match.group(1), match.start())
     normalized = answer.casefold()
     missing_citations = [item for item in case.required_citations if item not in citations]
     matched_groups = [
@@ -161,14 +165,27 @@ def evaluate(case: BenchmarkCase, answer: str, warnings: list[str]) -> dict[str,
         group for group, matched in zip(case.forbidden_term_groups, matched_forbidden_groups)
         if matched is not None
     ]
+    ordered_step_citations = case.ordered_citations
+    step_order_ok = (
+        not ordered_step_citations
+        or (
+            all(item in citation_positions for item in ordered_step_citations)
+            and all(
+                citation_positions[left] < citation_positions[right]
+                for left, right in zip(ordered_step_citations, ordered_step_citations[1:])
+            )
+        )
+    )
     fallback = any("câu trả lời dự phòng" in warning.casefold() for warning in warnings)
     checks = (len(case.required_citations) + len(case.required_term_groups)
-              + len(case.forbidden_citations) + len(case.forbidden_term_groups))
+              + len(case.forbidden_citations) + len(case.forbidden_term_groups)
+              + (1 if ordered_step_citations else 0))
     passed = (
         len(case.required_citations) - len(missing_citations)
         + len(case.required_term_groups) - len(missing_term_groups)
         + len(case.forbidden_citations) - len(forbidden_citations)
         + len(case.forbidden_term_groups) - len(forbidden_terms)
+        + (1 if ordered_step_citations and step_order_ok else 0)
     )
     return {
         "score": round(100 * passed / checks, 1) if checks else 100.0,
@@ -177,6 +194,8 @@ def evaluate(case: BenchmarkCase, answer: str, warnings: list[str]) -> dict[str,
         "missing_term_groups": missing_term_groups,
         "forbidden_citations": forbidden_citations,
         "forbidden_terms": forbidden_terms,
+        "step_order_ok": step_order_ok,
+        "ordered_step_citations": ordered_step_citations,
         "fallback": fallback,
         "passed_checks": passed,
         "total_checks": checks,
@@ -215,10 +234,13 @@ def run_case(
             "missing_term_groups": case.required_term_groups,
             "forbidden_citations": [],
             "forbidden_terms": [],
+            "step_order_ok": not case.ordered_citations,
+            "ordered_step_citations": case.ordered_citations,
             "fallback": False,
             "passed_checks": 0,
             "total_checks": (len(case.required_citations) + len(case.required_term_groups)
-                             + len(case.forbidden_citations) + len(case.forbidden_term_groups)),
+                             + len(case.forbidden_citations) + len(case.forbidden_term_groups)
+                             + (1 if case.ordered_citations else 0)),
         }
     result["usage"] = recorder.summary_since(mark)
     return result
@@ -257,6 +279,8 @@ def errors_by_mode(results: dict[str, list[dict[str, Any]]]) -> dict[str, Counte
                 counter[f"forbidden_citation: {citation}"] += 1
             for terms in row.get("forbidden_terms", []):
                 counter[f"forbidden_content: {' | '.join(terms)}"] += 1
+            if row.get("ordered_step_citations") and not row.get("step_order_ok"):
+                counter[f"wrong_step_order: {' -> '.join(row['ordered_step_citations'])}"] += 1
             if row["fallback"]:
                 counter["fallback_answer"] += 1
         grouped[mode] = counter
@@ -269,7 +293,7 @@ def render_evaluation(payload: dict[str, Any]) -> str:
         "",
         f"- Thời điểm UTC: {payload['created_at']}",
         f"- Model: `{payload['model']}`",
-        f"- Dataset: 5 ca cố định trong `rag/demos/graph_vs_vector_only_cases.json`.",
+        f"- Dataset: {len(payload['cases'])} ca cố định trong `rag/demos/graph_vs_vector_only_cases.json`.",
         "- Control arm bỏ toàn bộ Neo4j/SnapshotGraph; các thành phần còn lại được giữ nguyên.",
         "- Theo phạm vi thử đã chốt: đối chứng Graph-RAG với RAG không đồ thị; không có arm tra cứu thủ công.",
         "- Token chỉ được ghi khi Gemini trả `interaction.usage`; `N/A` nghĩa là API không trả usage, không phải 0 token.",
@@ -322,7 +346,7 @@ def render_evaluation(payload: dict[str, Any]) -> str:
     lines += [
         "## Phạm vi và giới hạn thử",
         "",
-        "- Chỉ 5 tình huống demo sinh con; không đại diện toàn bộ thủ tục hành chính.",
+        f"- Chỉ {len(payload['cases'])} tình huống demo sinh con; không đại diện toàn bộ thủ tục hành chính.",
         "- Mỗi arm chạy một lần mỗi ca. Kết quả sinh ngôn ngữ của LLM có dao động; muốn kết luận ổn định phải lặp nhiều vòng và lấy trung bình.",
         "- Accuracy ở đây là rubric evidence/nội dung định trước, không phải phán quyết pháp lý toàn diện hay đánh giá bởi chuyên gia.",
         "- Latency gồm LLM, embedding, Qdrant và (ở arm graph) Neo4j; môi trường mạng làm số đo thay đổi.",
@@ -333,15 +357,65 @@ def render_evaluation(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_answer_log(payload: dict[str, Any]) -> str:
-    """Create a human-readable audit trail for all five questions and both arms."""
+def _render_case_checklist(case: dict[str, Any], row: dict[str, Any]) -> tuple[list[str], list[str]]:
+    """Render every rubric check so a partial score is auditable."""
+    citations = set(row.get("citations", []))
+    answer = str(row.get("answer", "")).casefold()
     lines = [
-        "# Nhật ký 10 câu trả lời — Graph-RAG vs RAG không đồ thị",
+        "#### Checklist rubric",
+        "",
+        "| Nhóm | Tiêu chí | Kết quả |",
+        "|---|---|---|",
+    ]
+    failures: list[str] = []
+    for citation in case["required_citations"]:
+        passed = citation in citations
+        lines.append(f"| Citation bắt buộc | `{citation}` | {'✅ Có' if passed else '❌ Thiếu'} |")
+        if not passed:
+            failures.append(f"thiếu citation `{citation}`")
+    for group in case["required_term_groups"]:
+        matched = next((term for term in group if term.casefold() in answer), None)
+        display = " / ".join(group)
+        lines.append(f"| Nội dung bắt buộc | {display} | {'✅ ' + matched if matched else '❌ Thiếu toàn bộ nhóm'} |")
+        if not matched:
+            failures.append(f"thiếu nội dung `{display}`")
+    for citation in case["forbidden_citations"]:
+        passed = citation not in citations
+        lines.append(f"| Citation cấm | `{citation}` | {'✅ Không xuất hiện' if passed else '❌ Có xuất hiện'} |")
+        if not passed:
+            failures.append(f"có citation cấm `{citation}`")
+    for group in case.get("forbidden_term_groups", []):
+        matched = next((term for term in group if term.casefold() in answer), None)
+        display = " / ".join(group)
+        lines.append(f"| Nội dung cấm | {display} | {'✅ Không khẳng định' if not matched else '❌ Có: ' + matched} |")
+        if matched:
+            failures.append(f"khẳng định cấm `{matched}`")
+    ordered = case.get("ordered_citations", [])
+    if ordered:
+        positions: dict[str, int] = {}
+        for match in CITATION.finditer(str(row.get("answer", ""))):
+            positions.setdefault(match.group(1), match.start())
+        passed = (
+            all(item in positions for item in ordered)
+            and all(positions[left] < positions[right] for left, right in zip(ordered, ordered[1:]))
+        )
+        display = " → ".join(f"`{item}`" for item in ordered)
+        lines.append(f"| Thứ tự bước | {display} | {'✅ Đúng thứ tự' if passed else '❌ Thiếu hoặc đảo thứ tự'} |")
+        if not passed:
+            failures.append(f"thứ tự bước sai `{display}`")
+    lines.append("")
+    return lines, failures
+
+
+def render_answer_log(payload: dict[str, Any]) -> str:
+    """Create a human-readable audit trail for every question and both arms."""
+    lines = [
+        f"# Nhật ký {len(payload['cases']) * len(MODES)} câu trả lời — Graph-RAG vs RAG không đồ thị",
         "",
         f"- Thời điểm chạy UTC: {payload['created_at']}",
         f"- Model: `{payload['model']}`",
         "- Mỗi ca được chạy độc lập; không mang hội thoại từ ca trước.",
-        "- Câu trả lời dưới đây là output nguyên văn đã được lưu từ 10 lượt chạy.",
+        f"- Câu trả lời dưới đây là output nguyên văn đã được lưu từ {len(payload['cases']) * len(MODES)} lượt chạy.",
         "",
     ]
     by_mode = {
@@ -358,6 +432,7 @@ def render_answer_log(payload: dict[str, Any]) -> str:
             f"- Nội dung cần có: {'; '.join(' / '.join(group) for group in case['required_term_groups']) or 'Không có'}.",
             f"- Citation không được xuất hiện: {', '.join(f'`{item}`' for item in case['forbidden_citations']) or 'Không có'}.",
             f"- Nội dung không được khẳng định: {'; '.join(' / '.join(group) for group in case.get('forbidden_term_groups', [])) or 'Không có'}.",
+            f"- Thứ tự bước bắt buộc: {' → '.join(f'`{item}`' for item in case.get('ordered_citations', [])) or 'Không áp dụng'}.",
             "",
         ])
         for mode in MODES:
@@ -372,6 +447,8 @@ def render_answer_log(payload: dict[str, Any]) -> str:
             # A model occasionally emits escaped newlines inside a JSON string.
             # Decode only that presentation artifact in the human audit file.
             lines.extend([row["answer"].replace("\\n", "\n"), ""])
+            checklist, failures = _render_case_checklist(case, row)
+            lines.extend(checklist)
             usage = row["usage"]
             lines.extend([
                 "#### Quan sát benchmark",
@@ -381,6 +458,7 @@ def render_answer_log(payload: dict[str, Any]) -> str:
                 f"- Gemini: **{usage['api_calls']} calls**, input `{usage['input_tokens'] if usage['input_tokens'] is not None else 'N/A'}`, output `{usage['output_tokens'] if usage['output_tokens'] is not None else 'N/A'}`, total `{usage['total_tokens'] if usage['total_tokens'] is not None else 'N/A'}` tokens.",
                 f"- Citation bị thiếu theo rubric: {', '.join(f'`{item}`' for item in row['missing_citations']) or 'Không có'}.",
                 f"- Citation sai/không được phép: {', '.join(f'`{item}`' for item in row['forbidden_citations']) or 'Không có'}.",
+                f"- Mục không đạt: {'; '.join(failures) if failures else 'Không có.'}",
                 f"- Fallback: {'Có' if row['fallback'] else 'Không'}.",
             ])
             if row["warnings"]:
@@ -403,8 +481,8 @@ def write_artifacts(payload: dict[str, Any], output_dir: Path, stem: str) -> tup
 def main() -> None:
     if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
         sys.stdout.reconfigure(encoding="utf-8")
-    parser = argparse.ArgumentParser(description="Đối chứng Graph-RAG và vector-only RAG trên 5 ca demo.")
-    parser.add_argument("--cases", type=Path, default=CASES_PATH, help="File JSON chứa 5 ca và rubric.")
+    parser = argparse.ArgumentParser(description="Đối chứng Graph-RAG và vector-only RAG trên các ca demo.")
+    parser.add_argument("--cases", type=Path, default=CASES_PATH, help="File JSON chứa các ca và rubric.")
     parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR, help="Thư mục tạo report JSON/Markdown mới.")
     parser.add_argument("--min-api-interval", type=float, default=4.2, help="Khoảng cách tối thiểu giữa Gemini calls (mặc định 4.2 giây).")
     parser.add_argument("--mode", choices=("both", *MODES), default="both", help="Chạy cả hai arm hoặc chỉ một arm để debug.")
@@ -417,7 +495,7 @@ def main() -> None:
             args.output_dir,
             args.render_existing.stem,
         )
-        print(f"Đã lưu 10 câu hỏi/đáp: {answers_path}")
+        print(f"Đã lưu {len(payload['cases']) * len(MODES)} câu hỏi/đáp: {answers_path}")
         print(f"Đã lưu bảng đánh giá: {evaluation_path}")
         return
     if args.min_api_interval < 0:
@@ -454,7 +532,7 @@ def main() -> None:
     json_path = args.output_dir / f"graph_vs_vector_only_{stamp}.json"
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     answers_path, evaluation_path = write_artifacts(payload, args.output_dir, json_path.stem)
-    print(f"\nĐã lưu 10 câu hỏi/đáp: {answers_path}")
+    print(f"\nĐã lưu {len(cases) * len(modes)} câu hỏi/đáp: {answers_path}")
     print(f"Đã lưu bảng đánh giá: {evaluation_path}")
     print(f"Đã lưu dữ liệu chi tiết: {json_path}")
 

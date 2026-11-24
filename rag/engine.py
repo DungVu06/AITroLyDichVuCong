@@ -7,6 +7,7 @@ import json
 import logging
 import sys
 import socket
+import unicodedata
 from typing import Literal
 
 from neo4j.exceptions import ServiceUnavailable, SessionExpired
@@ -213,13 +214,16 @@ def build_context(
         )
         detail_types = list(dict.fromkeys(detail_types))
         if workflow_id:
-            # A graph edge proves ordering, while the evidence for documents
-            # and time may live on a component procedure. Keep the workflow
-            # parent and every procedure demanded by the deterministic
-            # contract in the detail retrieval set.
+            # A graph edge proves ordering, while documents and time may live
+            # on a component procedure. Relation requirements are already
+            # represented by relation_evidence; loading their source nodes as
+            # full procedure detail would wrongly make every child step an
+            # obligation for a parent-workflow answer.
             required_detail_ids = {workflow_id}
             required_detail_ids.update(
-                requirement.procedure_id for requirement in contract.requirements
+                requirement.procedure_id
+                for requirement in contract.requirements
+                if not requirement.relation_type
             )
             detail_procedures = [
                 item for item in graph.procedures
@@ -246,13 +250,17 @@ def build_context(
             procedures = [details.get(item.procedure_id, item) for item in graph.procedures]
 
     if contract.enforce_step_sequence:
+        sequence_procedures = (
+            [procedure for procedure in procedures if procedure.procedure_id == workflow_id]
+            if workflow_id else procedures
+        )
         required_step_numbers = {
             procedure.procedure_id: sorted({
                 chunk.step_number
                 for chunk in procedure.chunks
                 if chunk.chunk_type == "step_item" and chunk.step_number is not None
             })
-            for procedure in procedures
+            for procedure in sequence_procedures
         }
         contract = contract.model_copy(update={
             "required_step_numbers": {
@@ -315,8 +323,82 @@ def build_context(
     return context
 
 
+def _graph_linked_filing_decision(context: AnswerContext) -> str | None:
+    """Render the graph-only consequence of a documented workflow transfer.
+
+    The statement is produced from the structured edge, not guessed by the LLM.
+    It applies only where the user's missing item is the intermediate result that
+    the linked workflow itself transfers after submission.
+    """
+    if not (context.contract.workflow_id and context.contract.submission_channel):
+        return None
+    def folded(value: str) -> str:
+        return "".join(
+            character
+            for character in unicodedata.normalize("NFD", value.casefold())
+            if unicodedata.category(character) != "Mn"
+        ).replace("đ", "d")
+
+    question = folded(context.query.text)
+    if not any(marker in question for marker in ("chua", "khong co", "thieu")):
+        return None
+
+    def is_missing_transferred_result(item: RelationEvidence) -> bool:
+        if not item.transferred_result or item.target_id not in context.contract.procedure_ids:
+            return False
+        # Match the stable human-readable core of the transferred result. For
+        # example, a user saying "chưa có giấy khai sinh" matches "Giấy khai
+        # sinh điện tử" but a missing input such as "Giấy chứng sinh" does not.
+        result_core = folded(item.transferred_result).replace("dien tu", "").replace("ban ", "")
+        return " ".join(result_core.split()) in question
+
+    relation = next((item for item in context.relation_evidence if is_missing_transferred_result(item)), None)
+    if not relation or not relation.transferred_result:
+        return None
+    result = relation.transferred_result
+
+    submission_requirement = next(
+        (item for item in context.contract.requirements if item.claim_id == "linked_submission"),
+        None,
+    )
+    if not submission_requirement:
+        return None
+    submission_chunk = next(
+        (
+            chunk
+            for procedure in context.procedure_evidence
+            for chunk in procedure.chunks
+            if chunk.doc_id == submission_requirement.procedure_id
+            and chunk.chunk_type == submission_requirement.chunk_type
+            and chunk.step_number == submission_requirement.step_number
+            and chunk.chunk_id
+        ),
+        None,
+    )
+    if not submission_chunk:
+        return None
+
+    return (
+        f"Bạn có thể nộp hồ sơ liên thông ngay qua VNeID hoặc Cổng Dịch vụ công quốc gia; "
+        f"không cần có sẵn {result}. Sau khi tiếp nhận hồ sơ, hệ thống tự chuyển "
+        f"{result} để xử lý thủ tục đích. 【{submission_chunk.chunk_id}】 "
+        f"【{relation.citation_id}】"
+    )
+
+
+def _with_graph_linked_filing_decision(response: RAGResponse, context: AnswerContext) -> RAGResponse:
+    decision = _graph_linked_filing_decision(context)
+    if not decision or "có thể nộp hồ sơ liên thông ngay" in response.answer_markdown.casefold():
+        return response
+    return response.model_copy(update={"answer_markdown": f"{decision}\n\n{response.answer_markdown}"})
+
+
 def _fallback_response(response: RAGResponse, context: AnswerContext) -> RAGResponse:
-    lines = ["## Hướng dẫn theo thông tin đã kiểm chứng", "", "### Thứ tự thủ tục"]
+    lines = []
+    decision = _graph_linked_filing_decision(context)
+    if decision:
+        lines.extend([decision, ""])
+    lines.extend(["## Hướng dẫn theo thông tin đã kiểm chứng", "", "### Thứ tự thủ tục"])
     for item in response.journey:
         optional = f" ({item.reason})" if item.category == "optional" and item.reason else ""
         lines.append(f"- Ưu tiên {item.priority}: **{item.name}**{optional} 【{item.procedure_id}】")
@@ -423,15 +505,17 @@ def _generate_validated_response(context: AnswerContext) -> RAGResponse:
                              if outside else "Chưa xác định được thủ tục từ thông tin hiện có."),
             follow_up_questions=[] if outside else questions[:3] or ["Bạn muốn tra cứu thủ tục cụ thể nào?"],
         )
-    response = generate_answer(context)
+    response = _with_graph_linked_filing_decision(generate_answer(context), context)
     validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_procedure_citations(response, validation)
+        response = _with_graph_linked_filing_decision(response, context)
         validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_answer_with_gemini(response, validation, context)
+        response = _with_graph_linked_filing_decision(response, context)
         validation = validate_answer(response, context)
 
     if not validation.is_valid:
