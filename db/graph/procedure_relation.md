@@ -11,20 +11,11 @@ data/procedure/records/PROC_*.json
         ▼
 data/procedure/normalized_records/PROC_*.json ──► Neo4j
 
-Mọi relations ──► data/procedure/normalized_relation_report.json
-Chỉ relations có resolved ──► data/procedure/procedure_relations.json ──► Neo4j
+Cạnh đã xác nhận ──► normalized_records/PROC_*.json
+                     relations.resolved_edges ──► Neo4j + snapshot cục bộ
 ```
 
-`procedure_normalize.py` chuẩn hóa ID của thủ tục, làm sạch văn bản và xác định các thủ tục liên quan, ghi trạng thái xử lý của từng tham chiếu.
-
-Hai file quan hệ có mục đích khác nhau:
-
-| File | Nội dung |
-|---|---|
-| `data/procedure/normalized_relation_report.json` | Toàn bộ tham chiếu: đã resolve (tồn tại trong database) hoặc chưa resolve (chưa thu thập được). |
-| `data/procedure/procedure_relations.json` | Chỉ các quan hệ đã resolve đầy đủ tới thủ tục (`resolution_status = "resolved"`), dùng để import cạnh tương ứng. |
-
-Tham chiếu chưa resolve không bị mất: chúng vẫn được lưu trong report JSON, nhưng hiện chưa tạo node tạm hoặc relationship trong Neo4j.
+Normalizer lấy các tham chiếu trong `relations` và đối chiếu với nội dung thủ tục. Mỗi cạnh được lưu trong bản ghi nguồn, dùng `id` của bản ghi đó và `target_id` của cạnh để nối hai thủ tục. Cạnh trong gói Sinh con có thêm `workflow_id`, `evidence_record_id` và `evidence_step`. Cạnh luân chuyển ghi `transferred_result`. Cạnh có điều kiện ghi `condition`.
 
 ## 2. Các node
 
@@ -105,12 +96,11 @@ Thủ tục này liên quan đến việc giải quyết hoặc hưởng một c
 
 ## 4. Trạng thái resolve của tham chiếu
 
-Mỗi phần tử trong các mảng của `relations` được ghi thành một dòng trong `data/procedure/normalized_relation_report.json`. Trường `resolution_status` cho biết mức độ xác định của tham chiếu:
+`resolved` là cạnh được ghi vào bản chuẩn hóa. Normalizer đếm các mục thiếu ID, thiếu bằng chứng hoặc trùng lặp và in số lượng khi chạy. Để lưu chi tiết và lý do của từng mục, chạy:
 
-| Trạng thái | Ý nghĩa | Import vào graph |
-|---|---|---|
-| `resolved` | Xác định được ID đích tồn tại trong database (hoặc là ID `BEN_`). | Tạo cạnh tương ứng. |
-| `unresolved` | ID đích chưa có trong danh sách thủ tục đã crawl. | Không tạo cạnh. |
+```powershell
+python db/graph/procedure_normalize.py --report data/procedure/normalized_relation_report.json
+```
 
 ## 5. Một số truy vấn kiểm tra
 

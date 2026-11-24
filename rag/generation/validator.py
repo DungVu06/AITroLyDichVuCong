@@ -91,6 +91,8 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
                     for relation in context.relation_evidence
                     if relation.source_id == requirement.procedure_id
                     and relation.relationship_type == requirement.relation_type
+                    and (requirement.target_procedure_id is None
+                         or relation.target_id == requirement.target_procedure_id)
                 }
             else:
                 candidates = {

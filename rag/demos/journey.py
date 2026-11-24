@@ -8,6 +8,7 @@ import sys
 
 from db.neo4j_client import Neo4jClient
 from db.qdrant_client import QdrantVectorClient
+from rag.pipeline.answer_contract import build_answer_contract
 from rag.pipeline.journey import build_journey
 from rag.pipeline.preprocessing import preprocess_query
 from rag.pipeline.query_understanding import understand_query
@@ -26,9 +27,11 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=5)
     args = parser.parse_args()
 
-    query = preprocess_query(UserQuery(text=args.text))
+    user_query = UserQuery(text=args.text)
+    query = preprocess_query(user_query)
     state = understand_query(query)
     plan = route_query(query, state)
+    contract = build_answer_contract(user_query, state)
 
     with QdrantVectorClient.from_env() as qdrant:
         vector_result = VectorRetriever(qdrant).retrieve_from_plan(
@@ -40,13 +43,20 @@ def main() -> None:
     seed_ids = list(
         dict.fromkeys(chunk.doc_id for chunk in vector_result["procedures"])
     )
+    if contract.workflow_id:
+        seed_ids = [contract.workflow_id]
     with Neo4jClient.from_env() as neo4j:
         graph_result = GraphRetriever(neo4j).retrieve(
             seed_ids,
             include_benefits=plan.include_benefits,
         )
 
-    journey = build_journey(graph_result, seed_ids)
+    journey = build_journey(
+        graph_result,
+        seed_ids,
+        workflow_id=contract.workflow_id,
+        identity_card_requested=state.identity_card_requested,
+    )
     print(
         json.dumps(
             {

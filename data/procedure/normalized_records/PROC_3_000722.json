@@ -83,6 +83,41 @@
       "PROC_1_116788",
       "PROC_1_014137",
       "PROC_1_116410"
+    ],
+    "resolved_edges": [
+      {
+        "target_id": "PROC_1_001193",
+        "relation_type": "sub_procedures",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 1
+      },
+      {
+        "target_id": "PROC_1_116788",
+        "relation_type": "sub_procedures",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 4
+      },
+      {
+        "target_id": "PROC_1_014137",
+        "relation_type": "sub_procedures",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 4
+      },
+      {
+        "target_id": "PROC_1_116410",
+        "relation_type": "sub_procedures",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 5,
+        "condition": "identity_card_requested"
+      }
     ]
   },
   "jurisdiction": {

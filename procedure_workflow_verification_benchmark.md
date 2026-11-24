@@ -528,32 +528,71 @@ Thông tin ngày sinh đã được điều chỉnh trong Cơ sở dữ liệu q
 
 ```text
 [=== BẮT ĐẦU ĐIỀN KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
-Bạn không thể đến cơ quan Bảo hiểm xã hội để xin cấp thẻ BHYT ngay cho bé khi chưa làm giấy khai sinh vì khai sinh là bước tiên quyết đối với thủ tục cấp thẻ BHYT đơn lẻ 【REL:PROC_1_014137:REQUIRES:PROC_1_001193】【PROC_1_014137_c60_s0】.
+Con bạn 1 tháng tuổi chưa làm giấy khai sinh và đang bị ốm cần đi viện, bạn không thể đến thẳng cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT riêng lẻ cho trẻ trước khi có khai sinh theo cách thông thường, vì đối với trẻ dưới 6 tuổi, việc cấp thẻ BHYT được thực hiện liên thông cùng với thủ tục đăng ký khai sinh, đăng ký thường trú theo quy định 【PROC_1_014137_c60_s0】.
+
+Cơ quan tiếp nhận và giải quyết cấp thẻ BHYT đơn lẻ là Bảo hiểm xã hội tỉnh 【PROC_1_014137_c61_s0】 với thời gian giải quyết là 05 ngày làm việc kể từ ngày nhận đủ hồ sơ 【PROC_1_014137_c61_s0】, nhưng bạn có thể lựa chọn phương án thực hiện nhanh chóng qua gói liên thông điện tử.
 
 Thứ tự nên làm
-Thủ tục đăng ký khai sinh 【PROC_1_001193】 (Mã: PROC_1_001193): Cần hoàn thành trước tại Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】.
-Thủ tục cấp thẻ bảo hiểm y tế 【PROC_1_014137】 (Mã: PROC_1_014137): Thực hiện tại Bảo hiểm xã hội tỉnh sau khi đã có khai sinh hoặc làm theo hình thức liên thông 【PROC_1_014137_c61_s0】.
-Bạn có thể lựa chọn một trong hai phương án sau:
+Bạn có hai phương án thực hiện:
 
-Phương án 1 (Làm liên thông điện tử): Thực hiện nhóm thủ tục liên thông điện tử (Mã: PROC_3_000722) bao gồm đăng ký khai sinh, đăng ký thường trú và cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi trên Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID 【PROC_3_000722_c180_s1】.
-Phương án 2 (Làm từng bước đơn lẻ): Hoàn thành thủ tục đăng ký khai sinh tại Ủy ban nhân dân cấp xã (thời gian giải quyết: 1 ngày, miễn phí) 【PROC_1_001193_c48_s0】, sau đó tiến hành thủ tục cấp thẻ BHYT đơn lẻ tại Bảo hiểm xã hội tỉnh.
-Giấy tờ và cách thực hiện
-Đối với thủ tục cấp thẻ bảo hiểm y tế (đơn lẻ):
+Phương án 1: Thực hiện gói liên thông điện tử (Khuyên dùng)
 
-Hồ sơ phổ biến: Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2 Phụ lục ban hành kèm theo Nghị định số 188/2025/NĐ-CP 【PROC_1_014137_c50_s0】.
-Cách thực hiện: Nộp trực tuyến, qua dịch vụ bưu chính công ích, hoặc nộp trực tiếp tại bộ phận một cửa của cơ quan bảo hiểm xã hội 【PROC_1_014137_c59_s0】.
-Thời gian và lệ phí: 05 ngày làm việc kể từ ngày nhận đủ hồ sơ, miễn phí 【PROC_1_014137_c61_s0】.
-Nguồn tham khảo (9)
+Lý do: Giúp giải quyết đồng thời đăng ký khai sinh, đăng ký thường trú và cấp thẻ BHYT cho trẻ dưới 6 tuổi 【PROC_3_000722_c183_s1】.
+Cơ quan tiếp nhận: Công an cấp xã (hoặc nộp trực tuyến qua Cổng Dịch vụ công quốc gia / ứng dụng VNeID) 【PROC_3_000722_c185_s0】【PROC_3_000722_c180_s1】.
+Hồ sơ cần nộp: Tờ khai điện tử (Mẫu số 01) và dữ liệu điện tử/bản điện tử Giấy chứng sinh 【PROC_3_000722_c176_s0】【PROC_3_000722_c177_s0】.
+Phương án 2: Làm thủ tục đăng ký khai sinh trước tại Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】
+
+Lý do: Hoàn thành khai sinh (trong thời hạn 60 ngày kể từ ngày sinh con) 【PROC_1_001193_c43_s0】 để làm cơ sở cấp thẻ BHYT.
+Thời gian giải quyết: 01 ngày (Miễn phí) 【PROC_1_001193_c48_s0】.
+Sau khi có giấy khai sinh: Bạn có thể tiến hành nộp hồ sơ xin cấp thẻ BHYT theo hình thức trực tuyến, qua bưu chính hoặc trực tiếp tại Bảo hiểm xã hội tỉnh 【PROC_1_014137_c61_s0】 với Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2 【PROC_1_014137_c50_s0】.
+Thủ tục áp dụng
+Thủ tục đăng ký khai sinh 【PROC_1_001193】
+Thủ tục cấp thẻ bảo hiểm y tế 【PROC_1_014137】
+Nguồn tham khảo (12)
 
 Thủ tục đăng ký khai sinh — PROC_1_001193
 Thủ tục đăng ký khai sinh – execution_methods — PROC_1_001193_c48_s0
+Thủ tục đăng ký khai sinh – step_item — PROC_1_001193_c43_s0
 Thủ tục cấp thẻ bảo hiểm y tế — PROC_1_014137
 Thủ tục cấp thẻ bảo hiểm y tế – execution_methods — PROC_1_014137_c61_s0
-Thủ tục cấp thẻ bảo hiểm y tế – document_item — PROC_1_014137_c50_s0
-Thủ tục cấp thẻ bảo hiểm y tế – step_item — PROC_1_014137_c59_s0
 Thủ tục cấp thẻ bảo hiểm y tế – step_item — PROC_1_014137_c60_s0
+Thủ tục cấp thẻ bảo hiểm y tế – document_item — PROC_1_014137_c50_s0
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – execution_methods — PROC_3_000722_c185_s0
 Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item — PROC_3_000722_c180_s1
-Quan hệ thủ tục: PROC_1_014137 REQUIRES PROC_1_001193 —
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item — PROC_3_000722_c183_s1
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – document_item — PROC_3_000722_c177_s0
+Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – document_item — PROC_3_000722_c176_s0
+Căn cứ pháp lý của thủ tục
+
+Thủ tục đăng ký khai sinh · 15 văn bản
+
+Cấp xã · Toàn quốc · Hiệu lực từ 2019-07-31 · Ghi nhận 2026-11-18 · Phiên bản 178839f9e166
+
+04/2024/TT-BTP — Sửa đổi, bổ sung một số điều của Thông tư số 02/2020/TT-BTP ngày 08/4/2020 của Bộ trưởng Bộ Tư pháp ban hành, hướng dẫn sử dụng, quản lý mẫu sổ quốc tịch và mẫu giấy tờ về quốc tịch và Thông tư số 04/2020/TT-BTP ngày 28/5/2020 của Bộ trưởng Bộ Tư pháp quy định chi tiết thi hành một số điều của Luật Hộ tịch và Nghị định số 123/2015/NĐ-CP ngày 15/11/2015 của Chính phủ quy định chi tiết một số điều và biện pháp thi hành Luật Hộ tịch
+Thông tư số 03/2023/TT-BTP — Thông tư số 03/2023/TT-BTP ngày 02/8/2023 của Bộ trưởng Bộ Tư pháp
+106/2021/TT-BTC — Thông tư sửa đổi, bổ sung một số điều của Thông tư số 85/2019/TT-BTC ngày 29/11/2019 của Bộ Tài chính hướng dẫn về phí và lệ phí thuộc thẩm quyền quyết định của Hội đồng nhân dân tỉnh, thành phố trực thuộc Trung ương.
+04/2020/TT-BTP — Hướng dẫn Luật hộ tịch và Nghị định 123/2015/NĐ-CP hướng dẫn Luật hộ tịch do Bộ trưởng Bộ Tư pháp ban hành
+07/2025/NĐ-CP — Nghị định sửa đổi, bổ sung một số điều của các Nghị định trong lĩnh vực hộ tịch, quốc tịch, chứng thực.
+120/2025/NĐ-CP — Nghị định số 120/2025/NĐ-CP ngày 11/6/2025 của Chính phủ quy định về phân định thẩm quyền của chính quyền địa phương 02 cấp trong lĩnh vực quản lý nhà nước của Bộ Tư pháp.
+66.7/2025/NQ-CP — Nghị quyết số 66.7/2025/NQ-CP của Chính phủ: Quy định cắt giảm, đơn giản hóa thủ tục hành chính dựa trên dữ liệu
+60/2014/QH13 — Luật 60/2014/QH13
+01/2022/TT-BTP — Thông tư quy định chi tiết một số điều và biện pháp thi hành Nghị định số 87/2020/NĐ-CP ngày 28 tháng 7 năm 2020 của Chính phủ quy định về Cơ sở dữ liệu hộ tịch điện tử, đăng ký hộ tịch trực tuyến
+85/2019/TT-BTC — Thông tư Hướng dẫn về phí và lệ phí thuộc thẩm quyền quyết định của Hội đồng nhân dân tỉnh, thành phố trực thuộc Trung ương
+104/2022/NĐ-CP — Nghị định sửa đổi, bổ sung một số điều của các Nghị định liên quan đến việc nộp xuất trình sổ hộ khẩu, sổ tạm trú giấy khi thực hiện thủ tục hành chính, cung cấp dịch vụ công
+123/2015/NĐ-CP — Nghị định số 123/2015/NĐ-CP ngày 15/11/2015 của Chính phủ quy định chi tiết một số điều và biện pháp thi hành Luật Hộ tịch
+08/2025/TT-BTP — Thông tư số 08/2025/TT-BTP ngày 12/6/2025 của Bộ trưởng Bộ Tư pháp quy định về phân định thẩm quyền của chính quyền địa phương 02 cấp và phân cấp trong lĩnh vực quản lý nhà nước của Bộ Tư pháp
+18/2026/NĐ-CP — Nghị định sửa đổi, bổ sung một số nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản lý của Bộ Tư pháp
+87/2020/NĐ-CP — Nghị định quy định về Cơ sở dữ liệu hộ tịch điện tử, đăng ký hộ tịch trực tuyến
+Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực.
+
+Thủ tục cấp thẻ bảo hiểm y tế · 4 văn bản
+
+Cấp tỉnh · Toàn quốc · Hiệu lực từ 2025-07-11 · Ghi nhận 2026-11-18 · Phiên bản 7ee3b4668fb0
+
+188/2025/NĐ-CP — Nghị định quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm y tế (188/2025/NĐ-CP ngày 01/7/2025)
+25/2008/QH12 — Luật 25/2008/QH12 - Bảo hiểm y tế
+51/2024/QH15 — Luật số 51/2024/QH15 ngày 27/11/2024 của Quốc hội sửa đổi, bổ sung một số điều của Luật Bảo hiểm y tế
+Luật 46/2014/QH13 — 46/2014/QH13 Sửa đổi, bổ sung một số điều của Luật Bảo hiểm y tế
 [=== KẾT THÚC KẾT QUẢ AI TẠO RA TẠI ĐÂY ===]
 ```
 
@@ -566,7 +605,7 @@ Quan hệ thủ tục: PROC_1_014137 REQUIRES PROC_1_001193 —
 | Nhận diện điều kiện tiên quyết (Prerequisite) | Đăng ký khai sinh hoàn tất trước khi chuyển hồ sơ sang BHXH để cấp thẻ. Gia đình có thể nộp hồ sơ liên thông ngay. | Nêu khai sinh đi trước cấp thẻ và đưa ra phương án liên thông khi trẻ chưa có Giấy khai sinh. Chưa mô tả rõ việc chuyển hồ sơ sang BHXH. | Đạt | Trượt nếu hướng dẫn xin thẻ trước khi đăng ký khai sinh hoặc yêu cầu phải có sẵn Giấy khai sinh mới được nộp hồ sơ liên thông. |
 | Cơ quan thẩm quyền cấp thẻ BHYT | Bảo hiểm xã hội tỉnh / cơ quan BHXH (không phải UBND xã cấp thẻ BHYT). | Nêu BHXH tỉnh cấp thẻ và UBND cấp xã đăng ký khai sinh. | Đạt | Trượt nếu bảo UBND xã có thẩm quyền cấp thẻ BHYT. |
 | Thời hạn liên thông và khâu cấp thẻ BHYT | Toàn trình 03 ngày làm việc từ khi cơ quan có thẩm quyền nhận đủ hồ sơ, tối đa 05 ngày nếu phải xác minh. Khâu cấp thẻ BHYT không quá 02 ngày làm việc kể từ khi BHXH nhận được hồ sơ điện tử liên thông. | Chỉ nêu 05 ngày của thủ tục đơn lẻ. Thiếu 03 ngày toàn trình, tối đa 05 ngày nếu xác minh, và không quá 02 ngày cho khâu BHYT. | Không đạt | Trượt nếu nhầm thời hạn cấp riêng hoặc thời hạn của riêng khâu BHYT với thời hạn toàn trình. |
-| Biểu mẫu tờ khai liên thông | Tờ khai điện tử Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP. | Chỉ nêu Mẫu số 2 của thủ tục đơn lẻ. Thiếu Mẫu số 01 liên thông. | Không đạt | Trượt nếu dùng Mẫu số 2 của thủ tục cấp thẻ BHYT riêng lẻ cho hồ sơ liên thông. |
+| Biểu mẫu tờ khai liên thông | Tờ khai điện tử Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP. | Nêu 2 mẫu cho 2 trường hợp | Đạt | Trượt nếu dùng Mẫu số 2 của thủ tục cấp thẻ BHYT riêng lẻ cho hồ sơ liên thông. |
 | Định hướng giải pháp liên thông | Nộp hồ sơ liên thông cho trẻ dưới 6 tuổi trên Cổng DVCQG hoặc VNeID ngay khi trẻ chưa có Giấy khai sinh. | Đề xuất nộp liên thông qua Cổng DVCQG hoặc VNeID. | Đạt | Trượt nếu chỉ hướng dẫn thực hiện các thủ tục riêng lẻ. |
 
 #### Đánh giá tương tác yêu cầu bổ sung thông tin:
@@ -590,9 +629,9 @@ Mỗi tiêu chí được chấm theo nội dung kỳ vọng trong JSON và bằ
 | TC-PROC-02 | 4/5 | Không đạt |
 | TC-PROC-03 | 5/5 | Đạt |
 | TC-PROC-04 | 5/5 | Đạt |
-| TC-PROC-05 | 3/5 | Không đạt |
+| TC-PROC-05 | 4/5 | Không đạt |
 
-- **Tiêu chí đạt** 21/24 (87.5%).
+- **Tiêu chí đạt** 22/24 (91.7%).
 - **Ca đạt toàn bộ tiêu chí** 3/5.
 
 

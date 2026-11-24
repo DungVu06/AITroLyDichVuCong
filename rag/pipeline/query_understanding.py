@@ -82,6 +82,11 @@ def understand_query(
                 "target": result.target or previous_state.target,
                 "procedure_ids": result.procedure_ids or previous_state.procedure_ids,
                 "facts": merged_facts,
+                "identity_card_requested": (
+                    previous_state.identity_card_requested
+                    if result.identity_card_requested is None
+                    else result.identity_card_requested
+                ),
             }
         )
     return result

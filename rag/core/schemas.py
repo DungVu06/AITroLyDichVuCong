@@ -80,6 +80,7 @@ class QueryState(StrictModel):
     target: str | None = None
     procedure_ids: list[str] = Field(default_factory=list)
     asks_about_dependencies: bool = False
+    identity_card_requested: bool | None = None
     completed_ids: list[str] = Field(default_factory=list)
     facts: dict[str, Any] = Field(default_factory=dict)
     missing_facts: list[MissingFact] = Field(default_factory=list)
@@ -148,6 +149,11 @@ class ProcedureGraphRelation(StrictModel):
     source_id: str
     relationship_type: str
     target: ProcedureEvidence
+    workflow_id: str | None = None
+    condition: str | None = None
+    evidence_record_id: str | None = None
+    evidence_step: int | None = Field(default=None, ge=1)
+    transferred_result: str | None = None
 
 
 class BenefitGraphRelation(StrictModel):
@@ -213,6 +219,7 @@ class EvidenceRequirement(StrictModel):
     step_number: int | None = None
     excluded_terms: list[str] = Field(default_factory=list)
     relation_type: str | None = None
+    target_procedure_id: str | None = None
 
 
 class AnswerContract(StrictModel):
@@ -221,6 +228,7 @@ class AnswerContract(StrictModel):
     procedure_ids: list[str] = Field(default_factory=list)
     requirements: list[EvidenceRequirement] = Field(default_factory=list)
     required_follow_up_questions: list[str] = Field(default_factory=list)
+    workflow_id: str | None = None
     submission_channel: str | None = None
     processing_flow: list[str] = Field(default_factory=list)
     enforce_step_sequence: bool = False
@@ -233,6 +241,8 @@ class RelationEvidence(StrictModel):
     target_id: str
     citation_id: str
     text: str
+    evidence_record_id: str | None = None
+    evidence_step: int | None = None
 
 
 class AnswerContext(StrictModel):

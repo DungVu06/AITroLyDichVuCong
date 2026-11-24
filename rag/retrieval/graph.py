@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
+from db.graph.neo4j_import import PROCEDURE_RELATION_PROPERTIES
 from db.neo4j_client import Neo4jClient
 from rag.core.schemas import (
     BenefitGraphRelation,
@@ -23,6 +24,7 @@ OPTIONAL MATCH (source)-[relation:REQUIRES|NEXT_STEP|PART_OF|HAS_SUB_PROCEDURE]
                ->(target:Procedure)
 RETURN properties(source) AS source,
        type(relation) AS relationship_type,
+       properties(relation) AS relation,
        properties(target) AS target
 ORDER BY source.id, relationship_type, target.id
 """
@@ -114,11 +116,17 @@ class GraphRetriever:
             if row["relationship_type"] and row["target"]:
                 target = _procedure(row["target"])
                 procedures[target.procedure_id] = target
+                properties = row.get("relation") or {}
+                if row["relationship_type"] in {"REQUIRES", "NEXT_STEP"} and not (
+                    properties.get("evidence_record_id") and properties.get("evidence_step")
+                ):
+                    continue
                 relations.append(
                     ProcedureGraphRelation(
                         source_id=source.procedure_id,
                         relationship_type=row["relationship_type"],
                         target=target,
+                        **{key: properties.get(key) for key in PROCEDURE_RELATION_PROPERTIES},
                     )
                 )
 

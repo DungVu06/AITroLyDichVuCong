@@ -46,7 +46,6 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
     requirements: list[EvidenceRequirement] = []
     questions: list[str] = []
     submission_channel: str | None = None
-    processing_flow: list[str] = []
     sequence_markers = (
         "các bước", "trình tự", "quy trình", "hệ thống xử lý",
         "thứ tự", "thực hiện như thế nào",
@@ -81,23 +80,45 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
             "Chủ sở hữu chỗ ở hợp pháp đã đồng ý bằng văn bản cho đăng ký thường trú chưa?",
         ]
 
-    linked_case = "vneid" in text and any(term in text for term in ("liên thông", "4 trong 1", "bảo hiểm y tế", "thường trú"))
+    separate_filing = any(term in text for term in (
+        "tôi làm riêng", "tôi nộp riêng", "muốn làm riêng", "muốn nộp riêng",
+        "không làm liên thông", "không nộp liên thông",
+    ))
+    asks_for_linked = any(term in text for term in ("liên thông", "4 trong 1", "4-trong-1"))
+    related_to_birth = state.life_event == "sinh_con" or any(term in text for term in (
+        "khai sinh", "thường trú", "bảo hiểm y tế", "bhyt", "căn cước",
+    ))
+    linked_case = not separate_filing and (
+        LINKED in state.procedure_ids or (asks_for_linked and related_to_birth)
+    )
     if linked_case:
         procedure_ids.append(LINKED)
-        requirements += [
-            _requirement("linked_submission", "Kênh nộp hồ sơ liên thông", LINKED, "step_item", "VNeID", "Cổng Dịch vụ công quốc gia"),
-            _requirement("linked_birth_step", "Bước xử lý khai sinh", LINKED, "step_item", "đăng ký khai sinh", "24 giờ"),
-            _requirement("linked_residence_health_step", "Bước xử lý thường trú và BHYT", LINKED, "step_item", "đăng ký thường trú", "bảo hiểm y tế"),
-            _requirement("linked_card_step", "Bước xử lý cấp căn cước", LINKED, "step_item", "cấp thẻ căn cước", "05 ngày"),
-            _requirement("linked_total_time", "Thời gian giải quyết gói liên thông", LINKED, "execution_methods", "Ba (03) ngày"),
+        requirements.append(
+            _requirement("linked_submission", "Kênh nộp hồ sơ liên thông", LINKED, "step_item",
+                         "VNeID", "Cổng Dịch vụ công quốc gia", step_number=1)
+        )
+        transfers = [
+            (BIRTH, RESIDENCE, "Kết quả khai sinh chuyển sang thường trú"),
+            (BIRTH, HEALTH, "Kết quả khai sinh chuyển sang BHYT"),
         ]
-        submission_channel = "Người dân nộp trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia; các cơ quan xử lý tiếp theo qua hệ thống liên thông."
-        processing_flow = [
-            "Cổng Dịch vụ công quốc gia chuyển hồ sơ sang hệ thống của Bộ Tư pháp.",
-            "UBND cấp xã giải quyết đăng ký khai sinh khi hồ sơ hợp lệ.",
-            "Sau khai sinh, hệ thống chuyển dữ liệu để giải quyết thường trú và BHYT.",
-            "Hệ thống tiếp tục chuyển hồ sơ cấp thẻ căn cước nếu người đại diện đã yêu cầu.",
-        ]
+        if state.identity_card_requested is not False:
+            transfers.append((RESIDENCE, CARD, "Điều kiện và thứ tự xử lý căn cước"))
+        requirements.extend(
+            EvidenceRequirement(
+                claim_id=f"linked_transfer_{target}",
+                label=label,
+                procedure_id=source,
+                target_procedure_id=target,
+                relation_type="NEXT_STEP",
+            )
+            for source, target, label in transfers
+        )
+        if "processing_time" in state.topics or "bao lâu" in text or "bao nhiêu ngày" in text:
+            requirements.append(
+                _requirement("linked_total_time", "Thời gian giải quyết gói liên thông",
+                             LINKED, "execution_methods", "Ba (03) ngày")
+            )
+        submission_channel = "Người dân nộp hồ sơ liên thông trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia."
 
     mismatch_case = "vneid" in text and any(term in text for term in ("ngày sinh", "sai", "không khớp", "sai lệch"))
     if mismatch_case:
@@ -128,15 +149,11 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
     health_without_birth = (
         mentions_health and mentions_birth_registration and has_not_registered_birth
     )
-    if health_without_birth:
+    if health_without_birth and not linked_case:
         procedure_ids += [BIRTH, HEALTH, LINKED]
         requirements += [
-            EvidenceRequirement(
-                claim_id="health_requires_birth",
-                label="Khai sinh là bước tiên quyết của BHYT đơn lẻ",
-                procedure_id=HEALTH,
-                relation_type="REQUIRES",
-            ),
+            _requirement("health_under_six_filing", "Cấp thẻ BHYT cho trẻ dưới 6 tuổi",
+                         HEALTH, "step_item", "trẻ em dưới 6 tuổi", "thực hiện liên thông"),
             _requirement("health_form", "Tờ khai BHYT", HEALTH, "document_item", "Mẫu số 2"),
             _requirement("health_channel", "Hình thức nộp BHYT đơn lẻ", HEALTH, "execution_methods", "Hình thức: Trực tuyến"),
             _requirement("health_time", "Thời hạn cấp thẻ BHYT đơn lẻ", HEALTH, "execution_methods", "05 ngày"),
@@ -146,7 +163,7 @@ def build_answer_contract(query: UserQuery, state: QueryState) -> AnswerContract
         procedure_ids=list(dict.fromkeys(procedure_ids)),
         requirements=requirements,
         required_follow_up_questions=list(dict.fromkeys(questions))[:3],
+        workflow_id=LINKED if linked_case else None,
         submission_channel=submission_channel,
-        processing_flow=processing_flow,
         enforce_step_sequence=enforce_step_sequence,
     )

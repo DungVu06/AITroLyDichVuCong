@@ -35,6 +35,9 @@ except ImportError as exc:  # pragma: no cover - thông báo thân thiện khi t
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
+PROCEDURE_RELATION_PROPERTIES = (
+    "workflow_id", "condition", "evidence_record_id", "evidence_step", "transferred_result",
+)
 
 
 def load_dotenv(path: Path = ROOT_DIR / ".env") -> None:
@@ -85,7 +88,6 @@ def read_json_list(path: Path) -> list[dict[str, Any]]:
 def build_nodes(
     procedure_dir: Path,
     law_dir: Path,
-    procedure_relations_path: Path,
     related_benefit_relations_path: Path | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     procedures: list[dict[str, Any]] = []
@@ -94,11 +96,18 @@ def build_nodes(
     law_section_edges: list[dict[str, Any]] = []
     section_parent_edges: list[dict[str, Any]] = []
     law_citations: list[dict[str, Any]] = []
-    procedure_requires: list[dict[str, str]] = []
-    procedure_next_steps: list[dict[str, str]] = []
-    procedure_part_of: list[dict[str, str]] = []
-    procedure_sub_procedures: list[dict[str, str]] = []
+    procedure_requires: list[dict[str, Any]] = []
+    procedure_next_steps: list[dict[str, Any]] = []
+    procedure_part_of: list[dict[str, Any]] = []
+    procedure_sub_procedures: list[dict[str, Any]] = []
     procedure_related_benefits: list[dict[str, Any]] = []
+
+    procedure_relation_buckets = {
+        "prerequisites": procedure_requires,
+        "next_steps": procedure_next_steps,
+        "part_of": procedure_part_of,
+        "sub_procedures": procedure_sub_procedures,
+    }
 
     for record in read_json_files(procedure_dir, "PROC_*.json"):
         procedure = record.get("procedure") or {}
@@ -132,29 +141,21 @@ def build_nodes(
             }
         )
 
-    procedure_relation_buckets = {
-        "prerequisites": procedure_requires,
-        "next_steps": procedure_next_steps,
-        "part_of": procedure_part_of,
-        "sub_procedures": procedure_sub_procedures,
-    }
-    for relation in read_json_list(procedure_relations_path):
-        if as_text(relation.get("resolution_status")) != "resolved":
-            continue
+        edges = (record.get("relations") or {}).get("resolved_edges")
+        if not isinstance(edges, list):
+            raise ValueError(f"{procedure_id}: thiếu relations.resolved_edges. Chạy lại procedure_normalize.py.")
+        for edge in edges:
+            if edge.get("resolution_status") != "resolved":
+                continue
+            bucket = procedure_relation_buckets.get(edge.get("relation_type"))
+            target_id = as_text(edge.get("target_id"))
+            if bucket is not None and target_id:
+                bucket.append({
+                    "source_id": procedure_id,
+                    "target_id": target_id,
+                    "properties": {key: edge.get(key) for key in PROCEDURE_RELATION_PROPERTIES},
+                })
 
-        source_id = as_text(relation.get("source_id"))
-        target_id = as_text(relation.get("target_id"))
-        relation_type = as_text(relation.get("relation_type"))
-        if not source_id or not target_id:
-            continue
-
-        bucket = procedure_relation_buckets.get(relation_type)
-        if bucket is not None:
-            bucket.append({"source_id": source_id, "target_id": target_id})
-
-    # Đây là quan hệ Procedure -> LawSection, được sinh bởi
-    # create_related_benefit_relations.py. File này tách riêng khỏi
-    # procedure_relations.json vì target của nó là LawSection.
     if related_benefit_relations_path and related_benefit_relations_path.exists():
         for relation in read_json_list(related_benefit_relations_path):
             if as_text(relation.get("resolution_status")) != "resolved":
@@ -333,25 +334,29 @@ IMPORT_QUERIES = {
         UNWIND $rows AS row
         MATCH (source:Procedure {id: row.source_id})
         MATCH (target:Procedure {id: row.target_id})
-        MERGE (source)-[:REQUIRES]->(target)
+        MERGE (source)-[r:REQUIRES]->(target)
+        SET r += row.properties
     """,
     "procedure_next_steps": """
         UNWIND $rows AS row
         MATCH (source:Procedure {id: row.source_id})
         MATCH (target:Procedure {id: row.target_id})
-        MERGE (source)-[:NEXT_STEP]->(target)
+        MERGE (source)-[r:NEXT_STEP]->(target)
+        SET r += row.properties
     """,
     "procedure_part_of": """
         UNWIND $rows AS row
         MATCH (source:Procedure {id: row.source_id})
         MATCH (target:Procedure {id: row.target_id})
-        MERGE (source)-[:PART_OF]->(target)
+        MERGE (source)-[r:PART_OF]->(target)
+        SET r += row.properties
     """,
     "procedure_sub_procedures": """
         UNWIND $rows AS row
         MATCH (source:Procedure {id: row.source_id})
         MATCH (target:Procedure {id: row.target_id})
-        MERGE (source)-[:HAS_SUB_PROCEDURE]->(target)
+        MERGE (source)-[r:HAS_SUB_PROCEDURE]->(target)
+        SET r += row.properties
     """,
     "procedure_related_benefits": """
         UNWIND $rows AS row
@@ -406,12 +411,6 @@ def main() -> None:
         help="Thư mục chứa các file procedure đã chuẩn hóa (PROC_*.json)",
     )
     parser.add_argument(
-        "--procedure-relations",
-        type=Path,
-        default=ROOT_DIR / "data" / "procedure" / "procedure_relations.json",
-        help="File chỉ chứa các quan hệ procedure đã resolve",
-    )
-    parser.add_argument(
         "--related-benefit-relations",
         type=Path,
         default=ROOT_DIR
@@ -453,16 +452,15 @@ def main() -> None:
         print("Đã tạo constraint/index cơ bản.")
 
         if not args.init_only:
+            nodes = build_nodes(
+                args.procedure_dir,
+                args.law_dir,
+                args.related_benefit_relations,
+            )
             if args.reset:
                 print("Đang xóa toàn bộ node và relationship trong database...")
                 reset_database(driver, database)
                 print("Đã xóa dữ liệu cũ.")
-            nodes = build_nodes(
-                args.procedure_dir,
-                args.law_dir,
-                args.procedure_relations,
-                args.related_benefit_relations,
-            )
             import_nodes(driver, database, nodes)
             print("Hoàn tất import node và relationship procedure/law đã resolve.")
     finally:

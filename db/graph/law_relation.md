@@ -13,7 +13,7 @@ data/law/records/LAW_*.json
 data/law/normalized_records/LAW_*.json ──► Neo4j
 
 Mọi related_laws ──► data/law/normalized_relation_report.json
-Chỉ related_laws có resolved_section ──► data/law/law_relations.json ──► Neo4j
+normalized_records: content.sections[].related_laws ──► Neo4j (CITES)
 ```
 
 `law_normalize.py` chuẩn hóa ID của section, xác định văn bản/section được
@@ -24,7 +24,7 @@ Hai file quan hệ có mục đích khác nhau:
 | File | Nội dung |
 |---|---|
 | `data/law/normalized_relation_report.json` | Toàn bộ tham chiếu: đã resolve, resolve được document nhưng thiếu vị trí section, chưa resolve hoặc ambiguous. |
-| `data/law/law_relations.json` | Chỉ các quan hệ đã resolve đầy đủ tới section (`resolution_status = "resolved_section"`), dùng để import cạnh `CITES`. |
+| `data/law/law_relations.json` | Bản xuất riêng các quan hệ đã resolve đến section. Importer đọc `related_laws` trong `normalized_records/`. |
 
 Tham chiếu chưa resolve không bị mất: chúng vẫn được lưu trong report JSON,
 nhưng hiện chưa tạo node tạm hoặc relationship trong Neo4j.
@@ -208,13 +208,13 @@ biết mức độ xác định của tham chiếu:
 | `ambiguous_document` | Có nhiều văn bản có thể là văn bản đích, chưa chọn được một văn bản. | Không tạo cạnh. |
 
 Một tham chiếu có nhiều section đích được tách thành nhiều cạnh `CITES`, mỗi
-cạnh có một `target_section_id` trong `law_relations.json`.
+cạnh ứng với một phần tử trong `target_section_ids` của bản ghi chuẩn hóa.
 
 Tóm lại:
 
 ```text
 resolved_section
-    └── law_relations.json ──► Neo4j (:LawSection)-[:CITES]->(:LawSection)
+    └── normalized_records: content.sections[].related_laws ──► Neo4j (:LawSection)-[:CITES]->(:LawSection)
 
 mọi trạng thái
     └── normalized_relation_report.json

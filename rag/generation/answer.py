@@ -64,13 +64,18 @@ def _collect_sources(context: AnswerContext) -> list[SourceReference]:
         )
     for relation in context.relation_evidence:
         key = ("procedure_relation", relation.citation_id)
+        record = next((item for item in context.procedure_evidence
+                       if item.procedure_id == relation.evidence_record_id), None)
+        if record and relation.evidence_step:
+            title = f"{record.name} – Bước {relation.evidence_step}"
+        else:
+            title = f"Quan hệ giữa {relation.source_id} và {relation.target_id}"
         sources[key] = SourceReference(
             source_type="procedure_relation",
             source_id=relation.citation_id,
-            title=(
-                f"Quan hệ thủ tục: {relation.source_id} "
-                f"{relation.relationship_type} {relation.target_id}"
-            ),
+            title=title,
+            url=record.source_url if record else None,
+            metadata=context.source_metadata.get(relation.evidence_record_id or ""),
         )
     return list(sources.values())
 

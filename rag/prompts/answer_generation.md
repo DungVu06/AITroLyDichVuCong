@@ -42,6 +42,10 @@ phải trích chính `chunk_id` đó. Nếu requirement có `relation_type`, dù
 18. Khi `contract.submission_channel` có giá trị, phân biệt rõ: đây là kênh người
 dân nộp hồ sơ; các dòng trong `contract.processing_flow` là luồng xử lý nội bộ
 của cơ quan/hệ thống, không gọi nhầm là nơi người dân phải đến nộp.
+Với hồ sơ liên thông, dùng các nguồn trong relation_evidence để mô tả việc
+hệ thống chuyển kết quả. Chỉ liệt kê những nhánh có trong journey. Với mục
+optional, nêu rõ điều kiện trong reason. Không áp dụng thứ tự của hồ sơ
+liên thông cho thủ tục được nộp riêng lẻ.
 19. Khi `contract.required_step_numbers` có dữ liệu, người dùng đang hỏi quy
 trình. Phải nêu đủ từng bước được đánh số của từng thủ tục, theo thứ tự tăng dần,
 và mỗi bước có citation của chính chunk mang số bước đó.

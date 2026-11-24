@@ -4,15 +4,32 @@
     "title": "Khai sinh tại nhà không có Giấy chứng sinh",
     "question": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
     "required_citations": ["PROC_1_001193_c5_s0", "PROC_1_001193_c48_s0"],
-    "required_term_groups": [["người làm chứng", "cam đoan"], ["ủy ban nhân dân cấp xã"], ["1 ngày"]],
+    "required_term_groups": [
+      ["người làm chứng", "người chứng kiến"],
+      ["cam đoan"],
+      ["ủy ban nhân dân cấp xã", "ubnd cấp xã", "ubnd xã"],
+      ["1 ngày", "một ngày"]
+    ],
     "forbidden_citations": []
   },
   {
     "id": "TC02",
     "title": "Thường trú tại nhà thuê",
     "question": "Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?",
-    "required_citations": ["PROC_1_116788_c127_s0", "PROC_1_116788_c142_s2", "PROC_1_116788_c128_s0", "PROC_1_116788_c174_s0"],
-    "required_term_groups": [["công chứng", "chứng thực"], ["chủ sở hữu"], ["diện tích"], ["công an xã"], ["07 ngày"]],
+    "required_citations": [
+      "PROC_1_116788_c126_s0",
+      "PROC_1_116788_c127_s0",
+      "PROC_1_116788_c128_s0",
+      "PROC_1_116788_c174_s0"
+    ],
+    "required_term_groups": [
+      ["tờ khai thay đổi thông tin cư trú", "ct01"],
+      ["công chứng", "chứng thực"],
+      ["chủ sở hữu", "chủ nhà"],
+      ["diện tích"],
+      ["công an xã", "công an cấp xã", "cơ quan đăng ký cư trú cấp xã"],
+      ["7 ngày làm việc", "bảy ngày làm việc"]
+    ],
     "forbidden_citations": []
   },
   {
@@ -20,7 +37,15 @@
     "title": "Liên thông VNeID bốn thủ tục",
     "question": "Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?",
     "required_citations": ["PROC_3_000722_c180_s1", "PROC_3_000722_c181_s0", "PROC_3_000722_c182_s1", "PROC_3_000722_c183_s1", "PROC_3_000722_c184_s0", "PROC_3_000722_c185_s0"],
-    "required_term_groups": [["bước 1"], ["bước 2"], ["bước 3"], ["bước 4"], ["bước 5"], ["03", "3 ngày"]],
+    "required_term_groups": [
+      ["vneid", "cổng dịch vụ công quốc gia", "cổng dvcqg"],
+      ["24 giờ", "24h", "24 h"],
+      ["giấy khai sinh điện tử", "bản điện tử giấy khai sinh"],
+      ["kết quả đăng ký thường trú", "kết quả thường trú"],
+      ["theo yêu cầu", "có đề nghị", "đã đề nghị", "nếu đề nghị", "đã yêu cầu"],
+      ["3 ngày làm việc", "ba ngày làm việc", "ba (03) ngày làm việc"],
+      ["5 ngày làm việc", "năm ngày làm việc", "năm (05) ngày làm việc"]
+    ],
     "forbidden_citations": []
   },
   {
@@ -28,15 +53,43 @@
     "title": "Sai ngày sinh trước khi cấp Căn cước",
     "question": "Con tôi 15 tuổi (sinh năm 2011) đi làm thẻ Căn cước, nhưng trên VNeID ngày sinh của cháu bị sai so với Giấy khai sinh gốc. Gia đình có thể đến điểm cấp căn cước đưa giấy khai sinh để cán bộ làm thẻ luôn được không, hay phải làm thế nào?",
     "required_citations": ["PROC_1_116410_c73_s0", "PROC_1_116410_c63_s0", "PROC_1_116410_c76_s0", "PROC_1_116410_c78_s0"],
-    "required_term_groups": [["điều chỉnh"], ["trước"], ["mống mắt"], ["cc01"], ["cc02"]],
+    "required_term_groups": [
+      ["điều chỉnh", "sửa", "đính chính"],
+      ["cơ sở dữ liệu quốc gia về dân cư", "csdl quốc gia về dân cư", "cơ sở dữ liệu dân cư", "csdl dân cư"],
+      ["trước khi cấp", "trước khi làm", "trước khi thực hiện thủ tục cấp", "sau khi điều chỉnh", "sau khi thông tin đã được cập nhật"],
+      ["công an cấp xã", "công an xã", "bộ phận một cửa cấp xã"],
+      ["vân tay"],
+      ["ảnh khuôn mặt", "chụp ảnh mặt"],
+      ["mống mắt"],
+      ["cc01"],
+      ["cc02"],
+      ["7 ngày làm việc", "bảy ngày làm việc"]
+    ],
     "forbidden_citations": ["PROC_1_116410_c86_s0", "PROC_1_116410_c90_s0"]
   },
   {
     "id": "TC05",
     "title": "BHYT khi chưa đăng ký khai sinh",
     "question": "Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?",
-    "required_citations": ["REL:PROC_1_014137:REQUIRES:PROC_1_001193", "PROC_1_014137_c50_s0", "PROC_1_014137_c61_s0"],
-    "required_term_groups": [["khai sinh", "trước"], ["bảo hiểm xã hội"], ["05 ngày", "5 ngày"]],
+    "required_citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c176_s0",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c185_s0"
+    ],
+    "required_term_groups": [
+      ["liên thông"],
+      ["vneid", "cổng dịch vụ công quốc gia", "cổng dvcqg"],
+      ["khai sinh trước", "sau khi đăng ký khai sinh", "sau khi có giấy khai sinh", "sau khi có bản điện tử giấy khai sinh", "khi đã có giấy khai sinh", "sau khi hoàn tất khai sinh", "sau khi có kết quả khai sinh"],
+      ["giấy khai sinh điện tử", "bản điện tử giấy khai sinh"],
+      ["bảo hiểm xã hội", "bhxh"],
+      ["mẫu số 01", "mẫu số 1", "mẫu 01"],
+      ["2 ngày làm việc", "hai ngày làm việc", "hai (02) ngày làm việc"],
+      ["3 ngày làm việc", "ba ngày làm việc", "ba (03) ngày làm việc"],
+      ["5 ngày làm việc", "năm ngày làm việc", "năm (05) ngày làm việc"],
+      ["xác minh"],
+      ["nhận hồ sơ điện tử", "nhận được hồ sơ điện tử", "tiếp nhận hồ sơ điện tử"]
+    ],
     "forbidden_citations": []
   }
 ]

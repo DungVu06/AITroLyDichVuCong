@@ -10,7 +10,6 @@ from rag.retrieval.graph import BENEFIT_QUERY, LAW_EVIDENCE_QUERY, PROCEDURE_NOD
 class SnapshotGraph:
     def __init__(self):
         data = build_nodes(DATA / "procedure/normalized_records", DATA / "law/normalized_records",
-                           DATA / "procedure/procedure_relations.json",
                            DATA / "benefit_relation/related_benefit_relations.json")
         self.procedures = {p["id"]: p for p in data["procedures"]}
         self.sections = {s["id"]: s for s in data["sections"]}
@@ -20,7 +19,9 @@ class SnapshotGraph:
         for bucket, kind in (("procedure_requires", "REQUIRES"), ("procedure_next_steps", "NEXT_STEP"),
                              ("procedure_part_of", "PART_OF"), ("procedure_sub_procedures", "HAS_SUB_PROCEDURE")):
             for edge in data[bucket]:
-                self.edges[edge["source_id"]].append((kind, self.procedures[edge["target_id"]]))
+                target = self.procedures.get(edge["target_id"])
+                if target:
+                    self.edges[edge["source_id"]].append((kind, target, edge["properties"]))
         self.children = defaultdict(list)
         for edge in data["section_parent_edges"]:
             self.children[edge["parent_section_id"]].append(edge["section_id"])
@@ -31,8 +32,11 @@ class SnapshotGraph:
         if statement == PROCEDURE_NODES_QUERY:
             return [{"procedure": self.procedures[i]} for i in ids if i in self.procedures]
         if statement == PROCEDURE_QUERY:
-            return [{"source": self.procedures[i], "relationship_type": kind, "target": target}
-                    for i in ids if i in self.procedures for kind, target in self.edges.get(i, [(None, None)])]
+            return [
+                {"source": self.procedures[i], "relationship_type": kind, "target": target, "relation": relation}
+                for i in ids if i in self.procedures
+                for kind, target, relation in self.edges.get(i, [(None, None, None)])
+            ]
         if statement == LAW_EVIDENCE_QUERY:
             rows = []
             for req in parameters["sections"]:

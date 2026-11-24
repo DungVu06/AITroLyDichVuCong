@@ -5,8 +5,7 @@ Input mặc định:
 
 Output mặc định:
     data/procedure/normalized_records/PROC_*.json
-    data/procedure/normalized_relation_report.json
-    data/procedure/procedure_relations.json
+    data/procedure/normalized_relation_report.json (chỉ khi yêu cầu --report)
 """
 
 import argparse
@@ -17,10 +16,29 @@ import sys
 from pathlib import Path
 from typing import Any
 
-if sys.stdout.encoding.lower() != 'utf-8':
-    sys.stdout.reconfigure(encoding='utf-8')
-
 ROOT_DIR = Path(__file__).resolve().parents[2]
+
+
+BIRTH = "PROC_1_001193"
+RESIDENCE = "PROC_1_116788"
+HEALTH = "PROC_1_014137"
+CARD = "PROC_1_116410"
+LINKED = "PROC_3_000722"
+CARD_REQUESTED = "identity_card_requested"
+LINKED_CARD_STEP = 5
+
+# These references describe the local linked-service record. The text guards
+# prevent a reordered or changed crawl from silently publishing an old edge.
+LINKED_STEP_TERMS = {
+    1: ("lựa chọn dịch vụ công liên thông", "nộp hồ sơ"),
+    4: ("bản điện tử giấy khai sinh", "đăng ký thường trú", "bảo hiểm xã hội"),
+    LINKED_CARD_STEP: ("có đề nghị cấp thẻ căn cước", "thông báo kết quả giải quyết đăng ký thường trú"),
+}
+LINKED_DEPENDENCIES = (
+    (BIRTH, RESIDENCE, 4, "Giấy khai sinh điện tử"),
+    (BIRTH, HEALTH, 4, "Giấy khai sinh điện tử"),
+    (RESIDENCE, CARD, LINKED_CARD_STEP, "Thông báo kết quả đăng ký thường trú"),
+)
 
 
 def clean_text(value: Any) -> str:
@@ -176,7 +194,111 @@ def normalize_record(
     return remove_raw_fields(normalized), edges
 
 
+
+def verify_procedure_relations(
+    records: dict[str, dict[str, Any]],
+    declared_edges: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Validate and qualify the graph against the normalized local records."""
+    linked = records.get(LINKED, {})
+    steps = linked.get("procedure", {}).get("steps", [])
+    members = set(linked.get("relations", {}).get("sub_procedures", []))
+    member_steps = {BIRTH: 1, RESIDENCE: 4, HEALTH: 4, CARD: LINKED_CARD_STEP}
+    dependencies = {
+        key: (step, result, target)
+        for source, target, step, result in LINKED_DEPENDENCIES
+        for key in ((source, target, "next_steps"), (target, source, "prerequisites"))
+    }
+
+    # A dependency written in the procedure text can be absent from the
+    # legacy relations arrays, as with residence before the optional card.
+    keys = {
+        (edge["source_id"], edge["target_id"], edge["relation_type"])
+        for edge in declared_edges
+    }
+    declared_edges = [
+        *declared_edges,
+        *(
+            {"source_id": source, "target_id": target, "relation_type": kind}
+            for source, target, kind in dependencies
+            if (source, target, kind) not in keys and source in members and target in members
+        ),
+    ]
+    report = []
+    published = []
+    seen = set()
+    for edge in declared_edges:
+        source = edge["source_id"]
+        target = edge["target_id"]
+        kind = edge["relation_type"]
+        key = (source, target, kind)
+        row = dict(edge, resolution_status="resolved")
+        step = None
+        result = None
+        member = None
+        if key in seen:
+            row.update(resolution_status="duplicate", reason="Cạnh bị khai báo trùng.")
+        elif source not in records or target not in records:
+            row.update(resolution_status="unresolved", reason="Thiếu bản ghi cho ID của cạnh.")
+        elif key in dependencies and source in members and target in members:
+            step, result, member = dependencies[key]
+        elif kind == "sub_procedures" and source == LINKED:
+            member = target
+            step = member_steps.get(member)
+        elif kind == "part_of" and target == LINKED:
+            member = source
+            step = member_steps.get(member)
+        elif kind in {"prerequisites", "next_steps"}:
+            row.update(
+                resolution_status="unverified",
+                reason="Bản ghi chưa xác nhận quan hệ này trong phạm vi áp dụng.",
+            )
+
+        if step:
+            terms = LINKED_STEP_TERMS[step]
+            if step > len(steps) or not all(term in steps[step - 1].casefold() for term in terms):
+                row.update(
+                    resolution_status="unverified",
+                    reason=f"{LINKED} Bước {step} thiếu nội dung xác nhận cạnh.",
+                )
+            else:
+                row.update(workflow_id=LINKED, evidence_record_id=LINKED, evidence_step=step)
+                if member == CARD:
+                    row["condition"] = CARD_REQUESTED
+                if result:
+                    row["transferred_result"] = result
+        elif member:
+            row.update(resolution_status="unverified", reason="Chưa xác định bước của thủ tục thành phần.")
+
+        seen.add(key)
+        report.append(row)
+        if row["resolution_status"] == "resolved":
+            published.append(row)
+
+    validate_dependency_cycles(set(records), published)
+    return published, report
+
+
+def validate_dependency_cycles(procedure_ids: set[str], edges: list[dict[str, Any]]) -> None:
+    """Check the directed dependencies while ignoring membership and inverse duplicates."""
+    remaining: dict[str, set[str]] = {procedure_id: set() for procedure_id in procedure_ids}
+    for row in edges:
+        source, target = row["source_id"], row["target_id"]
+        if row["relation_type"] == "prerequisites":
+            remaining[source].add(target)
+        elif row["relation_type"] == "next_steps":
+            remaining[target].add(source)
+    while remaining:
+        ready = {node for node, prerequisites in remaining.items() if not prerequisites}
+        if not ready:
+            raise ValueError(f"Chu trình phụ thuộc giữa các thủ tục: {', '.join(sorted(remaining))}")
+        remaining = {
+            node: prerequisites - ready for node, prerequisites in remaining.items() if node not in ready
+        }
+
 def main() -> None:
+    if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, default=ROOT_DIR / "data/procedure/records")
     parser.add_argument(
@@ -184,16 +306,7 @@ def main() -> None:
         type=Path,
         default=ROOT_DIR / "data/procedure/normalized_records",
     )
-    parser.add_argument(
-        "--report",
-        type=Path,
-        default=ROOT_DIR / "data/procedure/normalized_relation_report.json",
-    )
-    parser.add_argument(
-        "--relations",
-        type=Path,
-        default=ROOT_DIR / "data/procedure/procedure_relations.json",
-    )
+    parser.add_argument("--report", type=Path, help="Đường dẫn JSON báo cáo, nếu cần rà soát")
     args = parser.parse_args()
 
     files = sorted(args.input_dir.glob("PROC_*.json"))
@@ -206,48 +319,39 @@ def main() -> None:
     records = [json.loads(path.read_text(encoding="utf-8")) for path in files]
     valid_ids = {clean_text(record.get("id")) for record in records if record.get("id")}
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    all_relations = []
-    resolved = unresolved = 0
-
+    normalized_records = {}
+    declared_edges = []
     for record in records:
         normalized, edges = normalize_record(record, valid_ids)
-        output_path = args.output_dir / f"{normalized['id']}.json"
+        procedure_id = normalized["id"]
+        if not procedure_id or procedure_id in normalized_records:
+            raise ValueError(f"ID thủ tục để trống hoặc trùng: {procedure_id!r}")
+        normalized_records[procedure_id] = normalized
+        declared_edges.extend(edges)
+
+    published, report = verify_procedure_relations(normalized_records, declared_edges)
+    for normalized in normalized_records.values():
+        normalized["relations"]["resolved_edges"] = []
+    for edge in published:
+        source = normalized_records[edge["source_id"]]
+        source["relations"]["resolved_edges"].append({
+            key: value for key, value in edge.items() if key != "source_id"
+        })
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    for procedure_id, normalized in normalized_records.items():
+        output_path = args.output_dir / f"{procedure_id}.json"
         output_path.write_text(
             json.dumps(normalized, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-        all_relations.extend(edges)
-        resolved += sum(1 for e in edges if e["resolution_status"] == "resolved")
-        unresolved += sum(1 for e in edges if e["resolution_status"] == "unresolved")
 
-    # Báo cáo tổng thể tất cả các relation
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(
-        json.dumps(all_relations, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-
-    # Lọc lại chỉ ghi các relation đã được resolve để dùng cho neo4j
-    deduped_edges = []
-    seen = set()
-    for edge in all_relations:
-        key = (edge["source_id"], edge["target_id"], edge["relation_type"])
-        if key not in seen:
-            seen.add(key)
-            if edge["resolution_status"] == "resolved":
-                deduped_edges.append(edge)
-
-    args.relations.parent.mkdir(parents=True, exist_ok=True)
-    args.relations.write_text(
-        json.dumps(deduped_edges, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"Báo cáo: {args.report}")
 
     print(f"Đã chuẩn hóa {len(records)} records vào: {args.output_dir}")
-    print(f"Tham chiếu: {len(all_relations)} | resolved={resolved} | unresolved={unresolved}")
-    print(f"Báo cáo: {args.report}")
-    print(f"Relations: {args.relations}")
+    print(f"Tham chiếu: {len(report)} | đã xác nhận={len(published)} | cần kiểm tra={len(report) - len(published)}")
 
 
 if __name__ == "__main__":

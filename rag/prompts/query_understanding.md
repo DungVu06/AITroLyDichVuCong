@@ -21,6 +21,7 @@ Chọn đúng một intent:
 - `topics`: chỉ dùng các topic phù hợp sau: `procedures`, `documents`, `steps`, `fees`, `processing_time`, `authority`, `eligibility`, `online_method`, `benefits`, `legal_basis`.
 - `target`: tên tự nhiên của thủ tục, quyền lợi hoặc vấn đề pháp luật được hỏi. Không tự tạo ID nội bộ. Để `null` nếu người dùng hỏi toàn bộ hành trình.
 - `facts`: object linh hoạt chứa mọi dữ kiện người dùng nói rõ hoặc có thể suy ra trực tiếp. Key viết snake_case. Không thêm giá trị giả định và không thêm key cho dữ kiện chưa biết.
+- `identity_card_requested`: trong ngữ cảnh hồ sơ liên thông cho trẻ, dùng `true` khi người dùng đề nghị làm căn cước, `false` khi họ nói không làm hoặc chỉ chọn các thủ tục còn lại, và `null` khi họ chỉ hỏi thông tin hoặc chưa bày tỏ lựa chọn.
 - `missing_facts`: chỉ thêm dữ kiện còn thiếu nếu thiếu nó khiến không thể trả lời đúng intent hiện tại. Không yêu cầu thêm thông tin chỉ để cá nhân hóa một câu trả lời tổng quan.
 
 ## Quy tắc chủ động hỗ trợ

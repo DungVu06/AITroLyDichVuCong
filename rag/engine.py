@@ -13,6 +13,7 @@ from neo4j.exceptions import ServiceUnavailable, SessionExpired
 from rag.retrieval.local_graph import SnapshotGraph
 import uuid
 
+from db.graph.procedure_normalize import LINKED_CARD_STEP
 from db.neo4j_client import Neo4jClient
 from db.qdrant_client import QdrantVectorClient
 from rag.pipeline.benefits import resolve_benefits
@@ -22,7 +23,7 @@ from rag.core.conversation import InMemoryConversationStore
 from rag.core.transcript import ConversationTranscriptStore
 from rag.generation.answer import filter_sources_to_citations, generate_answer, repair_answer_with_gemini
 from rag.generation.validator import repair_procedure_citations, validate_answer
-from rag.pipeline.journey import build_journey
+from rag.pipeline.journey import build_journey, select_workflow, workflow_transfer_evidence
 from rag.pipeline.preprocessing import preprocess_query
 from rag.pipeline.query_understanding import understand_query
 from rag.retrieval.graph import GraphRetriever
@@ -81,6 +82,9 @@ def build_context(
         else [*state.procedure_ids, *contract.procedure_ids]
     )
     requested = list(dict.fromkeys(i for i in requested_candidates if i in catalog))
+    workflow_id = contract.workflow_id
+    if workflow_id and workflow_id in catalog:
+        requested = [workflow_id]
     with QdrantVectorClient.from_env() as qdrant:
         retriever = VectorRetriever(qdrant, embedder=embedder)
         vector_result = retriever.retrieve_from_plan(
@@ -157,12 +161,25 @@ def build_context(
                 graph, legal_evidence = read_graph(SnapshotGraph())
                 used_local_graph = True
 
-        if plan.strategy == RetrievalStrategy.PROCEDURE_DETAIL:
+        if workflow_id and retrieval_mode == "graph":
+            workflow = select_workflow(graph, workflow_id, state.identity_card_requested)
+            expected = {
+                (requirement.procedure_id, requirement.target_procedure_id)
+                for requirement in contract.requirements if requirement.relation_type == "NEXT_STEP"
+            }
+            available = {(item.source_id, item.target_id) for item in workflow_transfer_evidence(workflow)}
+            if not used_local_graph and not expected.issubset(available):
+                graph, legal_evidence = read_graph(SnapshotGraph())
+                used_local_graph = True
+                workflow = select_workflow(graph, workflow_id, state.identity_card_requested)
+            graph = workflow
+        elif plan.strategy == RetrievalStrategy.PROCEDURE_DETAIL:
             # Retain the linked one-stop alternative for a multi-procedure request.
             focus = set(seed_ids)
             if state.asks_about_dependencies and not contract_resolved:
                 focus.update(r.target.procedure_id for r in graph.procedure_relations
-                             if r.relationship_type == "REQUIRES" and r.source_id in seed_ids)
+                             if r.relationship_type == "REQUIRES" and r.source_id in seed_ids
+                             and not r.workflow_id and r.evidence_record_id and r.evidence_step)
             if len(focus) > 1:
                 focus.update(r.target.procedure_id for r in graph.procedure_relations
                              if r.relationship_type == "PART_OF" and r.source_id in seed_ids)
@@ -175,8 +192,10 @@ def build_context(
             graph,
             seed_ids,
             completed_procedure_ids=(
-                [i for i in state.completed_ids if i in seed_ids]
+                state.completed_ids if workflow_id else [i for i in state.completed_ids if i in seed_ids]
             ),
+            workflow_id=workflow_id if retrieval_mode == "graph" else None,
+            identity_card_requested=state.identity_card_requested,
         )
         detail_types = list(plan.procedure_chunk_types)
         if state.asks_about_dependencies:
@@ -185,14 +204,26 @@ def build_context(
             item.chunk_type for item in contract.requirements if item.chunk_type
         )
         detail_types = list(dict.fromkeys(detail_types))
+        detail_procedures = [
+            item for item in graph.procedures if not workflow_id or item.procedure_id == workflow_id
+        ]
         procedures = retriever.retrieve_procedure_details(
-            graph.procedures,
+            detail_procedures,
             query=plan.procedure_query or query.normalized_text,
             chunk_types=detail_types if graph.procedures else [],
             per_type_limit=8,
             required_evidence=contract.requirements,
             preserve_step_sequence=contract.enforce_step_sequence,
         )
+        if workflow_id:
+            details = {item.procedure_id: item for item in procedures}
+            if state.identity_card_requested is False and workflow_id in details:
+                procedure = details[workflow_id]
+                details[workflow_id] = procedure.model_copy(update={"chunks": [
+                    chunk for chunk in procedure.chunks
+                    if chunk.chunk_type != "step_item" or chunk.step_number != LINKED_CARD_STEP
+                ]})
+            procedures = [details.get(item.procedure_id, item) for item in graph.procedures]
 
     if contract.enforce_step_sequence:
         required_step_numbers = {
@@ -238,37 +269,37 @@ def build_context(
     context.used_local_vector_index = retriever.used_local
     used = {p.procedure_id for p in procedures} | {item.law_id for item in all_legal}
     context.source_metadata = {k: metadata[k] for k in sorted(used) if k in metadata}
-    required_relation_types = {
-        requirement.relation_type
-        for requirement in contract.requirements
-        if requirement.relation_type
-    }
-    context.relation_evidence = [
-        RelationEvidence(
-            source_id=relation.source_id,
-            relationship_type=relation.relationship_type,
-            target_id=relation.target.procedure_id,
-            citation_id=(
-                f"REL:{relation.source_id}:{relation.relationship_type}:"
-                f"{relation.target.procedure_id}"
-            ),
-            text=(
-                f"{relation.source_id} {relation.relationship_type} "
-                f"{relation.target.procedure_id}"
-            ),
-        )
-        for relation in graph.procedure_relations
-        if relation.relationship_type in required_relation_types
-    ]
+    if workflow_id:
+        context.relation_evidence = workflow_transfer_evidence(graph)
+        context.contract.processing_flow = [item.text for item in context.relation_evidence]
+    else:
+        required_relation_types = {
+            requirement.relation_type
+            for requirement in contract.requirements
+            if requirement.relation_type
+        }
+        context.relation_evidence = [
+            RelationEvidence(
+                source_id=edge.source_id,
+                relationship_type=edge.relationship_type,
+                target_id=edge.target.procedure_id,
+                citation_id=f"REL:{edge.source_id}:{edge.relationship_type}:{edge.target.procedure_id}",
+                text=f"{edge.source_id} {edge.relationship_type} {edge.target.procedure_id}",
+                evidence_record_id=edge.evidence_record_id,
+                evidence_step=edge.evidence_step,
+            )
+            for edge in graph.procedure_relations
+            if not edge.workflow_id and edge.evidence_record_id and edge.evidence_step
+            and edge.relationship_type in required_relation_types
+        ]
     return context
 
 
 def _fallback_response(response: RAGResponse, context: AnswerContext) -> RAGResponse:
     lines = ["## Hướng dẫn theo thông tin đã kiểm chứng", "", "### Thứ tự thủ tục"]
     for item in response.journey:
-        lines.append(
-            f"- Ưu tiên {item.priority}: **{item.name}** 【{item.procedure_id}】"
-        )
+        optional = f" ({item.reason})" if item.category == "optional" and item.reason else ""
+        lines.append(f"- Ưu tiên {item.priority}: **{item.name}**{optional} 【{item.procedure_id}】")
 
     chunk_index = {
         chunk.chunk_id: chunk
@@ -282,21 +313,42 @@ def _fallback_response(response: RAGResponse, context: AnswerContext) -> RAGResp
         if requirement.relation_type:
             relation = next((item for item in context.relation_evidence
                              if item.relationship_type == requirement.relation_type
-                             and item.source_id == requirement.procedure_id), None)
+                             and item.source_id == requirement.procedure_id
+                             and (requirement.target_procedure_id is None
+                                  or item.target_id == requirement.target_procedure_id)), None)
             if relation:
-                lines.append(f"- **{requirement.label}:** {relation.text}. 【{relation.citation_id}】")
+                reference = (
+                    f" (Bước {relation.evidence_step} trong quy trình liên thông)"
+                    if context.contract.workflow_id else ""
+                )
+                lines.append(f"- {relation.text}{reference} 【{relation.citation_id}】")
                 rendered.add(requirement.claim_id)
             continue
         candidates = [
             chunk for chunk in chunk_index.values()
             if chunk.doc_id == requirement.procedure_id
             and chunk.chunk_type == requirement.chunk_type
+            and (requirement.step_number is None or chunk.step_number == requirement.step_number)
+            and not any(term.casefold() in chunk.text.casefold() for term in requirement.excluded_terms)
             and all(term.casefold() in chunk.text.casefold() for term in requirement.required_terms)
         ]
         if candidates:
             chunk = candidates[0]
-            lines.append(f"- **{requirement.label}:** {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
+            content = (
+                context.contract.submission_channel
+                if requirement.claim_id == "linked_submission"
+                else " ".join(chunk.text.split())
+            )
+            lines.append(f"- **{requirement.label}:** {content} 【{chunk.chunk_id}】")
             rendered.add(requirement.claim_id)
+
+    for procedure_id, expected_steps in context.contract.required_step_numbers.items():
+        for number in expected_steps:
+            chunk = next((item for item in chunk_index.values()
+                          if item.doc_id == procedure_id and item.chunk_type == "step_item"
+                          and item.step_number == number), None)
+            if chunk and not any(f"【{chunk.chunk_id}】" in line for line in lines):
+                lines.append(f"- {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
 
     # There may be no formal contract for a normal question. Keep a restrained
     # answer based on the best retrieved evidence in that case only.
@@ -412,7 +464,7 @@ class RAGEngine:
         )
         response = _generate_validated_response(context)
         if context.used_local_graph:
-            response.warnings.append("Không kết nối được Neo4j. Lượt này dùng quan hệ từ bộ dữ liệu local của dự án.")
+            response.warnings.append("Lượt này dùng quan hệ từ bộ dữ liệu cục bộ của dự án.")
         if context.used_local_vector_index:
             response.warnings.append("Không kết nối được Qdrant Cloud. Lượt này dùng chỉ mục Qdrant từ dữ liệu local của dự án.")
         response = filter_sources_to_citations(response)

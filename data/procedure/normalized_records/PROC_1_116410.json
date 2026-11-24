@@ -148,7 +148,28 @@
       "PROC_3_000722"
     ],
     "related_benefits": [],
-    "sub_procedures": []
+    "sub_procedures": [],
+    "resolved_edges": [
+      {
+        "target_id": "PROC_3_000722",
+        "relation_type": "part_of",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 5,
+        "condition": "identity_card_requested"
+      },
+      {
+        "target_id": "PROC_1_116788",
+        "relation_type": "prerequisites",
+        "resolution_status": "resolved",
+        "workflow_id": "PROC_3_000722",
+        "evidence_record_id": "PROC_3_000722",
+        "evidence_step": 5,
+        "condition": "identity_card_requested",
+        "transferred_result": "Thông báo kết quả đăng ký thường trú"
+      }
+    ]
   },
   "jurisdiction": {
     "level": "Cấp xã",

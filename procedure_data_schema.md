@@ -1,19 +1,27 @@
 # Schema Dữ liệu Thủ tục Hành chính (Procedures Data Schema)
 
 ## 1. Mục đích
-Tài liệu này định nghĩa cấu trúc chuẩn của các bản ghi thủ tục hành chính (`PROC_*.json`) được lưu trữ tại:
-```text
-data/procedure/records/PROC_*.json
-```
-Dữ liệu được thu thập trực tiếp từ API Cổng Dịch vụ công Quốc gia (`dichvucong.gov.vn`) và phục vụ các mục đích:
+
+Tài liệu mô tả bản ghi thủ tục hành chính (`PROC_*.json`) và các file quan hệ được sinh từ bản ghi. Dữ liệu gốc trong dự án được thu thập từ Cổng Dịch vụ công Quốc gia.
+
+| Đường dẫn | Vai trò |
+| :--- | :--- |
+| `data/procedure/records/PROC_*.json` | Bản ghi đầu vào của bước chuẩn hóa. |
+| `data/procedure/normalized_records/PROC_*.json` | Bản ghi đã chuẩn hóa, dùng cho chunking, đối chiếu bằng chứng và lưu cạnh trong `relations.resolved_edges`. |
+| Báo cáo JSON (khi dùng `--report <đường-dẫn>`) | Kết quả kiểm tra các cạnh, gồm cả các trường hợp cần rà soát. |
+
+Dữ liệu phục vụ các mục đích sau.
+
 1. **Lưu trữ chuẩn hóa**: Đảm bảo thông tin thủ tục chính xác nguyên bản, không lẫn mã rác HTML.
 2. **Chunking & Vector DB (Qdrant)**: Chia nhỏ theo từng thành phần (yêu cầu điều kiện, hồ sơ giấy tờ, trình tự thực hiện, cách thức nộp phí) để Hybrid Search.
-3. **Knowledge Graph (Neo4j)**: Xây dựng đồ thị tri thức với các quan hệ phụ thuộc giữa các thủ tục (`PREREQUISITE`, `NEXT_STEP`, `PART_OF`) và quan hệ căn cứ pháp luật / quyền lợi (`BASED_ON`, `RELATED_BENEFIT`).
+3. **Knowledge Graph (Neo4j và snapshot cục bộ)** dùng các cạnh `REQUIRES`, `NEXT_STEP`, `PART_OF` và `HAS_SUB_PROCEDURE` để tra cứu quan hệ giữa các thủ tục. Graph pháp luật và quyền lợi dùng dữ liệu liên kết riêng.
 4. **Quản lý hiệu lực & Phiên bản**: Đáp ứng kiểm chứng cập nhật khi quy định pháp luật hoặc quyết định công bố TTHC thay đổi.
 
 ---
 
-## 2. Cấu trúc JSON Tổng quát
+## 2. Cấu trúc bản ghi thủ tục
+
+Ví dụ dưới đây minh họa bản ghi đầu vào. Các ID trong `relations` là tham chiếu để normalizer kiểm tra trước khi xuất cạnh.
 
 ```json
 {
@@ -61,11 +69,13 @@ Dữ liệu được thu thập trực tiếp từ API Cổng Dịch vụ công 
     "prerequisites": [],
     "next_steps": [
       "PROC_1_116788",
-      "PROC_1_014137"
+      "PROC_1_014137",
+      "PROC_1_116410"
     ],
     "part_of": [
       "PROC_3_000722"
     ],
+    "sub_procedures": [],
     "related_benefits": [
       {
         "law_section_id": "LAW_VBPL_0cae53bb0a99d71f/part:B/section:II",
@@ -109,6 +119,7 @@ Dữ liệu được thu thập trực tiếp từ API Cổng Dịch vụ công 
 | `target_audience` | Array[String] | Có | Đối tượng thực hiện (ví dụ: `["Công dân Việt Nam"]`, `["Người nước ngoài"]`). |
 | `domain` | String | Có | Lĩnh vực chuyên môn, ví dụ: `Hộ tịch`, `Đăng ký, quản lý cư trú`, `Bảo hiểm y tế`. |
 | `procedure_type` | String | Không | Phân loại TTHC theo quy định (ví dụ: `TTHC được luật giao quy định chi tiết`). |
+| `normalization_version` | String | Có trong bản chuẩn hóa | Phiên bản bộ chuẩn hóa ghi vào `normalized_records/`. Giá trị hiện tại là `procedure-normalize-v2`. |
 
 ---
 
@@ -138,15 +149,18 @@ Dữ liệu được thu thập trực tiếp từ API Cổng Dịch vụ công 
 
 ---
 
-### 3.3. Object `relations` (Mối quan hệ Đồ thị Tri thức - Knowledge Graph)
+### 3.3. Object `relations` (Tham chiếu trong bản ghi)
 
-| Tên trường con | Kiểu dữ liệu | Ý nghĩa & Mô hình hóa trong Graph |
+Bốn mảng ID dưới đây chứa các tham chiếu đầu vào. Cạnh xuất ra có thể bổ sung quan hệ được xác nhận từ nội dung thủ tục hoặc đưa tham chiếu thiếu bằng chứng vào báo cáo. Xem [schema đầu ra](#4-schema-cạnh-đồ-thị-và-báo-cáo-rà-soát).
+
+| Tên trường con | Kiểu dữ liệu | Ý nghĩa |
 | :--- | :--- | :--- |
-| `legal_bases` | Array[Object] | **Căn cứ pháp lý hành chính**: Danh sách các văn bản luật làm cơ sở ban hành thủ tục. Mỗi item gồm `name` và `code` (VD: `{"code": "123/2015/NĐ-CP", "name": "Nghị định 123..."}`). Nối quan hệ `(Procedure)-[:BASED_ON]->(Law)`. |
-| `prerequisites` | Array[String] | **Thủ tục điều kiện tiên quyết**: Danh sách `id` các thủ tục bắt buộc phải hoàn thành trước (VD: `PROC_1_001193`). Nối quan hệ `(Procedure)-[:PREREQUISITE]->(Procedure)`. |
-| `next_steps` | Array[String] | **Thủ tục kế tiếp được đề xuất**: Danh sách `id` các thủ tục nên làm tiếp theo. Nối quan hệ `(Procedure)-[:NEXT_STEP]->(Procedure)`. |
-| `part_of` | Array[String] | **Thủ tục liên thông cha**: `id` của thủ tục liên thông bao chứa thủ tục này (VD: trỏ về `PROC_3_000722`). Nối quan hệ `(Procedure)-[:PART_OF]->(Procedure)`. |
-| `related_benefits` | Array[Object] | **Quyền lợi công dân được hưởng**: Trỏ đích danh tới từng Section của Luật quy định về chế độ trợ cấp, thai sản. Mỗi object gồm `law_section_id`, `scope` (`subtree`/`self`) và `note`. Nối quan hệ `(Procedure)-[:RELATED_BENEFIT]->(LawSection)`. |
+| `legal_bases` | Array[Object] | Căn cứ pháp lý được ghi trong bản thủ tục. Mỗi phần tử gồm `name` và `code`. |
+| `prerequisites` | Array[String] | Mã thủ tục dự kiến làm trước. Cạnh `REQUIRES` đi từ thủ tục hiện tại đến thủ tục tiên quyết. |
+| `next_steps` | Array[String] | Mã thủ tục dự kiến làm sau. Cạnh `NEXT_STEP` đi từ thủ tục hiện tại đến thủ tục tiếp theo. |
+| `part_of` | Array[String] | Mã gói liên thông chứa thủ tục hiện tại. Cạnh `PART_OF` đi từ thủ tục thành phần đến gói. |
+| `sub_procedures` | Array[String] | Mã thủ tục thành phần của gói. Cạnh `HAS_SUB_PROCEDURE` đi từ gói đến thủ tục thành phần. |
+| `related_benefits` | Array[Object] | Tham chiếu quyền lợi đến mục văn bản pháp luật. Mỗi phần tử gồm `law_section_id`, `scope` (`subtree` hoặc `self`) và `note`. Importer đọc các cạnh `RELATED_TO_BENEFIT` từ file quan hệ quyền lợi riêng. |
 
 ---
 
@@ -172,3 +186,66 @@ Phục vụ trực tiếp việc kiểm soát phiên bản và cảnh báo khi c
 | `version_control.proposal_number` | String | Số quyết định công bố TTHC của Bộ/Ngành (VD: `5860/QĐ-BCA-C06`, `QĐ/0001-BTP`). |
 | `version_control.state` | String | Trạng thái hiệu lực trên cổng: `ACTIVE` (đang có hiệu lực), `UPDATED` (đã cập nhật phiên bản mới). |
 | `version_control.raw_id` | String | UUID nội bộ của thủ tục trên database Cổng DVCQG. |
+
+---
+
+## 4. Schema cạnh đồ thị và báo cáo rà soát
+
+[Normalizer](db/graph/procedure_normalize.py) ghi các cạnh đã xác nhận vào `relations.resolved_edges` của bản ghi nguồn trong `normalized_records/`. Neo4j và snapshot cục bộ lấy `source_id` từ `id` của bản ghi chứa cạnh.
+
+### 4.1. Cạnh trong `relations.resolved_edges`
+
+| Trường | Kiểu dữ liệu | Khi có | Ý nghĩa |
+| :--- | :--- | :--- | :--- |
+| `target_id` | String | Luôn có | ID thủ tục ở đích cạnh. |
+| `relation_type` | String | Luôn có | Một trong `prerequisites`, `next_steps`, `part_of`, `sub_procedures`. Tên cạnh tương ứng trong Neo4j được liệt kê ở mục 3.3. |
+| `resolution_status` | String | Luôn có | Mảng cạnh chỉ chứa giá trị `resolved`. |
+| `workflow_id` | String | Cạnh đã xác nhận trong gói liên thông | ID của gói mà quan hệ áp dụng. |
+| `evidence_record_id` | String | Cạnh đã xác nhận trong gói liên thông | ID bản ghi chứa bước làm bằng chứng. |
+| `evidence_step` | Integer | Cạnh đã xác nhận trong gói liên thông | Vị trí đếm từ 1 trong mảng `procedure.steps` của bản ghi bằng chứng. Ví dụ, `5` trỏ đến `procedure.steps[4]`. |
+| `condition` | String | Quan hệ có điều kiện | `identity_card_requested` nghĩa là người đại diện hợp pháp đề nghị cấp căn cước khi nộp hồ sơ liên thông trực tuyến. |
+| `transferred_result` | String | Cạnh mô tả việc chuyển kết quả | Tên giấy tờ hoặc kết quả được hệ thống chuyển sang thủ tục tiếp theo. |
+
+Ví dụ về cạnh **Thường trú → Căn cước** trong [bản chuẩn hóa của thủ tục thường trú](data/procedure/normalized_records/PROC_1_116788.json). Bằng chứng nằm ở Bước 5 của [bản chuẩn hóa gói liên thông](data/procedure/normalized_records/PROC_3_000722.json).
+
+```json
+{
+  "target_id": "PROC_1_116410",
+  "relation_type": "next_steps",
+  "resolution_status": "resolved",
+  "workflow_id": "PROC_3_000722",
+  "evidence_record_id": "PROC_3_000722",
+  "evidence_step": 5,
+  "condition": "identity_card_requested",
+  "transferred_result": "Thông báo kết quả đăng ký thường trú"
+}
+```
+
+Trong ca Sinh con, Bước 4 mô tả việc hệ thống chuyển Giấy khai sinh điện tử sang hai nhánh thường trú và BHYT. Bước 5 mô tả việc hệ thống chuyển kết quả thường trú để xử lý nhánh căn cước khi có đề nghị. Phạm vi của các cạnh này là gói `PROC_3_000722`.
+
+### 4.2. Báo cáo rà soát tùy chọn
+
+Báo cáo dùng cùng các trường của cạnh và ghi thêm `source_id`. Mục cần rà soát có thêm `reason`. Xuất báo cáo bằng lệnh sau.
+
+```powershell
+python db/graph/procedure_normalize.py --report data/procedure/normalized_relation_report.json
+```
+
+| `resolution_status` | Ý nghĩa |
+| :--- | :--- |
+| `resolved` | Cạnh được ghi vào `relations.resolved_edges` của bản ghi nguồn. |
+| `unresolved` | Thiếu bản ghi cho ID ở đầu hoặc đích của cạnh. |
+| `unverified` | Bản ghi chưa đủ bằng chứng cho quan hệ hoặc phạm vi áp dụng. |
+| `duplicate` | Trùng tổ hợp `source_id`, `target_id` và `relation_type`. |
+
+Ví dụ về tham chiếu **Khai sinh → Căn cước** khi xuất báo cáo.
+
+```json
+{
+  "source_id": "PROC_1_001193",
+  "target_id": "PROC_1_116410",
+  "relation_type": "next_steps",
+  "resolution_status": "unverified",
+  "reason": "Bản ghi chưa xác nhận quan hệ này trong phạm vi áp dụng."
+}
+```
