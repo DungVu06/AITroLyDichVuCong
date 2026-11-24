@@ -1,92 +1,44 @@
-# Yorha — trợ lý thủ tục hành chính có kiểm chứng nguồn
+# Yorha
 
-Yorha là demo RAG tiếng Việt cho sự kiện **sinh con**. Mục tiêu không chỉ là để
-LLM trả lời, mà biến tình huống người dân kể thành hành trình thủ tục có evidence,
-quan hệ phụ thuộc, trích dẫn và hậu kiểm.
+Yorha là trợ lý hỏi đáp thủ tục hành chính tiếng Việt cho nhóm tình huống xoay quanh sự kiện sinh con. Hệ thống kết hợp LLM với dữ liệu thủ tục có cấu trúc để trả lời kèm nguồn, điều kiện, trình tự thực hiện và các quan hệ phụ thuộc giữa thủ tục.
 
-Ví dụ, câu “con chưa khai sinh có làm BHYT trước được không?” phải được trả lời
-từ quan hệ `REQUIRES`, evidence của thủ tục khai sinh/BHYT và chunk về thời hạn;
-không dùng kiến thức nền không được kiểm chứng của model.
+## Chức năng
 
-## Phạm vi
-
-- Dataset demo: 5 thủ tục liên quan sinh con, 4 văn bản luật và graph relation.
-- Ứng dụng hướng dẫn, không nộp hồ sơ hay xác thực thay người dân.
-- Nguồn pháp lý **không tự crawl**. Khi có đợt cập nhật, người quản lý sửa/import
-  data; runtime so phiên bản với baseline rồi gắn review/cảnh báo.
-- Citation thể hiện evidence trong dataset tại thời điểm ghi nhận, không thay thế
-  xác nhận của cơ quan có thẩm quyền.
+- Tra cứu thủ tục, hồ sơ, cơ quan tiếp nhận, cách nộp, thời hạn và lệ phí.
+- Hướng dẫn các hành trình nhiều thủ tục, ví dụ khai sinh → thường trú → BHYT → Căn cước.
+- Trích dẫn chunk dữ liệu đã dùng trong câu trả lời.
+- Hiển thị căn cứ pháp lý, phạm vi áp dụng và trạng thái cần rà soát khi metadata nguồn có thông tin đó.
+- Lưu transcript Markdown riêng theo từng phiên chat.
+- Hỏi bổ sung khi chưa đủ dữ kiện hoặc trả lời dựa trên evidence khi không thể xác minh một claim cần thiết.
 
 ## Kiến trúc
 
 ```text
-Người dùng → Streamlit → RAGEngine
-                           ├─ Gemini: hiểu query, diễn đạt, repair khi cần
-                           ├─ Qdrant: semantic chunks
-                           ├─ Neo4j: procedure/legal relations
-                           └─ Python: routing, contract, validation, fallback
+Streamlit UI
+    │
+    ▼
+RAG engine
+    ├── LLM: hiểu câu hỏi, tạo và sửa câu trả lời
+    ├── Qdrant: tìm chunk thủ tục và văn bản theo ngữ nghĩa
+    ├── Neo4j: truy vấn quan hệ giữa thủ tục, luật và quyền lợi
+    └── Python: route, kiểm evidence, kiểm thứ tự, fallback và hiển thị nguồn
 ```
 
-| Thành phần | Vai trò |
-| --- | --- |
-| `ui/streamlit_app.py` | Chat UI, warning, nguồn, căn cứ pháp lý, phiên chat mới. |
-| `rag/engine.py` | Orchestrator, local fallback, validation order và transcript. |
-| Gemini | Hiểu ngôn ngữ, tạo answer draft, repair tối đa một lần. |
-| Qdrant | Chunk thủ tục/văn bản cho semantic retrieval. |
-| Neo4j | `REQUIRES`, `NEXT_STEP`, `PART_OF`, `HAS_SUB_PROCEDURE`, benefit relations. |
-| Pydantic | Schema biên giới pipeline và JSON output của LLM. |
+LLM xử lý phần ngôn ngữ. Việc chọn bằng chứng bắt buộc, kiểm citation, thứ tự workflow và quyết định fallback được thực hiện bằng schema và code Python.
 
-Embedding dùng `keepitreal/vietnamese-sbert` (768 chiều) trong process Python.
-LLM không tự quyết route, thứ tự phụ thuộc, source ID hoặc validation verdict.
+## Luồng một lượt hỏi đáp
 
-## Pipeline runtime
+1. Chuẩn hóa câu hỏi và nhận diện ý định, thủ tục, dữ kiện đã có và dữ kiện còn thiếu.
+2. Lập kế hoạch truy xuất và xác định evidence bắt buộc cho những tình huống có rủi ro sai lộ trình.
+3. Lấy chunk liên quan từ Qdrant; mở rộng quan hệ từ Neo4j khi câu hỏi liên quan dependency hoặc workflow.
+4. Ghép context gồm thủ tục, các bước, điều kiện, nguồn pháp lý và metadata nguồn.
+5. Tạo câu trả lời, hậu kiểm citation/nội dung/thứ tự, sửa có kiểm soát khi cần, rồi trả fallback dựa trên evidence nếu vẫn không đạt.
 
-Backbone vẫn là 13 chặng; các chặng mới/củng cố giải quyết việc LLM và semantic
-retrieval có thể làm rơi evidence quan trọng.
-
-1. **Preprocess** — chuẩn hóa input thành `PreprocessedQuery`.
-2. **Query understanding** — Gemini tạo `QueryState`: intent, topics, facts,
-   procedure IDs, dữ kiện thiếu.
-3. **Conversation merge** — hợp nhất facts và pending question từ lượt trước.
-4. **Routing** — Python tạo `RetrievalPlan`, không gọi thêm LLM.
-5. **Answer contract** — Python nhận diện tình huống có claim rủi ro từ facts
-   rõ ràng và quy định procedure/chunk/relation/step phải có evidence.
-6. **Vector retrieval** — Qdrant semantic search; lỗi network/404 collection sẽ
-   chuyển sang local index từ `data/chunks/`.
-7. **Graph retrieval** — Neo4j mở rộng procedure/legal relation; lỗi network/DNS
-   sẽ chuyển sang snapshot graph local.
-8. **Authority selection** — contract đã resolve procedure sẽ chặn procedure phụ
-   do LLM đoán chỉ vì một tên giấy tờ có trong câu hỏi.
-9. **Journey + detail** — tính priority và lấy document/step/execution chunks;
-   contract evidence luôn được giữ trước ranking thông thường.
-10. **Step sequence** — khi người dùng hỏi quy trình/trình tự, giữ tối thiểu một
-    chunk cho mỗi `step_number`; validator buộc answer trích đủ các bước.
-11. **Context + version metadata** — compact evidence và ghép scope, effective
-    date, observed version, legal bases/review thành `AnswerContext`.
-12. **Generate/validate/repair** — Gemini answer → Python validation → Python
-    repair → Gemini repair một lần → fallback evidence-only nếu vẫn không đạt.
-13. **Delivery** — UI chỉ hiện cited source; transcript tự lưu theo conversation.
-
-Xem [debug_request1.md](debug_request1.md) để đọc audit năm use case và kiến
-trúc kiểm chứng chi tiết.
-
-## Version, hiệu lực và căn cứ pháp lý
-
-`rag/retrieval/catalog.py` tạo `SourceMetadata` từ normalized records và mốc
-`rag/retrieval/source_versions.json`.
-
-- Metadata: URL, phạm vi, ngày hiệu lực, ngày ghi nhận, hash phiên bản, validity
-  và legal bases.
-- Record khác baseline, law hết hiệu lực/chưa xác minh sẽ gắn `review`.
-- Review law lan tới procedure tham chiếu law đó; UI hiển thị trong **Căn cứ pháp
-  lý của thủ tục**. Answer đưa warning khi review nói nguồn đổi phiên bản/hết
-  hiệu lực.
-- Đây là kiểm soát sau khi quản trị viên cập nhật data, không là tự động update
-  qua internet.
+Khi Qdrant hoặc Neo4j không kết nối được, engine có thể sử dụng chỉ mục vector cục bộ hoặc snapshot graph từ dữ liệu dự án và gắn cảnh báo vào lượt trả lời.
 
 ## Cài đặt
 
-Chạy trong PowerShell tại root:
+Yêu cầu: Python và quyền truy cập Gemini, Qdrant Cloud, Neo4j Aura (hoặc cấu hình tương đương).
 
 ```powershell
 python -m venv .venv
@@ -95,26 +47,23 @@ python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Điền `.env`:
+Cấu hình `.env`:
 
-| Biến | Mục đích |
+| Biến | Mô tả |
 | --- | --- |
-| `GEMINI_API_KEY` | Gemini cho query understanding, answer và repair. |
-| `GEMINI_QUERY_MODEL` | Model Gemini; mặc định `gemini-3.5-flash-lite`. |
-| `QDRANT_URL`, `QDRANT_API_KEY` | Qdrant Cloud có collections `procedures`, `laws`. |
-| `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | Neo4j Aura/graph. |
-| `EMBEDDING_MODEL` | Phải trùng embedding model dùng lúc import Qdrant. |
+| `GEMINI_API_KEY` | Khóa gọi Gemini. |
+| `GEMINI_QUERY_MODEL` | Model Gemini dùng cho hệ thống. |
+| `QDRANT_URL`, `QDRANT_API_KEY` | Kết nối Qdrant. |
+| `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | Kết nối Neo4j. |
+| `EMBEDDING_MODEL` | Embedding model, phải trùng model khi tạo vector database. |
 
-Runtime tự dùng CA bundle của `certifi` nếu `SSL_CERT_FILE` chưa được đặt. Không
-cần thêm biến đó vào `.env` chỉ để chạy trên Windows.
-
-### Chạy UI
+## Chạy ứng dụng
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run ui/streamlit_app.py
 ```
 
-### Chạy CLI
+Chạy từ dòng lệnh:
 
 ```powershell
 .\.venv\Scripts\python.exe -m rag "Khai sinh cần giấy tờ gì?"
@@ -122,52 +71,29 @@ cần thêm biến đó vào `.env` chỉ để chạy trên Windows.
 .\.venv\Scripts\python.exe -m rag "Khai sinh cần giấy tờ gì?" --json
 ```
 
-Một lượt thông thường có 2 Gemini API calls: query understanding và answer.
-Nếu validation cần repair, có thêm tối đa 1 Gemini call.
+## Khởi tạo dữ liệu truy xuất
 
-### Chạy test
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests/rag -v
-```
-
-Test không gọi Gemini; kiểm tra contract của 5 tình huống, validator, transcript,
-version impact, conversation state và local graph/vector fallback.
-
-## Rebuild database
-
-Người dùng demo chỉ cần `.env` hợp lệ rồi chạy UI. Khi dựng database mới, import
-cả graph và vector trước:
+Sau khi cấu hình các biến kết nối, import graph và vector database:
 
 ```powershell
 .\.venv\Scripts\python.exe db/graph/neo4j_import.py --related-benefit-relations data/benefit_relation/related_benefit_relations.json
 .\.venv\Scripts\python.exe db/vector/setup_qdrant_db.py
 ```
 
-Thiếu Qdrant import sẽ tạo lỗi `Collection procedures doesn't exist`. Runtime có
-local fallback để không chết phiên demo, nhưng không thay thế việc import DB đầy
-đủ trước khi bàn giao.
+Graph import tạo các node thủ tục, luật, section và relationship. Vector import tạo các collection Qdrant cần thiết cho retrieval. Cần chạy cả hai lệnh khi dựng database mới.
 
-## Cấu trúc runtime
+## Kiểm thử
 
-```text
-rag/
-├── engine.py                 # Orchestrator
-├── core/                     # config, schema, conversation, transcript
-├── pipeline/                 # understanding, routing, contract, journey, context
-├── retrieval/                # Qdrant/Neo4j + fallback + version catalog
-├── generation/               # answer, validator, repair
-├── prompts/                  # Gemini prompts
-└── conversation_logs/        # Markdown transcript runtime
-tests/rag/                    # Unit/regression test, không gọi Gemini
-ui/streamlit_app.py           # Streamlit frontend
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests/rag -v
 ```
 
-## Tài liệu
+## Cấu trúc thư mục
 
-| File | Nội dung |
-| --- | --- |
-| [rag/README.md](rag/README.md) | Mô tả module RAG chi tiết. |
-| [debug_request1.md](debug_request1.md) | Cải tổ pipeline, evidence contract và audit 5 use case. |
-| [procedure_workflow_verification_benchmark.md](procedure_workflow_verification_benchmark.md) | Benchmark gốc. |
-| [data_processing_pipeline.md](data_processing_pipeline.md) | Chuẩn bị dữ liệu. |
+```text
+data/       Dữ liệu thủ tục, luật, chunk và mapping relation
+db/         Client và script import Neo4j/Qdrant
+rag/        Engine, retrieval, pipeline, generation, schema và prompt
+tests/      Unit test và regression test
+ui/         Ứng dụng Streamlit
+```
