@@ -1,0 +1,357 @@
+% Compile with XeLaTeX on Overleaf.
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{DejaVu Serif}
+\usepackage{polyglossia}
+\setdefaultlanguage{vietnamese}
+\usepackage{booktabs,longtable,tabularx,array}
+\usepackage[table]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\newcommand{\yes}{\textcolor{green!50!black}{\checkmark}}
+\newcommand{\partok}{\textcolor{orange!80!black}{\ensuremath{\triangle}}}
+\newcommand{\src}[1]{\texttt{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newtcolorbox{questionbox}{colback=blue!4,colframe=blue!55!black,boxrule=.4pt,arc=1.5mm,breakable}
+\newtcolorbox{answerbox}{colback=black!2,colframe=black!28,boxrule=.4pt,arc=1.5mm,breakable}
+\titleformat{\section}{\Large\bfseries}{\thesection.}{.5em}{}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries BÁO CÁO CẢI TIẾN HỆ THỐNG YORHA}\\[4pt]
+{\large Trợ lý thủ tục hành chính cho sự kiện sinh con}\\[4pt]
+\end{center}
+
+\noindent\textbf{Tóm tắt.}
+Yorha hỗ trợ người dân tra cứu thủ tục khi sinh con và hiểu trình tự xử lý hồ sơ liên thông. Trên bốn ca kiểm chứng, Graph-RAG đạt 46/47 tiêu chí và vector-only đạt 43/47 tiêu chí. Điểm trung bình theo ca lần lượt là 97,5 và 92,6 trên 100. Thời gian phản hồi trung bình lần lượt là 23,590 và 19,374 giây mỗi ca. Chênh lệch điểm tập trung ở hai ca có quan hệ giữa nhiều thủ tục.
+
+\section{Kiểm chứng tính đúng đắn của lộ trình thủ tục}
+
+\subsection{Bốn use case kiểm chứng}
+
+\begin{longtable}{p{1.1cm}p{4.2cm}p{8.1cm}}
+\toprule
+\textbf{Ca} & \textbf{Tình huống} & \textbf{Kết quả mong muốn}\\
+\midrule
+\endhead
+TC01 & Sinh tại nhà, không có Giấy chứng sinh. & Vẫn đăng ký khai sinh được; phân biệt đúng văn bản người làm chứng và giấy cam đoan khi không có người làm chứng; nộp UBND cấp xã; thời hạn 01 ngày.\\
+TC02 & Thuê nhà bằng hợp đồng viết tay, muốn đăng ký thường trú. & Nêu CT01/ý kiến chủ sở hữu, yêu cầu công chứng hoặc chứng thực hợp đồng, điều kiện diện tích, Công an xã và 07 ngày làm việc.\\
+TC03 & Làm liên thông VNeID cho khai sinh, thường trú, BHYT và Căn cước. & Nêu đầy đủ và đúng thứ tự: nộp hồ sơ $\rightarrow$ chuyển Tư pháp $\rightarrow$ khai sinh $\rightarrow$ chuyển Giấy khai sinh điện tử sang cư trú/BHXH $\rightarrow$ Căn cước khi có đề nghị và đã có kết quả thường trú; nêu mốc 24 giờ, 03/05 ngày.\\
+TC05 & Trẻ chưa khai sinh, gia đình cần BHYT. & Phân biệt cấp BHYT riêng lẻ với nộp gói liên thông; kết luận có thể nộp liên thông ngay, không cần có sẵn Giấy khai sinh điện tử; nêu Mẫu 01, BHXH và các mốc 02/03/05 ngày.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Rubric và kết quả từng ca}
+
+\textit{Nguồn các bảng chi tiết: JSON kết quả lượt chạy \texttt{20261124-143408}. Mỗi dòng là một mục chấm. Với mục nội dung, cụm từ trong ô là cụm rubric tìm thấy trong câu trả lời đã lưu. Với mục trích dẫn, rubric kiểm tra đúng mã nguồn.}
+\begin{longtable}{p{1.1cm}p{9.8cm}p{2.2cm}}
+\toprule
+\textbf{Ca} & \textbf{Criteria} & \textbf{Kết quả}\\
+\midrule
+\endhead
+TC01 & Hai nhánh người làm chứng/cam đoan; UBND cấp xã; 01 ngày; citation \src{PROC\_1\_001193\_c5\_s0}, \src{PROC\_1\_001193\_c48\_s0}. & \yes\ 7/7\\
+TC02 & CT01, chủ sở hữu, công chứng/chứng thực, diện tích, Công an xã, 07 ngày; bốn citation rubric. & \partok\ 9/10\\
+TC03 & Sáu citation workflow; VNeID, 24 giờ, Giấy khai sinh điện tử, kết quả thường trú, điều kiện có đề nghị, 03/05 ngày; thứ tự bước 1--5. & \yes\ 14/14\\
+TC05 & Liên thông, nộp ngay, Giấy khai sinh điện tử, BHXH, Mẫu 01, 02/03/05 ngày, xác minh, hồ sơ điện tử; không khẳng định phải hoàn tất khai sinh trước khi nộp liên thông. & \yes\ 16/16\\
+\bottomrule
+\end{longtable}
+
+\subsubsection*{TC01}
+\begin{questionbox}
+\textbf{Người dùng:} Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?
+\end{questionbox}
+
+\textbf{Trả lời Graph-RAG}\par\nobreak
+\begin{answerbox}
+Trường hợp sinh con tại nhà ở xã An Phú và không có Giấy chứng sinh của bệnh viện, anh/chị vẫn có thể thực hiện đăng ký khai sinh \src{[PROC\_1\_001193\_c5\_s0][PROC\_1\_001193\_c48\_s0]}.
+
+\textbf{Cơ quan tiếp nhận và giải quyết:} Ủy ban nhân dân cấp xã \src{[PROC\_1\_001193\_c48\_s0]}.
+
+\textbf{Hồ sơ thay thế Giấy chứng sinh:} Nếu không có Giấy chứng sinh thì nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh \src{[PROC\_1\_001193\_c5\_s0]}.
+
+\textbf{Cách thức và thời gian:} Nộp trực tuyến, qua dịch vụ bưu chính hoặc trực tiếp; thời gian giải quyết 01 ngày; miễn phí \src{[PROC\_1\_001193\_c48\_s0]}.
+\end{answerbox}
+
+\textbf{Trả lời vector-only}\par\nobreak
+\begin{answerbox}
+Vẫn có thể đăng ký khai sinh. Nếu không có Giấy chứng sinh, nộp văn bản của người làm chứng xác nhận việc sinh; nếu không có người làm chứng thì nộp giấy cam đoan về việc sinh \src{[PROC\_1\_001193\_c5\_s0]}. Nộp tại UBND cấp xã, trực tuyến, bưu chính hoặc trực tiếp; thời hạn 01 ngày và miễn lệ phí \src{[PROC\_1\_001193\_c48\_s0]}.
+\end{answerbox}
+
+\par\smallskip
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.49\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}@{}}
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC01}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC01 (tiếp)}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endhead
+\multicolumn{3}{@{}l@{}}{\textit{Nội dung}}\\*
+1. Nêu văn bản của người làm chứng để thay Giấy chứng sinh. & \yes\ Đạt\newline {\footnotesize Khớp “văn bản của người làm chứng”.} & \yes\ Đạt\newline {\footnotesize Khớp “văn bản của người làm chứng”.}\\
+2. Nêu điều kiện không có người làm chứng. & \yes\ Đạt\newline {\footnotesize Khớp “nếu không có người làm chứng”.} & \yes\ Đạt\newline {\footnotesize Khớp “nếu không có người làm chứng”.}\\
+3. Nêu giấy cam đoan về việc sinh. & \yes\ Đạt\newline {\footnotesize Khớp “cam đoan”.} & \yes\ Đạt\newline {\footnotesize Khớp “cam đoan”.}\\
+4. Nêu UBND cấp xã là cơ quan giải quyết. & \yes\ Đạt\newline {\footnotesize Khớp “ủy ban nhân dân cấp xã”.} & \yes\ Đạt\newline {\footnotesize Khớp “ủy ban nhân dân cấp xã”.}\\
+5. Nêu thời hạn 1 ngày. & \yes\ Đạt\newline {\footnotesize Khớp “1 ngày”.} & \yes\ Đạt\newline {\footnotesize Khớp “1 ngày”.}\\
+\multicolumn{3}{@{}l@{}}{\textit{Trích dẫn}}\\*
+6. Giấy tờ thay thế\newline \src{PROC\_1\_001193\_c5\_s0} & \yes\ Đạt & \yes\ Đạt\\
+7. Kênh nộp, cơ quan và thời hạn\newline \src{PROC\_1\_001193\_c48\_s0} & \yes\ Đạt & \yes\ Đạt\\
+\midrule
+\textbf{Tổng} & \textbf{7/7} & \textbf{7/7}\\
+\bottomrule
+\end{longtable}
+
+
+\subsubsection*{TC02}
+\begin{questionbox}
+\textbf{Người dùng:} Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?
+\end{questionbox}
+
+\textbf{Trả lời Graph-RAG}\par\nobreak
+\begin{answerbox}
+Trường hợp thuê nhà ở xã Tân Triều bằng hợp đồng viết tay, cơ quan tiếp nhận và giải quyết hồ sơ là \textbf{Công an xã} \src{[PROC\_1\_116788\_c174\_s0]}.
+
+\textbf{Giấy tờ cần chuẩn bị:} Tờ khai thay đổi thông tin cư trú (mẫu CT01), trong đó có ý kiến đồng ý cho đăng ký thường trú của chủ sở hữu chỗ ở hợp pháp, trừ trường hợp đã có văn bản đồng ý riêng \src{[PROC\_1\_116788\_c124\_s0]}. Hợp đồng thuê chỗ ở phải được công chứng hoặc chứng thực; vì vậy cần công chứng/chứng thực hợp đồng trước khi nộp \src{[PROC\_1\_116788\_c127\_s0]}. Đồng thời phải có thông tin chứng minh đủ diện tích nhà ở, có thể khai thác điện tử, xuất trình giấy tờ hoặc xác nhận của UBND cấp xã \src{[PROC\_1\_116788\_c128\_s0]}.
+
+\textbf{Cách thực hiện và thời gian:} Nộp trực tuyến hoặc trực tiếp. Thời hạn 07 ngày làm việc kể từ ngày nhận đủ hồ sơ hợp lệ; lệ phí 20.000 đồng/lần trực tiếp hoặc 10.000 đồng/lần qua Cổng DVCQG \src{[PROC\_1\_116788\_c174\_s3]}.
+\end{answerbox}
+
+\textbf{Trả lời vector-only}\par\nobreak
+\begin{answerbox}
+Nộp tại Công an xã. Do hợp đồng thuê viết tay, cần hoàn thiện công chứng hoặc chứng thực hợp đồng và có văn bản đồng ý của chủ sở hữu trước khi nộp.
+
+Hồ sơ gồm CT01 có ý kiến đồng ý của chủ hộ/chủ sở hữu \src{[PROC\_1\_116788\_c124\_s0]}, hợp đồng thuê đã công chứng/chứng thực \src{[PROC\_1\_116788\_c127\_s0]}, và thông tin chứng minh đủ diện tích \src{[PROC\_1\_116788\_c128\_s0]}. Nộp trực tuyến hoặc trực tiếp; thời hạn 07 ngày làm việc, lệ phí theo hình thức nộp \src{[PROC\_1\_116788\_c174\_s0]}.
+\end{answerbox}
+
+\par\smallskip
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.49\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}@{}}
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC02}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC02 (tiếp)}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endhead
+\multicolumn{3}{@{}l@{}}{\textit{Nội dung}}\\*
+1. Nêu Tờ khai thay đổi thông tin cư trú (CT01). & \yes\ Đạt\newline {\footnotesize Khớp “tờ khai thay đổi thông tin cư trú”.} & \yes\ Đạt\newline {\footnotesize Khớp “tờ khai thay đổi thông tin cư trú”.}\\
+2. Nêu yêu cầu công chứng hoặc chứng thực hợp đồng thuê. & \yes\ Đạt\newline {\footnotesize Khớp “công chứng”.} & \yes\ Đạt\newline {\footnotesize Khớp “công chứng”.}\\
+3. Nêu ý kiến đồng ý của chủ sở hữu chỗ ở hợp pháp. & \yes\ Đạt\newline {\footnotesize Khớp “chủ sở hữu”.} & \yes\ Đạt\newline {\footnotesize Khớp “chủ sở hữu”.}\\
+4. Nêu yêu cầu chứng minh đủ diện tích nhà ở. & \yes\ Đạt\newline {\footnotesize Khớp “diện tích”.} & \yes\ Đạt\newline {\footnotesize Khớp “diện tích”.}\\
+5. Nêu Công an cấp xã là cơ quan giải quyết. & \yes\ Đạt\newline {\footnotesize Khớp “công an xã”.} & \yes\ Đạt\newline {\footnotesize Khớp “công an xã”.}\\
+6. Nêu thời hạn 7 ngày làm việc. & \yes\ Đạt\newline {\footnotesize Khớp “7 ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “7 ngày làm việc”.}\\
+\multicolumn{3}{@{}l@{}}{\textit{Trích dẫn}}\\*
+7. Tờ khai cư trú CT01\newline \src{PROC\_1\_116788\_c126\_s0} & \partok\ Chưa đạt\newline {\footnotesize Dẫn c124\_s0; rubric yêu cầu c126\_s0.} & \partok\ Chưa đạt\newline {\footnotesize Dẫn c124\_s0; rubric yêu cầu c126\_s0.}\\
+8. Công chứng hoặc chứng thực hợp đồng thuê\newline \src{PROC\_1\_116788\_c127\_s0} & \yes\ Đạt & \yes\ Đạt\\
+9. Chứng minh diện tích nhà ở\newline \src{PROC\_1\_116788\_c128\_s0} & \yes\ Đạt & \yes\ Đạt\\
+10. Cơ quan giải quyết\newline \src{PROC\_1\_116788\_c174\_s0} & \yes\ Đạt & \yes\ Đạt\\
+\midrule
+\textbf{Tổng} & \textbf{9/10} & \textbf{9/10}\\
+\bottomrule
+\end{longtable}
+
+\textit{Checklist trừ một điểm: output cite \src{c124\_s0}, trong khi rubric cũ yêu cầu exact-ID \src{c126\_s0}; các điều kiện nghiệp vụ vẫn có đủ.}
+
+\subsubsection*{TC03}
+\begin{questionbox}
+\textbf{Người dùng:} Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?
+\end{questionbox}
+
+\textbf{Trả lời Graph-RAG}\par\nobreak
+\begin{answerbox}
+Người dân nộp hồ sơ liên thông trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia \src{[PROC\_3\_000722\_c180\_s1][PROC\_3\_000722\_c185\_s0]}. Hồ sơ gồm Tờ khai điện tử Mẫu 01, dữ liệu điện tử Giấy chứng sinh hoặc giấy tờ thay thế, và giấy tờ cư trú nếu đăng ký thường trú khác nơi ở của cha mẹ.
+
+\textbf{Bước 1:} Truy cập Cổng DVCQG hoặc VNeID, chọn dịch vụ liên thông, nộp hồ sơ và lệ phí \src{[PROC\_3\_000722\_c180\_s1]}.
+
+\textbf{Bước 2:} Cổng nhận thanh toán, bóc tách hồ sơ và chuyển sang hệ thống giải quyết TTHC của Bộ Tư pháp để đồng bộ về hệ thống hộ tịch điện tử \src{[PROC\_3\_000722\_c181\_s0]}.
+
+\textbf{Bước 3:} Công chức hộ tịch tại UBND cấp xã giải quyết đăng ký khai sinh trong 24 giờ khi hồ sơ hợp lệ; nếu cần bổ sung thì người yêu cầu hoàn thiện trong 07 ngày làm việc \src{[PROC\_3\_000722\_c182\_s1][PROC\_3\_000722\_c182\_s3]}.
+
+\textbf{Bước 4:} Bản điện tử Giấy khai sinh được chuyển sang hệ thống cư trú để đăng ký thường trú và hệ thống BHXH để cấp BHYT \src{[PROC\_3\_000722\_c183\_s1]}. Graph ghi nhận việc chuyển Giấy khai sinh điện tử sang thường trú và BHYT qua relation evidence.
+
+\textbf{Bước 5:} Khi người đại diện có đề nghị cấp Căn cước, \textbf{sau khi có kết quả đăng ký thường trú}, hệ thống chuyển hồ sơ sang hệ thống cấp Căn cước \src{[PROC\_3\_000722\_c184\_s0]}.
+
+\textbf{Thời hạn:} Tổng thời gian là 03 ngày làm việc, tối đa 05 ngày nếu phải xác minh. Khâu BHYT tối đa 02 ngày từ khi nhận hồ sơ điện tử \src{[PROC\_3\_000722\_c185\_s0][PROC\_3\_000722\_c183\_s2]}.
+\end{answerbox}
+
+\textbf{Trả lời vector-only}\par\nobreak
+\begin{answerbox}
+Nộp hồ sơ liên thông qua VNeID/Cổng DVCQG. Bước 1 là nộp hồ sơ và lệ phí; bước 2 cổng bóc tách rồi chuyển sang hệ thống của Bộ Tư pháp; bước 3 UBND cấp xã giải quyết khai sinh trong 24 giờ; bước 4 chuyển bản điện tử Giấy khai sinh sang hệ thống cư trú và BHXH; bước 5 cấp Căn cước khi có đề nghị \src{[PROC\_3\_000722\_c180\_s1]--[PROC\_3\_000722\_c184\_s0]}.
+
+Hồ sơ có Mẫu 01, dữ liệu điện tử/bản điện tử Giấy chứng sinh hoặc giấy tờ thay thế, và hồ sơ cư trú khi cần. Tổng thời gian 03 ngày làm việc, tối đa 05 ngày nếu xác minh; khâu BHYT tối đa 02 ngày từ khi nhận hồ sơ điện tử \src{[PROC\_3\_000722\_c183\_s2][PROC\_3\_000722\_c185\_s0]}.
+
+Output này không nói rõ điều kiện “sau khi có kết quả đăng ký thường trú” trước nhánh Căn cước.
+\end{answerbox}
+
+\par\smallskip
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.49\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}@{}}
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC03}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC03 (tiếp)}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endhead
+\multicolumn{3}{@{}l@{}}{\textit{Nội dung}}\\*
+1. Nêu kênh nộp trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia. & \yes\ Đạt\newline {\footnotesize Khớp “vneid”.} & \yes\ Đạt\newline {\footnotesize Khớp “vneid”.}\\
+2. Nêu mốc 24 giờ của khâu đăng ký khai sinh. & \yes\ Đạt\newline {\footnotesize Khớp “24 giờ”.} & \yes\ Đạt\newline {\footnotesize Khớp “24 giờ”.}\\
+3. Nêu việc luân chuyển Giấy khai sinh điện tử. & \yes\ Đạt\newline {\footnotesize Khớp “giấy khai sinh điện tử”.} & \yes\ Đạt\newline {\footnotesize Khớp “bản điện tử giấy khai sinh”.}\\
+4. Nêu phải có kết quả thường trú trước khi xử lý căn cước. & \yes\ Đạt\newline {\footnotesize Khớp “kết quả đăng ký thường trú”.} & \partok\ Chưa đạt\newline {\footnotesize Thiếu ý này.}\\
+5. Nêu nhánh căn cước được xử lý khi có đề nghị. & \yes\ Đạt\newline {\footnotesize Khớp “có đề nghị”.} & \yes\ Đạt\newline {\footnotesize Khớp “có đề nghị”.}\\
+6. Nêu mốc 3 ngày làm việc của gói liên thông. & \yes\ Đạt\newline {\footnotesize Khớp “ba (03) ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “ba (03) ngày làm việc”.}\\
+7. Nêu mốc tối đa 5 ngày làm việc khi cần xác minh. & \yes\ Đạt\newline {\footnotesize Khớp “năm (05) ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “năm (05) ngày làm việc”.}\\
+\multicolumn{3}{@{}l@{}}{\textit{Trích dẫn}}\\*
+8. Bước 1, nộp liên thông\newline \src{PROC\_3\_000722\_c180\_s1} & \yes\ Đạt & \yes\ Đạt\\
+9. Bước 2, chuyển hồ sơ sang Tư pháp\newline \src{PROC\_3\_000722\_c181\_s0} & \yes\ Đạt & \yes\ Đạt\\
+10. Bước 3, giải quyết khai sinh\newline \src{PROC\_3\_000722\_c182\_s1} & \yes\ Đạt & \yes\ Đạt\\
+11. Bước 4, chuyển sang cư trú và BHXH\newline \src{PROC\_3\_000722\_c183\_s1} & \yes\ Đạt & \yes\ Đạt\\
+12. Bước 5, xử lý nhánh căn cước\newline \src{PROC\_3\_000722\_c184\_s0} & \yes\ Đạt & \yes\ Đạt\\
+13. Thời hạn giải quyết cả gói\newline \src{PROC\_3\_000722\_c185\_s0} & \yes\ Đạt & \yes\ Đạt\\
+\multicolumn{3}{@{}l@{}}{\textit{Thứ tự}}\\*
+14. Trích dẫn các bước 1 đến 5 theo đúng thứ tự xuất hiện. & \yes\ Đạt\newline {\footnotesize Đúng thứ tự Bước 1–5.} & \yes\ Đạt\newline {\footnotesize Đúng thứ tự Bước 1–5.}\\
+\midrule
+\textbf{Tổng} & \textbf{14/14} & \textbf{13/14}\\
+\bottomrule
+\end{longtable}
+
+
+\subsubsection*{TC05}
+\begin{questionbox}
+\textbf{Người dùng:} Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?
+\end{questionbox}
+
+\textbf{Trả lời Graph-RAG}\par\nobreak
+\begin{answerbox}
+\textbf{Bạn có thể nộp hồ sơ liên thông ngay} qua VNeID hoặc Cổng DVCQG, không cần có sẵn Giấy khai sinh điện tử. Sau khi tiếp nhận hồ sơ, hệ thống tự chuyển Giấy khai sinh điện tử để xử lý thủ tục đích \src{[PROC\_3\_000722\_c180\_s1]} \src{[REL:PROC\_1\_001193:NEXT\_STEP:PROC\_1\_014137]}.
+
+Không nộp hồ sơ BHYT riêng lẻ trước cho trẻ chưa có giấy khai sinh; lựa chọn phù hợp là gói liên thông gồm khai sinh, thường trú và BHYT.
+
+\textbf{Cách thực hiện:} Nộp trực tuyến trên VNeID hoặc Cổng DVCQG. Hồ sơ gồm Tờ khai điện tử Mẫu 01 và dữ liệu điện tử/bản điện tử Giấy chứng sinh hoặc giấy tờ thay thế \src{[PROC\_3\_000722\_c176\_s0][PROC\_3\_000722\_c177\_s0]}.
+
+\textbf{Thời hạn:} Tổng thời gian 03 ngày làm việc kể từ khi nhận đủ hồ sơ; nếu xác minh không quá 05 ngày. Riêng cấp thẻ BHYT tối đa 02 ngày từ khi nhận hồ sơ điện tử. Sau khai sinh, hệ thống chuyển kết quả sang thường trú và chuyển hồ sơ BHYT sang BHXH \src{[PROC\_3\_000722\_c185\_s0][PROC\_3\_000722\_c183\_s1][PROC\_3\_000722\_c183\_s2]}.
+\end{answerbox}
+
+\textbf{Trả lời vector-only}\par\nobreak
+\begin{answerbox}
+Không đến trực tiếp cơ quan BHXH để xin cấp thẻ BHYT riêng cho trẻ trước khi làm giấy khai sinh. Với trẻ dưới 6 tuổi, việc cấp thẻ BHYT thực hiện qua gói liên thông điện tử gồm khai sinh, thường trú và BHYT \src{[PROC\_3\_000722\_c183\_s1]}.
+
+Hồ sơ có Tờ khai điện tử Mẫu 01 và dữ liệu điện tử Giấy chứng sinh hoặc giấy tờ thay thế. Nộp trực tuyến qua Cổng DVCQG hoặc VNeID \src{[PROC\_3\_000722\_c176\_s0][PROC\_3\_000722\_c180\_s1]}. Tổng thời gian 03 ngày, tối đa 05 ngày nếu xác minh; khâu BHYT tối đa 02 ngày từ khi nhận hồ sơ điện tử \src{[PROC\_3\_000722\_c185\_s0][PROC\_3\_000722\_c183\_s2]}.
+
+Output thiếu kết luận “có thể nộp hồ sơ liên thông ngay” và thiếu cụm “Giấy khai sinh điện tử” nên không đạt hai criteria này.
+\end{answerbox}
+
+\par\smallskip
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.49\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}>{\raggedright\arraybackslash}p{.22\textwidth}@{}}
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC05}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l@{}}{\textbf{Đối chiếu theo rubric TC05 (tiếp)}}\\
+\toprule
+\textbf{Tiêu chí} & \textbf{Graph-RAG} & \textbf{Vector-only}\\
+\midrule
+\endhead
+\multicolumn{3}{@{}l@{}}{\textit{Nội dung}}\\*
+1. Hướng dẫn thực hiện theo quy trình liên thông. & \yes\ Đạt\newline {\footnotesize Khớp “liên thông”.} & \yes\ Đạt\newline {\footnotesize Khớp “liên thông”.}\\
+2. Nêu kênh nộp trực tuyến qua VNeID hoặc Cổng Dịch vụ công quốc gia. & \yes\ Đạt\newline {\footnotesize Khớp “vneid”.} & \yes\ Đạt\newline {\footnotesize Khớp “vneid”.}\\
+3. Nêu rõ gia đình có thể nộp hồ sơ liên thông ngay. & \yes\ Đạt\newline {\footnotesize Khớp “có thể nộp hồ sơ liên thông ngay”.} & \partok\ Chưa đạt\newline {\footnotesize Thiếu ý này.}\\
+4. Nêu Giấy khai sinh điện tử là kết quả được hệ thống chuyển. & \yes\ Đạt\newline {\footnotesize Khớp “giấy khai sinh điện tử”.} & \partok\ Chưa đạt\newline {\footnotesize Thiếu ý này.}\\
+5. Nêu cơ quan BHXH xử lý cấp thẻ. & \yes\ Đạt\newline {\footnotesize Khớp “bảo hiểm xã hội”.} & \yes\ Đạt\newline {\footnotesize Khớp “bảo hiểm xã hội”.}\\
+6. Nêu Tờ khai điện tử Mẫu số 01. & \yes\ Đạt\newline {\footnotesize Khớp “mẫu số 01”.} & \yes\ Đạt\newline {\footnotesize Khớp “mẫu số 01”.}\\
+7. Nêu mốc tối đa 2 ngày làm việc cho khâu cấp thẻ BHYT. & \yes\ Đạt\newline {\footnotesize Khớp “2 ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “2 ngày làm việc”.}\\
+8. Nêu mốc 3 ngày làm việc của gói liên thông. & \yes\ Đạt\newline {\footnotesize Khớp “ba (03) ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “ba (03) ngày làm việc”.}\\
+9. Nêu mốc tối đa 5 ngày làm việc khi cần xác minh. & \yes\ Đạt\newline {\footnotesize Khớp “5 ngày làm việc”.} & \yes\ Đạt\newline {\footnotesize Khớp “năm (05) ngày làm việc”.}\\
+10. Nêu trường hợp cần xác minh. & \yes\ Đạt\newline {\footnotesize Khớp “xác minh”.} & \yes\ Đạt\newline {\footnotesize Khớp “xác minh”.}\\
+11. Nêu mốc bắt đầu tính thời hạn khâu BHYT là khi nhận hồ sơ điện tử. & \yes\ Đạt\newline {\footnotesize Khớp “nhận được hồ sơ điện tử”.} & \yes\ Đạt\newline {\footnotesize Khớp “nhận được hồ sơ điện tử”.}\\
+\multicolumn{3}{@{}l@{}}{\textit{Trích dẫn}}\\*
+12. Kênh nộp liên thông\newline \src{PROC\_3\_000722\_c180\_s1} & \yes\ Đạt & \yes\ Đạt\\
+13. Tờ khai điện tử Mẫu 01\newline \src{PROC\_3\_000722\_c176\_s0} & \yes\ Đạt & \yes\ Đạt\\
+14. Thời hạn riêng của khâu BHYT\newline \src{PROC\_3\_000722\_c183\_s2} & \yes\ Đạt & \yes\ Đạt\\
+15. Thời hạn của gói liên thông\newline \src{PROC\_3\_000722\_c185\_s0} & \yes\ Đạt & \yes\ Đạt\\
+\multicolumn{3}{@{}l@{}}{\textit{Điều kiện loại trừ}}\\*
+16. Tránh khẳng định phải hoàn tất khai sinh hoặc phải có Giấy khai sinh trước khi nộp hồ sơ liên thông. & \yes\ Đạt\newline {\footnotesize Không có khẳng định này.} & \yes\ Đạt\newline {\footnotesize Không có khẳng định này.}\\
+\midrule
+\textbf{Tổng} & \textbf{16/16} & \textbf{14/16}\\
+\bottomrule
+\end{longtable}
+
+
+\section{Quản lý hiệu lực và phạm vi văn bản}
+
+\begin{longtable}{p{4.2cm}p{3.1cm}p{6.1cm}}
+\toprule
+\textbf{Yêu cầu} & \textbf{Trạng thái} & \textbf{Phần đã có}\\
+\midrule
+\endhead
+Phiên bản nguồn & Có & Hash snapshot procedure/law; thay đổi nội dung so với baseline tạo review notice.\\
+Ngày hiệu lực & Có khi nguồn cung cấp & \src{effective\_date}/validity được đưa vào metadata nguồn.\\
+Phạm vi địa phương & Có & Jurisdiction level/location của thủ tục được giữ trong metadata.\\
+Nguồn chính thức & Có khi record có URL & URL procedure/law section đi cùng evidence được truy xuất.\\
+Cảnh báo & Có một phần & Cảnh báo khác phiên bản, hết hiệu lực hoặc thiếu validity trên source của lượt trả lời.\\
+\bottomrule
+\end{longtable}
+
+Ví dụ, khi mã băm nội dung của bản ghi được truy xuất khác với mốc đối chiếu, hệ thống đánh dấu nguồn cần rà soát. Ngày hiệu lực, ngày ghi nhận và phạm vi áp dụng được hiển thị khi bản ghi cung cấp các trường này. Việc cập nhật nguồn hiện thực hiện bằng cách thay bộ dữ liệu cục bộ và nạp lại. Tự động đánh dấu mọi bước bị ảnh hưởng khi văn bản thay đổi còn cần dữ liệu lịch sử phiên bản, ngày hết hiệu lực và quan hệ thay thế.
+
+\begin{center}
+\fbox{\parbox[c][6cm][c]{.85\linewidth}{\centering\Large VỊ TRÍ CHÈN ẢNH UI\\[8pt]\normalsize Chèn ảnh UI đã khoanh citation, nguồn, phạm vi, ngày hiệu lực/ghi nhận và warning tại đây.}}
+\end{center}
+
+\section{Đối chứng Graph-RAG với RAG không đồ thị}
+
+\subsection{Thiết lập đối chứng}
+
+Kết quả lấy từ lượt chạy \texttt{20261124-143408}. Hai chế độ dùng cùng bốn câu hỏi, bộ dữ liệu nguồn, rubric và mô hình \texttt{gemini-3.5-flash-lite}. Mỗi chế độ trả lời một lần cho mỗi ca. Phạm vi đối chứng gồm hai chế độ RAG trong bảng dưới đây.
+
+Cả hai chế độ dùng chung bước phân tích câu hỏi, xác định yêu cầu bằng chứng, sinh câu trả lời bằng Gemini và hậu kiểm. Sự khác biệt nằm ở bước truy xuất và thông tin đưa vào ngữ cảnh trả lời.
+
+\begin{tabularx}{\linewidth}{p{3cm}YY}
+\toprule
+& \textbf{RAG không đồ thị (vector-only)} & \textbf{Graph-RAG}\\
+\midrule
+Truy xuất & Tìm các đoạn dữ liệu liên quan bằng độ tương đồng vector. & Tìm bằng vector và truy vấn thêm các quan hệ trong knowledge graph.\\
+Ngữ cảnh cho Gemini & Các đoạn dữ liệu được chọn từ kết quả truy xuất vector. & Các đoạn dữ liệu kèm quan hệ giữa các thủ tục, điều kiện áp dụng và kết quả được chuyển giữa các bước khi phù hợp.\\
+\bottomrule
+\end{tabularx}
+
+Ở TC03 và TC05, Graph-RAG sử dụng graph từ bộ dữ liệu cục bộ, theo cảnh báo trong nhật ký lượt chạy. Rubric kiểm tra cụm từ cần có hoặc cần tránh, mã trích dẫn và thứ tự trích dẫn khi ca có yêu cầu. Chẳng hạn, ở TC02 cả hai câu trả lời đều nêu CT01 nhưng bị trừ điểm vì rubric yêu cầu một mã trích dẫn cụ thể.
+
+\subsection{Kết quả đối chứng}
+
+Điểm mỗi ca là tỷ lệ tiêu chí đạt quy đổi về thang 100. Điểm tổng hợp là trung bình của bốn điểm theo ca. Tổng số tiêu chí đạt được cộng trực tiếp trên cả bốn ca. Thời gian đo từ lúc nhận câu hỏi đến khi trả lời, bao gồm truy xuất dữ liệu và gọi mô hình. Token là tổng đầu vào và đầu ra mà API ghi nhận.
+
+\begin{center}
+\begin{tabular}{lrrrrrr}
+\toprule
+Ca & Graph & Vector & Graph (s) & Vector (s) & Graph token & Vector token\\
+\midrule
+TC01 & 100.0 & 100.0 & 21.993 & 20.325 & 6,980 & 7,047\\
+TC02 & 90.0 & 90.0 & 15.807 & 16.770 & 9,717 & 9,805\\
+TC03 & 100.0 & 92.9 & 29.030 & 24.937 & 30,138 & 18,598\\
+TC05 & 100.0 & 87.5 & 27.531 & 15.464 & 36,676 & 10,286\\
+\midrule
+Trung bình mỗi ca & \textbf{97.5} & \textbf{92.6} & 23.590 & 19.374 & & \\
+Tổng token trên 4 ca & & & & & 83,511 & 45,736\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+TC01 và TC02 có cùng điểm ở hai chế độ. Ở TC03, câu trả lời vector-only thiếu điều kiện đã có kết quả thường trú trước khi xử lý căn cước. Ở TC05, câu trả lời vector-only thiếu ý có thể nộp hồ sơ liên thông ngay và ý Giấy khai sinh điện tử là kết quả hệ thống chuyển tiếp. Ba tiêu chí này tạo nên chênh lệch 46/47 so với 43/47 trong lượt chạy.
+
+Graph-RAG mất thêm trung bình 4,216 giây mỗi ca và dùng tổng cộng 83.511 token, so với 45.736 token của vector-only. Kết quả mô tả bốn tình huống của sự kiện sinh con. Cần lặp lại phép thử và mở rộng bộ ca để xác định chênh lệch về chất lượng và thời gian có ổn định hay không.
+
+\end{document}
