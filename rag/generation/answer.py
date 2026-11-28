@@ -345,21 +345,32 @@ def refine_answer(
         markdown = markdown[:start] + replacement + markdown[end:]
     markdown = _normalize_citations(markdown)
     available = {source.source_id for source in response.sources}
-    missing_ids = set()
+    missing_citations = []
 
     def resolve_citation(match: re.Match[str]) -> str:
         source_id = match.group(1).strip()
         if source_id in available:
             return f"【{source_id}】"
-        missing_ids.add(source_id)
-        return ""
+        line_start = match.string.rfind("\n", 0, match.start()) + 1
+        line_end = match.string.find("\n", match.end())
+        if line_end == -1:
+            line_end = len(match.string)
+        line = CITATION_PATTERN.sub("", match.string[line_start:line_end]).strip()
+        excerpt = " ".join(line.split())
+        if len(excerpt) > 240:
+            excerpt = excerpt[:237] + "..."
+        missing_citations.append((source_id, excerpt))
+        return f" **[Nguồn chưa xác định: `{source_id}`]**"
 
     markdown = CITATION_PATTERN.sub(resolve_citation, markdown)
     warnings = list(dict.fromkeys([*response.warnings, *draft.warnings]))
     if skipped:
         warnings.append("Một số chỉnh sửa không xác định được vị trí trong câu trả lời và chưa được áp dụng.")
-    if missing_ids:
-        warnings.append("Một số trích dẫn không xác định được trong nguồn đã truy xuất; vui lòng kiểm tra nội dung liên quan.")
+    for source_id, excerpt in dict.fromkeys(missing_citations):
+        message = f"Không xác định được nguồn {source_id} trong dữ liệu đã truy xuất."
+        if excerpt:
+            message += f" Nội dung liên quan: {excerpt}"
+        warnings.append(message)
     return response.model_copy(update={
         "answer_markdown": markdown,
         "warnings": warnings,

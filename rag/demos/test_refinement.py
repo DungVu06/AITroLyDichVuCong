@@ -23,6 +23,9 @@ class RefinementTest(unittest.TestCase):
         self.assertIn("【P1】", result.answer_markdown)
         self.assertNotIn("【UNKNOWN】", result.answer_markdown)
         self.assertEqual(len(result.warnings), 3)
+        self.assertIn("UNKNOWN", result.warnings[-1])
+        self.assertIn("Thông tin", result.warnings[-1])
+        self.assertIn("Nguồn chưa xác định: `UNKNOWN`", result.answer_markdown)
         self.assertEqual(result.follow_up_questions, ["Bạn có thông tin nào?"])
 
     def test_cited_chunk_keeps_parent_metadata(self):

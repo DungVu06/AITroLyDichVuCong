@@ -30,43 +30,6 @@ PROCEDURE_CHUNK_LIMITS = {
 }
 
 
-def derive_decision_questions(
-    query: UserQuery,
-    procedures: list[ProcedureEvidence],
-) -> list[str]:
-    """Ask only for facts that select a conditional path in retrieved evidence."""
-    user_text = query.text.casefold()
-    evidence = "\n".join(
-        chunk.text.casefold()
-        for procedure in procedures
-        for chunk in procedure.chunks
-    )
-    rules = (
-        (
-            ("người làm chứng", "giấy cam đoan"),
-            ("người làm chứng",),
-            "Khi sinh tại nhà, có người làm chứng có thể xác nhận việc sinh không?",
-        ),
-        (
-            ("công chứng hoặc chứng thực",),
-            ("công chứng", "chứng thực"),
-            "Hợp đồng thuê, mượn hoặc ở nhờ đã được công chứng hoặc chứng thực chưa?",
-        ),
-        (
-            ("ý kiến đồng ý", "chủ sở hữu"),
-            ("chủ sở hữu đồng ý", "chủ nhà đồng ý", "ý kiến đồng ý"),
-            "Chủ sở hữu chỗ ở hợp pháp đã đồng ý bằng văn bản cho đăng ký thường trú chưa?",
-        ),
-    )
-    questions = [
-        question
-        for triggers, known_markers, question in rules
-        if all(trigger in evidence for trigger in triggers)
-        and not any(marker in user_text for marker in known_markers)
-    ]
-    return list(dict.fromkeys(questions))[:3]
-
-
 def _shorten_chunk(chunk: RetrievedChunk, max_chars: int = 1_500) -> RetrievedChunk:
     text = chunk.text.strip()
     if len(text) > max_chars:
@@ -151,10 +114,9 @@ def build_answer_context(
         procedure_evidence=compact_procedures,
         benefits=[_compact_benefit(item) for item in benefits],
         legal_evidence=legal_evidence or [],
-        required_follow_up_questions=list(dict.fromkeys([
-            *active_contract.required_follow_up_questions,
-            *derive_decision_questions(query, compact_procedures),
-        ]))[:3],
+        required_follow_up_questions=list(dict.fromkeys(
+            active_contract.required_follow_up_questions
+        ))[:3],
         contract=active_contract,
         response_rules=response_rules or ResponseRules(),
     )
