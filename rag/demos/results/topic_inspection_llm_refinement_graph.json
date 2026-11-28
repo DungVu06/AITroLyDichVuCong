@@ -1,0 +1,1025 @@
+{
+  "TC01": {
+    "status": "ok",
+    "latency_seconds": 45.745,
+    "answer": "Trường hợp vợ sinh con tại nhà và không có Giấy chứng sinh, bạn vẫn có thể thực hiện thủ tục đăng ký khai sinh 【PROC_1_001193_c5_s0】.\n\n### Thứ tự nên làm\n- Nộp hồ sơ đăng ký khai sinh tại Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】.\n\n### Giấy tờ và cách thực hiện\n- **Thành phần hồ sơ:** Thay cho Giấy chứng sinh, bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh 【PROC_1_001193_c5_s0】.\n- **Cách thức nộp hồ sơ:** Bạn có thể lựa chọn một trong các hình thức gồm trực tuyến, trực tiếp hoặc thông qua dịch vụ bưu chính 【PROC_1_001193_c48_s0】.\n- **Thời gian giải quyết:** 1 ngày 【PROC_1_001193_c48_s0】.\n- **Lệ phí:** Miễn phí 【PROC_1_001193_c48_s0】.",
+    "warnings": [],
+    "sources": [
+      "PROC_1_001193_c5_s0",
+      "PROC_1_001193_c48_s0"
+    ],
+    "score": 100.0,
+    "citations": [
+      "PROC_1_001193_c48_s0",
+      "PROC_1_001193_c5_s0"
+    ],
+    "missing_citations": [],
+    "missing_term_groups": [],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [],
+    "fallback": false,
+    "passed_checks": 7,
+    "total_checks": 7,
+    "usage": {
+      "api_calls": 3,
+      "api_elapsed_seconds": 12.328,
+      "input_tokens": 13443,
+      "output_tokens": 859,
+      "total_tokens": 14302
+    },
+    "context": {
+      "used_local_graph": false,
+      "used_local_vector_index": false,
+      "query": {
+        "text": "Vợ tôi vừa sinh cháu tại nhà ở xã An Phú, không có Giấy chứng sinh của bệnh viện thì có làm giấy khai sinh được không? Tôi phải nộp hồ sơ ở đâu, cần giấy tờ gì thay thế và thời gian giải quyết bao lâu?",
+        "conversation_id": null
+      },
+      "query_state": {
+        "life_event": "sinh_con",
+        "intent": "procedure_detail",
+        "topics": [
+          "procedures",
+          "documents",
+          "authority",
+          "processing_time",
+          "eligibility"
+        ],
+        "target": "đăng ký khai sinh",
+        "procedure_ids": [
+          "PROC_1_001193"
+        ],
+        "asks_about_dependencies": false,
+        "identity_card_requested": null,
+        "completed_ids": [],
+        "facts": {
+          "noi_sinh": "tai_nha",
+          "dia_chi_noi_sinh": "xa_An_Phu",
+          "co_giay_chung_sinh": false
+        },
+        "missing_facts": []
+      },
+      "journey": [
+        {
+          "procedure_id": "PROC_1_001193",
+          "name": "Thủ tục đăng ký khai sinh",
+          "priority": 1,
+          "category": "required",
+          "status": "unknown",
+          "reason": "Khớp trực tiếp với tình huống người dùng.",
+          "depends_on": []
+        }
+      ],
+      "procedure_evidence": [
+        {
+          "procedure_id": "PROC_1_001193",
+          "name": "Thủ tục đăng ký khai sinh",
+          "authority": "Ủy ban nhân dân cấp xã",
+          "eligibility": "",
+          "source_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bfd-3fe0-70ac-b9d6-5e9e20d6eef7",
+          "vector_score": null,
+          "chunks": [
+            {
+              "collection": "procedures",
+              "point_id": "17",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c17_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\n- + Trường hợp giấy tờ, tài liệu phải gửi kèm trong hồ sơ đăng ký khai sinh trực tuyến đã có bản sao điện tử hoặc đã có bản điện tử giấy tờ hộ tịch thì người yêu cầu được sử dụng bản điện tử này - Số lượng: Theo quy định (Theo trường hợp / nếu có).",
+              "score": 0.6473578,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "5",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c5_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\n- - Giấy chứng sinh; trường hợp không có Giấy chứng sinh thì nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh - Số lượng: 1 Bản chính (Theo trường hợp / nếu có).",
+              "score": 0.7096088,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "19",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c19_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\n- - Trường hợp người đi đăng ký khai sinh cho trẻ em là ông, bà, người thân thích khác thì không phải có văn bản ủy quyền của cha, mẹ trẻ em, nhưng phải thống nhất với cha, mẹ trẻ em về các nội dung khai sinh - Số lượng: Theo quy định (Theo trường hợp / nếu có).",
+              "score": 0.73767877,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "3",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c3_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\n- Trường hợp người yêu cầu đã nộp bản điện tử Giấy chứng sinh hoặc cơ quan đăng ký hộ tịch đã khai thác được dữ liệu điện tử có ký số của Giấy chứng sinh thì không phải nộp bản giấy - Số lượng: Theo quy định (Theo trường hợp / nếu có).",
+              "score": 0.6621374,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "54",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c48_s0",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "Cách thức nộp hồ sơ, thời gian giải quyết và lệ phí của Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\nCơ quan tiếp nhận và giải quyết: Ủy ban nhân dân cấp xã.\n- Hình thức: Trực tuyến. Thời gian giải quyết: 1 ngày. Lệ phí: Miễn phí.\n- Hình thức: Dịch vụ bưu chính. Thời gian giải quyết: 1 ngày. Lệ phí: Miễn phí.\n- Hình thức: Trực tiếp. Thời gian giải quyết: 1 ngày. Lệ phí: Miễn phí.",
+              "score": 0.46562862,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "0",
+              "doc_id": "PROC_1_001193",
+              "chunk_id": "PROC_1_001193_c0_s0",
+              "chunk_type": "eligibility",
+              "step_number": null,
+              "text": "Đối tượng và điều kiện thực hiện Thủ tục đăng ký khai sinh (Mã: PROC_1_001193):\n- Đối tượng thực hiện: Công dân Việt Nam, Người Việt Nam định cư ở nước ngoài.",
+              "score": 0.5349396,
+              "metadata": {}
+            }
+          ]
+        }
+      ],
+      "benefits": [],
+      "legal_evidence": [],
+      "source_metadata": {
+        "PROC_1_001193": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/019d2bfd-3fe0-70ac-b9d6-5e9e20d6eef7",
+          "version": "178839f9e1667aedfddb35dd7d65bfaa1966e750fba9e121fe2ccbea17285ba9",
+          "effective_date": "2019-07-31",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "UPDATED",
+          "legal_bases": [
+            "04/2024/TT-BTP — Sửa đổi, bổ sung một số điều của Thông tư số 02/2020/TT-BTP ngày 08/4/2020 của Bộ trưởng Bộ Tư pháp ban hành, hướng dẫn sử dụng, quản lý mẫu sổ quốc tịch và mẫu giấy tờ về quốc tịch và Thông tư số 04/2020/TT-BTP ngày 28/5/2020 của Bộ trưởng Bộ Tư pháp quy định chi tiết thi hành một số điều của Luật Hộ tịch và Nghị định số 123/2015/NĐ-CP ngày 15/11/2015 của Chính phủ quy định chi tiết một số điều và biện pháp thi hành Luật Hộ tịch",
+            "Thông tư số 03/2023/TT-BTP — Thông tư số 03/2023/TT-BTP ngày 02/8/2023 của Bộ trưởng Bộ Tư pháp",
+            "106/2021/TT-BTC — Thông tư sửa đổi, bổ sung một số điều của Thông tư số 85/2019/TT-BTC ngày 29/11/2019 của Bộ Tài chính hướng dẫn về phí và lệ phí thuộc thẩm quyền quyết định của Hội đồng nhân dân tỉnh, thành phố trực thuộc Trung ương.",
+            "04/2020/TT-BTP — Hướng dẫn Luật hộ tịch và Nghị định 123/2015/NĐ-CP hướng dẫn Luật hộ tịch do Bộ trưởng Bộ Tư pháp ban hành",
+            "07/2025/NĐ-CP — Nghị định sửa đổi, bổ sung một số điều của các Nghị định trong lĩnh vực hộ tịch, quốc tịch, chứng thực.",
+            "120/2025/NĐ-CP — Nghị định số 120/2025/NĐ-CP ngày 11/6/2025 của Chính phủ quy định về phân định thẩm quyền của chính quyền địa phương 02 cấp trong lĩnh vực quản lý nhà nước của Bộ Tư pháp.",
+            "66.7/2025/NQ-CP — Nghị quyết số 66.7/2025/NQ-CP của Chính phủ: Quy định cắt giảm, đơn giản hóa thủ tục hành chính dựa trên dữ liệu",
+            "60/2014/QH13 — Luật 60/2014/QH13",
+            "01/2022/TT-BTP — Thông tư quy định chi tiết một số điều và biện pháp thi hành Nghị định số 87/2020/NĐ-CP ngày 28 tháng 7 năm 2020 của Chính phủ quy định về Cơ sở dữ liệu hộ tịch điện tử, đăng ký hộ tịch trực tuyến",
+            "85/2019/TT-BTC — Thông tư Hướng dẫn về phí và lệ phí thuộc thẩm quyền quyết định của Hội đồng nhân dân tỉnh, thành phố trực thuộc Trung ương",
+            "104/2022/NĐ-CP — Nghị định sửa đổi, bổ sung một số điều của các Nghị định liên quan đến việc nộp xuất trình sổ hộ khẩu, sổ tạm trú giấy khi thực hiện thủ tục hành chính, cung cấp dịch vụ công",
+            "123/2015/NĐ-CP — Nghị định số 123/2015/NĐ-CP ngày 15/11/2015 của Chính phủ quy định chi tiết một số điều và biện pháp thi hành Luật Hộ tịch",
+            "08/2025/TT-BTP — Thông tư số 08/2025/TT-BTP ngày 12/6/2025 của Bộ trưởng Bộ Tư pháp quy định về phân định thẩm quyền của chính quyền địa phương 02 cấp và phân cấp trong lĩnh vực quản lý nhà nước của Bộ Tư pháp",
+            "18/2026/NĐ-CP — Nghị định sửa đổi, bổ sung một số nghị định để cắt giảm, đơn giản hóa thủ tục hành chính, điều kiện kinh doanh thuộc phạm vi quản lý của Bộ Tư pháp",
+            "87/2020/NĐ-CP — Nghị định quy định về Cơ sở dữ liệu hộ tịch điện tử, đăng ký hộ tịch trực tuyến"
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        }
+      },
+      "required_follow_up_questions": [
+        "Khi sinh tại nhà, có người làm chứng có thể xác nhận việc sinh không?"
+      ],
+      "contract": {
+        "procedure_ids": [
+          "PROC_1_001193"
+        ],
+        "requirements": [],
+        "required_follow_up_questions": [],
+        "workflow_id": null,
+        "submission_channel": null,
+        "processing_flow": [],
+        "enforce_step_sequence": false,
+        "required_step_numbers": {}
+      },
+      "relation_evidence": [],
+      "response_rules": {
+        "demo_scope": "Demo sự kiện sinh con; trạng thái hiệu lực luật có thể thiếu.",
+        "must_cite_claims": true,
+        "must_not_invent_procedures": true,
+        "must_mark_uncertain_benefits": true
+      }
+    }
+  },
+  "TC02": {
+    "status": "ok",
+    "latency_seconds": 28.693,
+    "answer": "Để đăng ký thường trú tại căn nhà thuê ở xã Tân Triều với hợp đồng thuê nhà viết tay, bạn cần thực hiện thủ tục **Đăng ký thường trú** (Mã: PROC_1_116788)【PROC_1_116788_c121_s0】. Hồ sơ và cơ quan tiếp nhận được quy định cụ thể như sau:\n\n### Cơ quan tiếp nhận\n- **Công an Xã** là cơ quan tiếp nhận và giải quyết thủ tục đăng ký thường trú【PROC_1_116788_c174_s0】.\n\n### Thành phần hồ sơ cần chuẩn bị\n1. **Tờ khai thay đổi thông tin cư trú** (Mẫu CT01 ban hành kèm theo Thông tư số 116/2026/TT-BCA), trong đó ghi rõ ý kiến đồng ý cho đăng ký thường trú của chủ sở hữu chỗ ở hợp pháp được cho thuê, trừ trường hợp đã có ý kiến đồng ý bằng văn bản (1 bản chính)【PROC_1_116788_c126_s0】.\n2. **Thông tin chứng minh đủ diện tích nhà ở** để đăng ký thường trú tại chỗ ở hợp pháp do thuê: Thông tin này được khai thác trực tiếp trong căn cước điện tử, tài khoản định danh điện tử qua Ứng dụng định danh quốc gia hoặc Cơ sở dữ liệu quốc gia về dân cư, cơ sở dữ liệu về cư trú. Trường hợp không khai thác được thông tin, bạn cần xuất trình giấy tờ, tài liệu theo quy định tại khoản 2 Điều 5 Nghị định số 154/2024/NĐ-CP, trong đó thể hiện diện tích nhà ở hoặc xác nhận của Ủy ban nhân dân cấp xã về điều kiện diện tích bình quân theo Mẫu số 02 ban hành kèm theo Nghị định số 58/2026/NĐ-CP (1 bản chính, nếu có)【PROC_1_116788_c128_s0】.\n\n### Thời gian và lệ phí giải quyết\n- **Thời gian giải quyết:** 07 ngày làm việc kể từ ngày nhận được hồ sơ đầy đủ và chính xác【PROC_1_116788_c174_s3】. Trường hợp bạn nộp hồ sơ đăng ký thường trú kèm theo Tờ khai xác nhận tình trạng chỗ ở hợp pháp, diện tích nhà ở tối thiểu đến cơ quan đăng ký cư trú, thời gian giải quyết của Ủy ban nhân dân cấp xã sẽ không tính vào thời hạn giải quyết hồ sơ đăng ký thường trú【PROC_1_116788_c174_s2】【PROC_1_116788_c174_s3】.\n- **Lệ phí:** 20.000 đồng/lần đăng ký khi nộp hồ sơ trực tiếp; hoặc 10.000 đồng/lần đăng ký khi nộp qua Cổng dịch vụ công quốc gia【PROC_1_116788_c174_s3】.",
+    "warnings": [],
+    "sources": [
+      "PROC_1_116788_c121_s0",
+      "PROC_1_116788_c128_s0",
+      "PROC_1_116788_c126_s0",
+      "PROC_1_116788_c174_s2",
+      "PROC_1_116788_c174_s3",
+      "PROC_1_116788_c174_s0"
+    ],
+    "score": 80.0,
+    "citations": [
+      "PROC_1_116788_c121_s0",
+      "PROC_1_116788_c126_s0",
+      "PROC_1_116788_c128_s0",
+      "PROC_1_116788_c174_s0",
+      "PROC_1_116788_c174_s2",
+      "PROC_1_116788_c174_s3"
+    ],
+    "missing_citations": [
+      "PROC_1_116788_c127_s0"
+    ],
+    "missing_term_groups": [
+      [
+        "công chứng",
+        "chứng thực"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [],
+    "fallback": false,
+    "passed_checks": 8,
+    "total_checks": 10,
+    "usage": {
+      "api_calls": 3,
+      "api_elapsed_seconds": 14.141,
+      "input_tokens": 17405,
+      "output_tokens": 1688,
+      "total_tokens": 19093
+    },
+    "context": {
+      "used_local_graph": false,
+      "used_local_vector_index": false,
+      "query": {
+        "text": "Tôi đang thuê nhà ở xã Tân Triều, có hợp đồng thuê nhà viết tay. Tôi muốn đăng ký thường trú về căn nhà thuê này thì cần điều kiện và giấy tờ gì, nộp cho Công an xã hay UBND xã?",
+        "conversation_id": null
+      },
+      "query_state": {
+        "life_event": "dang_ky_thuong_tru",
+        "intent": "procedure_detail",
+        "topics": [
+          "eligibility",
+          "documents",
+          "authority"
+        ],
+        "target": "Đăng ký thường trú",
+        "procedure_ids": [
+          "PROC_1_116788"
+        ],
+        "asks_about_dependencies": false,
+        "identity_card_requested": null,
+        "completed_ids": [],
+        "facts": {
+          "noi_o": "nha_thue",
+          "dia_diem": "xa_Tan_Trieu",
+          "giay_to_nha_o": "hop_dong_thue_nha_viet_tay"
+        },
+        "missing_facts": []
+      },
+      "journey": [
+        {
+          "procedure_id": "PROC_1_116788",
+          "name": "Đăng ký thường trú",
+          "priority": 1,
+          "category": "required",
+          "status": "unknown",
+          "reason": "Khớp trực tiếp với tình huống người dùng.",
+          "depends_on": []
+        }
+      ],
+      "procedure_evidence": [
+        {
+          "procedure_id": "PROC_1_116788",
+          "name": "Đăng ký thường trú",
+          "authority": "Công an Xã",
+          "eligibility": "a) Đối với trường hợp “Đăng ký thường trú” Người thực hiện thủ tục đã được thu thập, cập nhật thông tin công dân vào Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu về cư trú. b) Đối với trường hợp “Xóa đăng ký thường trú” - Trong thời hạn 01 ngày kể từ ngày nhận được quyết định hủy bỏ đăng ký thường trú của thủ trưởng cấp trên trực tiếp hoặc ngay sau khi ra quyết định hủy bỏ đăng ký thường trú đối với công dân, cơ quan đăng ký cư trú thực hiện việc xóa đăng ký thường trú đối với công dân và cập nhật việc xóa đăng ký thường trú vào Cơ sở dữ liệu về cư trú, Cơ sở dữ liệu quốc gia về dân cư. - Trong thời hạn 01 ngày làm việc kể từ ngày Cơ sở dữ liệu quốc gia về dân cư, cơ quan đăng ký cư trú tiếp nhận thông tin phản ánh về người thuộc trường hợp bị xóa đăng ký thường trú quy định tại điểm a, đ khoản 1 Điều 24 Luật Cư trú, cơ quan đăng ký cư trú có trách nhiệm kiểm tra, xác minh, thực hiện xóa đăng ký thường trú đối với công dân và cập nhật việc xóa đăng ký thường trú vào Cơ sở dữ liệu về cư trú, Cơ sở dữ liệu quốc gia về dân cư. - Trong thời hạn 07 ngày, kể từ ngày hộ gia đình có người thuộc diện xóa đăng ký thường trú theo quy định tại điểm b, d, e, g, h, i khoản 1 Điều 24 Luật Cư trú thì người thuộc diện xóa đăng ký thường trú hoặc đại diện hộ gia đình hoặc người đại diện theo pháp luật có trách nhiệm thực hiện thủ tục xóa đăng ký thường trú. - Trường hợp người thuộc diện xóa đăng ký thường trú theo quy định tại điểm b, d, e, g, h, i khoản 1 Điều 24 Luật Cư trú mà hộ gia đình chỉ có 01 người hoặc đại diện hộ gia đình hoặc người đại diện theo pháp luật không thực hiện thủ tục xóa đăng ký thường trú thì cơ quan đăng ký cư trú có trách nhiệm kiểm tra, xác minh, lập biên bản về việc công dân, đại diện hộ gia đình không thực hiện thủ tục xóa đăng ký thường trú và thực hiện xóa đăng ký thường trú đối với công dân. - Cơ quan, đơn vị quản lý người học tập, công tác, làm việc trong lực lượng vũ trang nhân dân có văn bản đề nghị cơ quan đăng ký cư trú trên địa bàn đóng quân xóa đăng ký thường trú đối với người thuộc đơn vị mình quản lý. Văn bản đề nghị cần nêu rõ họ, chữ đệm và tên khai sinh; ngày, tháng, năm sinh; số định danh cá nhân của người thuộc trường hợp xóa đăng ký thường trú; lý do đề nghị xóa đăng ký thường trú. c) Đối với trường hợp “Tách hộ” Thành viên hộ gia đình được tách hộ để đăng ký thường trú tại cùng một nơi thường trú phải có năng lực hành vi dân sự đầy đủ; trường hợp có nhiều thành viên cùng đăng ký tách hộ để lập thành một hộ gia đình mới thì trong số các thành viên đó có ít nhất một người có năng lực hành vi dân sự đầy đủ. d) Đối với trường hợp “Điều chỉnh thông tin về cư trú trong Cơ sở dữ liệu về cư trú” Không",
+          "source_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/01a0e614-34b3-7355-929c-9f54d24e6bc0",
+          "vector_score": null,
+          "chunks": [
+            {
+              "collection": "procedures",
+              "point_id": "129",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c121_s0",
+              "chunk_type": "eligibility",
+              "step_number": null,
+              "text": "Đối tượng và điều kiện thực hiện Đăng ký thường trú (Mã: PROC_1_116788):\n- Đối tượng thực hiện: Người Việt Nam định cư ở nước ngoài, Công dân Việt Nam.\n- Yêu cầu, điều kiện thực hiện:",
+              "score": 0.5426083,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "130",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c121_s1",
+              "chunk_type": "eligibility",
+              "step_number": null,
+              "text": "a) Đối với trường hợp “Đăng ký thường trú” Người thực hiện thủ tục đã được thu thập, cập nhật thông tin công dân vào Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu về cư trú. b) Đối với trường hợp “Xóa đăng ký thường trú” - Trong thời hạn 01 ngày kể từ ngày nhận được quyết định hủy bỏ đăng ký thường trú của thủ trưởng cấp trên trực tiếp hoặc ngay sau khi ra quyết định hủy bỏ đăng ký thường trú đối với công dân, cơ quan đăng ký cư trú thực hiện việc xóa đăng ký thường trú đối với công dân và cập nhật việc xóa đăng ký thường trú vào Cơ sở dữ liệu về cư trú, Cơ sở dữ liệu quốc gia về dân cư",
+              "score": 0.53662586,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "132",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c121_s3",
+              "chunk_type": "eligibility",
+              "step_number": null,
+              "text": "- Trường hợp người thuộc diện xóa đăng ký thường trú theo quy định tại điểm b, d, e, g, h, i khoản 1 Điều 24 Luật Cư trú mà hộ gia đình chỉ có 01 người hoặc đại diện hộ gia đình hoặc người đại diện theo pháp luật không thực hiện thủ tục xóa đăng ký thường trú thì cơ quan đăng ký cư trú có trách nhiệm kiểm tra, xác minh, lập biên bản về việc công dân, đại diện hộ gia đình không thực hiện thủ tục xóa đăng ký thường trú và thực hiện xóa đăng ký thường trú đối với công dân. - Cơ quan, đơn vị quản lý người học tập, công tác, làm việc trong lực lượng vũ trang nhân dân có văn bản đề nghị cơ quan đăng ký cư trú trên địa bàn đóng quân xóa đăng ký thường trú đối với người thuộc đơn vị mình quản lý. Văn bản đề nghị cần nêu rõ họ, chữ đệm và tên khai sinh; ngày, tháng, năm sinh; số định danh cá nhân của người thuộc trường hợp xóa đăng ký thường trú; lý do đề nghị xóa đăng ký thường trú",
+              "score": 0.5363123,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "140",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c128_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Đăng ký thường trú (Mã: PROC_1_116788):\n- Thông tin chứng minh đủ diện tích nhà ở để đăng ký thường trú tại chỗ ở hợp pháp do thuê, mượn, ở nhờ được khai thác trong căn cước điện tử, tài khoản định danh điện tử trên hệ thống định danh và xác thực điện tử qua Ứng dụng định danh quốc gia hoặc trong Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu về cư trú, Hệ thống thông tin giải quyết thủ tục hành chính cấp bộ, cấp tỉnh hoặc cơ sở dữ liệu quốc gia, cơ sở dữ liệu chuyên ngành khác. Trường hợp không khai thác được thông tin thì công dân xuất trình giấy tờ, tài liệu quy định tại khoản 2 Điều 5 Nghị định số 154/2024/NĐ-CP, trong đó có thể hiện diện tích nhà ở hoặc xác nhận của Ủy ban nhân dân cấp xã về điều kiện diện tích bình quân bảo đảm theo quy định của Hội đồng nhân dân tỉnh, thành phố trực thuộc trung ương theo Mẫu số 02 ban hành kèm theo Nghị định số 58/2026/NĐ-CP ngày 13/02/2026 của Chính phủ - Số lượng: 1 Bản chính (Theo trường hợp / nếu có).",
+              "score": 0.71233976,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "152",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c140_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Đăng ký thường trú (Mã: PROC_1_116788):\n- Đối với Công an nhân dân: Giấy giới thiệu của Thủ trưởng đơn vị quản lý trực tiếp ghi rõ nội dung để làm thủ tục đăng ký thường trú và đơn vị có chỗ ở cho cán bộ chiến sĩ (ký tên, đóng dấu) - Số lượng: 1 Bản chính (Theo trường hợp / nếu có).",
+              "score": 0.647053,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "138",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c126_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Đăng ký thường trú (Mã: PROC_1_116788):\n- Tờ khai thay đổi thông tin cư trú (mẫu CT01 ban hành kèm theo Thông tư số 116/2026/TT-BCA) hoặc Tờ khai thay đổi thông tin cư trú dùng cho người Việt Nam định cư ở nước ngoài về Việt Nam sinh sống (mẫu CT02 ban hành kèm theo Thông tư số 116/2026/TT-BCA), trong đó ghi rõ ý kiến đồng ý cho đăng ký thường trú của chủ hộ, chủ sở hữu chỗ ở hợp pháp được cho thuê, cho mượn, cho ở nhờ hoặc người được ủy quyền, trừ trường hợp đã có ý kiến đồng ý bằng văn bản - Số lượng: 1 Bản chính (Theo trường hợp / nếu có).",
+              "score": 0.66371256,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "159",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c142_s5",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "- Sĩ quan, quân nhân chuyên nghiệp, công nhân, viên chức quốc phòng đã đăng ký thường trú vào nhà ở công vụ, đơn vị đóng quân khi chuyển đăng ký thường trú ra chỗ ở hợp pháp ngoài nơi nhà ở công vụ, nơi đơn vị đóng quân thì hồ sơ đăng ký thường trú tại chỗ ở mới phải kèm theo Giấy giới thiệu đăng ký thường trú của đơn vị đang công tác (ký tên và đóng dấu). - Trường hợp công dân không tự thực hiện thủ tục về cư trú thì được ủy quyền cho người khác thực hiện thủ tục về cư trú, trừ trường hợp người giám hộ, người đại diện thực hiện thủ tục về cư trú cho người được giám hộ, người được đại diện thì không phải ủy quyền - Số lượng: 1 Bản chính (Theo trường hợp / nếu có).",
+              "score": 0.63578343,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "195",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c174_s2",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "Trường hợp công dân nộp hồ sơ đăng ký thường trú và Tờ khai đề nghị xác nhận nơi thường xuyên đậu, đỗ; sử dụng phương tiện vào mục đích để ở hoặc Tờ khai xác nhận tình trạng chỗ ở hợp pháp, diện tích nhà ở tối thiểu để đăng ký thường trú, đăng ký tạm trú đến cơ quan đăng ký cư trú thì thời gian giải quyết của Ủy ban nhân dân cấp xã không tính vào thời hạn giải quyết hồ sơ đăng ký thường trú. - Thời hạn 05 ngày làm việc kể từ ngày nhận được hồ sơ đầy đủ và chính xác đối với trường hợp “Xóa đăng ký thường trú” và “Tách hộ”).",
+              "score": 0.669392,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "196",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c174_s3",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "- Hình thức: Trực tuyến. Thời gian giải quyết: 7 ngày làm việc. Lệ phí: 20,000 Việt Nam Đồng (Công dân nộp hồ sơ trực tiếp thu 20.000 đồng/lần đăng ký thường trú); 10,000 Việt Nam Đồng (Công dân nộp hồ sơ qua Cổng dịch vụ công quốc gia thu 10.000 đồng/lần đăng ký thường trú); 10,000 Việt Nam Đồng (Công dân nộp hồ sơ trực tiếp thu 10.000 đồng/lần đăng ký tách hộ); 5,000 Việt Nam Đồng (Công dân nộp hồ sơ qua Cổng dịch vụ công quốc gia thu 5.000 đồng/lần đăng ký tách hộ) (- Thời hạn 07 ngày làm việc kể từ ngày nhận được hồ sơ đầy đủ và chính xác đối với trường hợp “Đăng ký thường trú”. Trường hợp công dân nộp hồ sơ đăng ký thường trú và Tờ khai đề nghị xác nhận nơi thường xuyên đậu, đỗ; sử dụng phương tiện vào mục đích để ở hoặc Tờ khai xác nhận tình trạng chỗ ở hợp pháp, diện tích nhà ở tối thiểu để đăng ký thường trú, đăng ký tạm trú đến cơ quan đăng ký cư trú thì thời gian giải quyết của Ủy ban nhân dân cấp xã không tính vào thời hạn giải quyết hồ sơ đăng ký thường trú",
+              "score": 0.6273874,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "193",
+              "doc_id": "PROC_1_116788",
+              "chunk_id": "PROC_1_116788_c174_s0",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "Cách thức nộp hồ sơ, thời gian giải quyết và lệ phí của Đăng ký thường trú (Mã: PROC_1_116788):\nCơ quan tiếp nhận và giải quyết: Công an Xã.",
+              "score": 0.59939474,
+              "metadata": {}
+            }
+          ]
+        }
+      ],
+      "benefits": [],
+      "legal_evidence": [],
+      "source_metadata": {
+        "PROC_1_116788": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh/01a0e614-34b3-7355-929c-9f54d24e6bc0",
+          "version": "68b8db2264f6f66f26615a658feadd297af34bc61ea61347655773ab2e7ece7a",
+          "effective_date": "2026-09-15",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "ACTIVE",
+          "legal_bases": [
+            "154/2024/NĐ-CP — Nghị định quy định chi tiết một số điều và biện pháp thi hành Luật Cư trú",
+            "54/2025/TT-BCA — Thông tư số 54/2025/TT-BCA ngày 01/7/2025 của Bộ trưởng Bộ Công an quy định về quy trình đăng ký cư trú.",
+            "66.7/2025/NQ-CP — Nghị quyết số 66.7/2025/NQ-CP của Chính phủ: Quy định cắt giảm, đơn giản hóa thủ tục hành chính dựa trên dữ liệu",
+            "68/2020/QH14 — Luật Cư trú 2020",
+            "116/2026/TT-BCA — Thông tư số 116/2026/TT-BCA ngày 29/6/2026 của Bộ trưởng Bộ Công an quy định chi tiết một số điều và biện pháp thi hành Luật Cư trú",
+            "190/2021/TT-BQP — Thông tư số 190/2021/TT-BQP ngày 31/12/2021 của Bộ trưởng Bộ Quốc phòng quy định điều kiện, hồ sơ, thủ tục đăng ký thường trú, đăng ký tạm trú trong Bộ Quốc phòng.",
+            "75/2022/TT-BTC — Thông tư số 75/2022/TT-BTC của Bộ Tài chính: Quy định mức thu, chế độ thu, nộp và quản lý lệ phí đăng ký cư trú",
+            "29/2026/TT-BTC — QUY ĐỊNH MỨC THU, MIỄN MỘT SỐ KHOẢN PHÍ, LỆ PHÍ ĐỂ HỖ TRỢ VIỆC KẾT NỐI, KHAI THÁC, SỬ DỤNG DỮ LIỆU VÀ KHUYẾN KHÍCH THỰC HIỆN DỊCH VỤ CÔNG TRÊN ỨNG DỤNG VNEID"
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        }
+      },
+      "required_follow_up_questions": [
+        "Chủ sở hữu chỗ ở hợp pháp đã đồng ý bằng văn bản cho đăng ký thường trú chưa?"
+      ],
+      "contract": {
+        "procedure_ids": [
+          "PROC_1_116788"
+        ],
+        "requirements": [],
+        "required_follow_up_questions": [],
+        "workflow_id": null,
+        "submission_channel": null,
+        "processing_flow": [],
+        "enforce_step_sequence": false,
+        "required_step_numbers": {}
+      },
+      "relation_evidence": [],
+      "response_rules": {
+        "demo_scope": "Demo sự kiện sinh con; trạng thái hiệu lực luật có thể thiếu.",
+        "must_cite_claims": true,
+        "must_not_invent_procedures": true,
+        "must_mark_uncertain_benefits": true
+      }
+    }
+  },
+  "TC03": {
+    "status": "ok",
+    "latency_seconds": 28.923,
+    "answer": "Khi thực hiện thủ tục liên thông điện tử (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ em dưới 6 tuổi) trên ứng dụng VNeID 【PROC_3_000722_c180_s1】, hệ thống sẽ xử lý qua các bước cụ thể như sau:\n\n- **Bước 1:** Người yêu cầu truy cập ứng dụng VNeID, lựa chọn dịch vụ công liên thông để nộp hồ sơ trực tuyến và đóng lệ phí theo quy định 【PROC_3_000722_c180_s1】. Thông tin trong tờ khai điện tử được điền tự động từ cơ sở dữ liệu quốc gia . Trường hợp hồ sơ chưa đầy đủ, thông báo bổ sung được gửi trong vòng 24 giờ 【PROC_3_000722_c182_s2】, và người yêu cầu cần hoàn thiện trong 07 ngày làm việc 【PROC_3_000722_c182_s3】.\n- **Bước 4:** Sau khi bản điện tử Giấy khai sinh được chuyển tiếp, Cổng Dịch vụ công quốc gia chuyển hồ sơ điện tử đến Hệ thống thông tin quản lý cư trú để đăng ký thường trú và Hệ thống thông tin ngành Bảo hiểm xã hội để cấp thẻ bảo hiểm y tế 【PROC_3_000722_c183_s2】; thời gian cấp thẻ bảo hiểm y tế không quá 02 ngày làm việc 【PROC_3_000722_c183_s2】; thời gian giải quyết cấp thẻ căn cước không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử 【PROC_3_000722_c184_s0】.\n- *Lưu ý:* Nếu tiếp nhận hồ sơ sau 15 giờ, thời gian giải quyết được tính bắt đầu từ ngày làm việc tiếp theo 【PROC_3_000722_c185_s0】.",
+    "warnings": [
+      "Một số trích dẫn không xác định được trong nguồn đã truy xuất; vui lòng kiểm tra nội dung liên quan."
+    ],
+    "sources": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c182_s3",
+      "PROC_3_000722_c184_s0",
+      "PROC_3_000722_c182_s2",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c185_s0"
+    ],
+    "score": 50.0,
+    "citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c182_s2",
+      "PROC_3_000722_c182_s3",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c184_s0",
+      "PROC_3_000722_c185_s0"
+    ],
+    "missing_citations": [
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1"
+    ],
+    "missing_term_groups": [
+      [
+        "kết quả đăng ký thường trú",
+        "kết quả thường trú"
+      ],
+      [
+        "theo yêu cầu",
+        "có đề nghị",
+        "đã đề nghị",
+        "nếu đề nghị",
+        "đã yêu cầu"
+      ],
+      [
+        "3 ngày làm việc",
+        "ba ngày làm việc",
+        "ba (03) ngày làm việc"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": false,
+    "ordered_step_citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c184_s0"
+    ],
+    "fallback": false,
+    "passed_checks": 7,
+    "total_checks": 14,
+    "usage": {
+      "api_calls": 3,
+      "api_elapsed_seconds": 12.998,
+      "input_tokens": 15598,
+      "output_tokens": 1950,
+      "total_tokens": 17548
+    },
+    "context": {
+      "used_local_graph": false,
+      "used_local_vector_index": false,
+      "query": {
+        "text": "Tôi muốn làm thủ tục liên thông trên VNeID để vừa khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho con tôi dưới 6 tuổi. Các bước hệ thống xử lý như thế nào và mất bao nhiêu ngày làm việc?",
+        "conversation_id": null
+      },
+      "query_state": {
+        "life_event": "sinh_con",
+        "intent": "procedure_detail",
+        "topics": [
+          "steps",
+          "processing_time",
+          "online_method"
+        ],
+        "target": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+        "procedure_ids": [
+          "PROC_3_000722"
+        ],
+        "asks_about_dependencies": false,
+        "identity_card_requested": true,
+        "completed_ids": [],
+        "facts": {
+          "platform": "vneid",
+          "child_age": "duoi_6_tuoi"
+        },
+        "missing_facts": []
+      },
+      "journey": [
+        {
+          "procedure_id": "PROC_3_000722",
+          "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+          "priority": 1,
+          "category": "required",
+          "status": "unknown",
+          "reason": "Khớp trực tiếp với tình huống người dùng.",
+          "depends_on": []
+        }
+      ],
+      "procedure_evidence": [
+        {
+          "procedure_id": "PROC_3_000722",
+          "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+          "authority": "Công an cấp Xã",
+          "eligibility": "Không",
+          "source_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "vector_score": null,
+          "chunks": [
+            {
+              "collection": "procedures",
+              "point_id": "204",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c180_s1",
+              "chunk_type": "step_item",
+              "step_number": 1,
+              "text": "- Bước 1: Người yêu cầu truy cập vào Cổng Dịch vụ công quốc gia (tại địa chỉ dichvucong.gov.vn) hoặc trên ứng dụng VNeID, lựa chọn dịch vụ công liên thông Đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi để thực hiện nộp hồ sơ trực tuyến và lệ phí theo quy định. Các thông tin trong tờ khai điện tử được điền tự động đối với các thông tin đã có trong Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu hộ tịch, Cơ sở dữ liệu quốc gia về Bảo hiểm và cơ sở dữ liệu, hệ thống thông tin có liên quan khác. Cá nhân đăng nhập Cổng Dịch vụ công quốc gia hoặc Ứng dụng định danh quốc gia (VNeID) đề nghị giải quyết thủ tục hành chính thì không phải thực hiện ký số biểu mẫu điện tử tương tác. Thông báo hẹn trả kết quả giải quyết từng thủ tục hành chính trong quy trình liên thông được gửi cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia",
+              "score": 0.73329186,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "205",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c181_s0",
+              "chunk_type": "step_item",
+              "step_number": 2,
+              "text": "Trình tự thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722) - Bước 2:\n- Bước 2. Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công từ nền tảng thanh toán và tiến hành bóc tách thành phần hồ sơ, thực hiện chuyển hồ sơ (bao gồm biểu mẫu điện tử tương tác, các giấy tờ đính kèm) sang Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp qua Nền tảng chia sẻ và điều phối dữ liệu. Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp đồng bộ hồ sơ về Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp. Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp tiếp nhận hồ sơ và phản hồi trạng thái cho Cổng Dịch vụ công quốc gia qua Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp",
+              "score": 0.72582513,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "209",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s3",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "Trường hợp cần bổ sung thành phần hồ sơ thì người yêu cầu có trách nhiệm hoàn thiện hồ sơ trong 07 ngày làm việc, nếu quá thời hạn này không bổ sung thì người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để dừng xử lý do không bổ sung theo quy định. Thông tin về việc dừng xử lý được gửi đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia. Sau khi tiếp nhận hồ sơ đăng ký khai sinh, Chủ tịch Ủy ban nhân dân xã, phường, đặc khu đồng thời xem xét, quyết định việc hỗ trợ tài chính khi sinh con và thực hiện chi trả cho phụ nữ sinh con theo quy định pháp luật dân số",
+              "score": 0.6140264,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "211",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c183_s1",
+              "chunk_type": "step_item",
+              "step_number": 4,
+              "text": "- Bước 4. Giải quyết hồ sơ đăng ký thường trú và cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi Sau khi Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp chuyển bản điện tử Giấy khai sinh sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (bao gồm biểu mẫu, tờ khai người yêu cầu đã kê khai, bản điện tử Giấy khai sinh) đến Hệ thống thông tin quản lý cư trú để thực hiện đăng ký thường trú và Hệ thống thông tin ngành Bảo hiểm xã hội để thực hiện cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi theo quy định pháp luật liên quan. Thời gian giải quyết đăng ký thường trú không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử đối với trường hợp: con về với cha, mẹ và cha, mẹ là chủ hộ, đồng thời là chủ sở hữu chỗ ở hợp pháp; con về với cha, mẹ nhưng cha, mẹ không phải là chủ sở hữu chỗ ở hợp pháp",
+              "score": 0.8071314,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "213",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c184_s0",
+              "chunk_type": "step_item",
+              "step_number": 5,
+              "text": "Trình tự thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722) - Bước 5:\n- Bước 5. Giải quyết hồ sơ cấp thẻ căn cước cho trẻ em dưới 6 tuổi (khi người đại diện hợp pháp có đề nghị cấp thẻ căn cước cho trẻ tại bước nộp hồ sơ trực tuyến) Sau khi Hệ thống thông tin quản lý cư trú của Bộ Công an chuyển bản điện tử Thông báo kết quả giải quyết đăng ký thường trú sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (biểu mẫu, tờ khai người yêu cầu đã kê khai) đến Hệ thống sản xuất, cấp và quản lý căn cước của Bộ Công an để thực hiện cấp thẻ căn cước theo quy định của Luật Căn cước số 26/2023/QH15. Thời gian giải quyết cấp thẻ căn cước không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử trên hệ thống",
+              "score": 0.84831005,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "207",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s1",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "- Bước 3. Giải quyết hồ sơ đăng ký khai sinh và hỗ trợ kinh phí khi sinh con (nếu có) Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện nghiệp vụ đăng ký khai sinh trong 24 giờ kể từ khi Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp nhận đủ hồ sơ hợp lệ",
+              "score": 0.64358556,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "208",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s2",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "Trường hợp hồ sơ chưa đầy đủ hoặc không đủ điều kiện giải quyết: Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để gửi thông tin trạng thái hồ sơ đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp, sau đó Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia, trong đó nêu rõ lý do đối với các trường hợp hồ sơ bị từ chối giải quyết hoặc nêu rõ loại giấy tờ, nội dung cần bổ sung trong thời gian không qua 24 giờ kể từ thời điểm nhận được hồ sơ điện tử trên hệ thống",
+              "score": 0.56879985,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "212",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c183_s2",
+              "chunk_type": "step_item",
+              "step_number": 4,
+              "text": "Đối với các trường hợp khác yêu cầu phải xác minh theo quy định của Luật Cư trú thì thời hạn giải quyết không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử, thông tin xác nhận qua ứng dụng VNeID. Thời gian giải quyết cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi không quá 02 ngày làm việc, kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông",
+              "score": 0.6777885,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "214",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c185_s0",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "Cách thức nộp hồ sơ, thời gian giải quyết và lệ phí của Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\nCơ quan tiếp nhận và giải quyết: Công an cấp Xã.\n- Hình thức: Trực tuyến. Thời gian giải quyết: Xem phần mô tả ngày. Lệ phí: Miễn phí (Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền giải quyết nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc. Nếu tiếp nhận hồ sơ sau 15 giờ thì thời gian được tính bắt đầu từ ngày làm việc tiếp theo. Phí, lệ phí: Theo quy định của các TTHC tương ứng).",
+              "score": 0.74093413,
+              "metadata": {}
+            }
+          ]
+        }
+      ],
+      "benefits": [],
+      "legal_evidence": [],
+      "source_metadata": {
+        "PROC_3_000722": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "version": "7f6120790947820287ece1c62c8a5e6e1166a0ceebacab2a5cd2ef729ba31d74",
+          "effective_date": "2026-08-09",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "ACTIVE",
+          "legal_bases": [
+            "Nghị định số 301/2026/NĐ-CP — Nghị định số 301/2026/NĐ-CP ngày 30 tháng 7 năm 2026 của Chính phủ sửa đổi, bổ sung một số điều của Nghị định số 63/2024/NĐ-CP ngày 10 tháng 6 năm 2024 của Chính phủ quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi; đăng ký khai tử, xóa đăng ký thường trú, giải quyết mai táng phí, tử tuất."
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        }
+      },
+      "required_follow_up_questions": [],
+      "contract": {
+        "procedure_ids": [
+          "PROC_3_000722"
+        ],
+        "requirements": [],
+        "required_follow_up_questions": [],
+        "workflow_id": null,
+        "submission_channel": null,
+        "processing_flow": [],
+        "enforce_step_sequence": true,
+        "required_step_numbers": {
+          "PROC_3_000722": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      },
+      "relation_evidence": [],
+      "response_rules": {
+        "demo_scope": "Demo sự kiện sinh con; trạng thái hiệu lực luật có thể thiếu.",
+        "must_cite_claims": true,
+        "must_not_invent_procedures": true,
+        "must_mark_uncertain_benefits": true
+      }
+    }
+  },
+  "TC05": {
+    "status": "ok",
+    "latency_seconds": 34.471,
+    "answer": "Bạn không thể đến trực tiếp cơ quan Bảo hiểm xã hội để xin cấp thẻ BHYT riêng cho trẻ 1 tháng tuổi chưa có giấy khai sinh【PROC_3_000722_c183_s1】.\n\n### Thứ tự nên làm\nBạn cần thực hiện thủ tục qua nhóm liên thông điện tử (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi) trên Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID【PROC_3_000722_c180_s1】.\n\n### Giấy tờ và cách thực hiện\n- **Hồ sơ cần nộp:** \n  - Tờ khai điện tử (Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP)【PROC_3_000722_c176_s0】.\n  - Dữ liệu điện tử có ký số của Giấy chứng sinh được liên thông từ cơ sở khám chữa bệnh hoặc bản điện tử/bản chụp/bản điện tử giấy tờ thay thế giấy chứng sinh đính kèm trên Cổng Dịch vụ công quốc gia【PROC_3_000722_c177_s0】.\n- **Cách thực hiện:** Nộp hồ sơ trực tuyến trên Cổng Dịch vụ công quốc gia (dichvucong.gov.vn) hoặc ứng dụng VNeID【PROC_3_000722_c180_s1】.\n- **Cơ quan tiếp nhận và giải quyết:** Công an cấp Xã (tiếp nhận chung)【PROC_3_000722_c185_s0】.\n- **Thời gian giải quyết:** \n  - Thời gian toàn bộ quy trình liên thông: 03 ngày làm việc kể từ khi các cơ quan có thẩm quyền nhận đủ hồ sơ, trường hợp phải xác minh thì không quá 05 ngày làm việc (nếu tiếp nhận sau 15 giờ thì tính từ ngày làm việc tiếp theo)【PROC_3_000722_c185_s0】.\n  - Riêng thời gian cấp thẻ bảo hiểm y tế: Không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông【PROC_3_000722_c183_s2】.\n- **Lệ phí:** Miễn phí (phí, lệ phí khác theo quy định của các thủ tục hành chính tương ứng)【PROC_3_000722_c185_s0】.",
+    "warnings": [],
+    "sources": [
+      "PROC_3_000722_c177_s0",
+      "PROC_3_000722_c176_s0",
+      "PROC_3_000722_c185_s0",
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c183_s2"
+    ],
+    "score": 87.5,
+    "citations": [
+      "PROC_3_000722_c176_s0",
+      "PROC_3_000722_c177_s0",
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c185_s0"
+    ],
+    "missing_citations": [],
+    "missing_term_groups": [
+      [
+        "có thể nộp hồ sơ liên thông ngay",
+        "có thể nộp ngay qua vneid",
+        "có thể nộp ngay qua cổng dịch vụ công quốc gia"
+      ],
+      [
+        "giấy khai sinh điện tử",
+        "bản điện tử giấy khai sinh"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [],
+    "fallback": false,
+    "passed_checks": 14,
+    "total_checks": 16,
+    "usage": {
+      "api_calls": 3,
+      "api_elapsed_seconds": 13.998,
+      "input_tokens": 18505,
+      "output_tokens": 1470,
+      "total_tokens": 19975
+    },
+    "context": {
+      "used_local_graph": false,
+      "used_local_vector_index": false,
+      "query": {
+        "text": "Con tôi 1 tháng tuổi chưa làm giấy khai sinh, giờ cháu đang bị ốm cần đi viện. Tôi có thể đến cơ quan Bảo hiểm xã hội xin cấp thẻ BHYT trước cho cháu được không? Cơ quan nào cấp và thời gian giải quyết là bao lâu?",
+        "conversation_id": null
+      },
+      "query_state": {
+        "life_event": "sinh_con",
+        "intent": "procedure_detail",
+        "topics": [
+          "procedures",
+          "documents",
+          "authority",
+          "processing_time",
+          "eligibility"
+        ],
+        "target": "cấp thẻ bảo hiểm y tế",
+        "procedure_ids": [
+          "PROC_1_014137"
+        ],
+        "asks_about_dependencies": true,
+        "identity_card_requested": null,
+        "completed_ids": [],
+        "facts": {
+          "tuoi_cua_tre": "1 tháng tuổi",
+          "tinh_trang_khai_sinh": "chưa làm",
+          "tinh_trang_suc_khoe": "ốm cần đi viện"
+        },
+        "missing_facts": []
+      },
+      "journey": [
+        {
+          "procedure_id": "PROC_3_000722",
+          "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+          "priority": 1,
+          "category": "required",
+          "status": "unknown",
+          "reason": "Khớp trực tiếp với tình huống người dùng.",
+          "depends_on": []
+        }
+      ],
+      "procedure_evidence": [
+        {
+          "procedure_id": "PROC_3_000722",
+          "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+          "authority": "Công an cấp Xã",
+          "eligibility": "Không",
+          "source_url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "vector_score": null,
+          "chunks": [
+            {
+              "collection": "procedures",
+              "point_id": "200",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c177_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\n- Dữ liệu điện tử có ký số của Giấy chứng sinh được liên thông từ cơ sở khám bệnh, chữa bệnh với Cổng Dịch vụ công quốc gia hoặc bản điện tử Giấy chứng sinh do người yêu cầu đăng ký khai sinh đính kèm trên Cổng Dịch vụ công quốc gia. Trường hợp không có giấy chứng sinh thì người yêu cầu đăng ký khai sinh có thể đính kèm bản chụp hoặc bản điện tử giấy tờ thay giấy chứng sinh theo quy định pháp luật về hộ tịch - Số lượng: 1 Bản chính, 1 Bản sao (Theo trường hợp / nếu có).",
+              "score": 0.6263713,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "201",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c178_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\n- Trường hợp đăng ký thường trú cho trẻ em khác nơi thường trú của cha, mẹ (nếu được cha, mẹ đồng ý) thì đính kèm các thành phần hồ sơ theo quy định pháp luật về cư trú - Số lượng: 1 Bản chính, 1 Bản sao (Theo trường hợp / nếu có).",
+              "score": 0.58829653,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "199",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c176_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\n- Tờ khai điện tử (Mẫu số 01 kèm theo Nghị định số 301/2026/NĐ-CP) - Số lượng: 1 Bản chính, 1 Bản sao (Theo trường hợp / nếu có).",
+              "score": 0.5764226,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "202",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c179_s0",
+              "chunk_type": "document_item",
+              "step_number": null,
+              "text": "Thành phần hồ sơ cần nộp để thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\n- Các thành phần hồ sơ trên là bản giấy thì phải thực hiện số hóa theo quy định tại Nghị định số 118/2025/NĐ-CP, được sửa đổi, bổ sung bởi Nghị định số 367/2025/NĐ-CP ngày 31 tháng 12 năm 2025 - Số lượng: Theo quy định (Theo trường hợp / nếu có).",
+              "score": 0.5548749,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "214",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c185_s0",
+              "chunk_type": "execution_methods",
+              "step_number": null,
+              "text": "Cách thức nộp hồ sơ, thời gian giải quyết và lệ phí của Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\nCơ quan tiếp nhận và giải quyết: Công an cấp Xã.\n- Hình thức: Trực tuyến. Thời gian giải quyết: Xem phần mô tả ngày. Lệ phí: Miễn phí (Ba (03) ngày làm việc kể từ khi các cơ quan có thẩm quyền giải quyết nhận đầy đủ hồ sơ theo quy định, trường hợp phải xác minh thì không quá năm (05) ngày làm việc. Nếu tiếp nhận hồ sơ sau 15 giờ thì thời gian được tính bắt đầu từ ngày làm việc tiếp theo. Phí, lệ phí: Theo quy định của các TTHC tương ứng).",
+              "score": 0.55868465,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "198",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c175_s0",
+              "chunk_type": "eligibility",
+              "step_number": null,
+              "text": "Đối tượng và điều kiện thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722):\n- Đối tượng thực hiện: Công dân Việt Nam.",
+              "score": 0.59144884,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "204",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c180_s1",
+              "chunk_type": "step_item",
+              "step_number": 1,
+              "text": "- Bước 1: Người yêu cầu truy cập vào Cổng Dịch vụ công quốc gia (tại địa chỉ dichvucong.gov.vn) hoặc trên ứng dụng VNeID, lựa chọn dịch vụ công liên thông Đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi để thực hiện nộp hồ sơ trực tuyến và lệ phí theo quy định. Các thông tin trong tờ khai điện tử được điền tự động đối với các thông tin đã có trong Cơ sở dữ liệu quốc gia về dân cư, Cơ sở dữ liệu hộ tịch, Cơ sở dữ liệu quốc gia về Bảo hiểm và cơ sở dữ liệu, hệ thống thông tin có liên quan khác. Cá nhân đăng nhập Cổng Dịch vụ công quốc gia hoặc Ứng dụng định danh quốc gia (VNeID) đề nghị giải quyết thủ tục hành chính thì không phải thực hiện ký số biểu mẫu điện tử tương tác. Thông báo hẹn trả kết quả giải quyết từng thủ tục hành chính trong quy trình liên thông được gửi cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia",
+              "score": 0.5059997,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "205",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c181_s0",
+              "chunk_type": "step_item",
+              "step_number": 2,
+              "text": "Trình tự thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722) - Bước 2:\n- Bước 2. Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công từ nền tảng thanh toán và tiến hành bóc tách thành phần hồ sơ, thực hiện chuyển hồ sơ (bao gồm biểu mẫu điện tử tương tác, các giấy tờ đính kèm) sang Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp qua Nền tảng chia sẻ và điều phối dữ liệu. Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp đồng bộ hồ sơ về Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp. Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp tiếp nhận hồ sơ và phản hồi trạng thái cho Cổng Dịch vụ công quốc gia qua Hệ thống thông tin giải quyết TTHC của Bộ Tư pháp",
+              "score": 0.41380906,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "207",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s1",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "- Bước 3. Giải quyết hồ sơ đăng ký khai sinh và hỗ trợ kinh phí khi sinh con (nếu có) Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện nghiệp vụ đăng ký khai sinh trong 24 giờ kể từ khi Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp nhận đủ hồ sơ hợp lệ",
+              "score": 0.44901133,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "208",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s2",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "Trường hợp hồ sơ chưa đầy đủ hoặc không đủ điều kiện giải quyết: Người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để gửi thông tin trạng thái hồ sơ đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp, sau đó Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia, trong đó nêu rõ lý do đối với các trường hợp hồ sơ bị từ chối giải quyết hoặc nêu rõ loại giấy tờ, nội dung cần bổ sung trong thời gian không qua 24 giờ kể từ thời điểm nhận được hồ sơ điện tử trên hệ thống",
+              "score": 0.3358942,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "209",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c182_s3",
+              "chunk_type": "step_item",
+              "step_number": 3,
+              "text": "Trường hợp cần bổ sung thành phần hồ sơ thì người yêu cầu có trách nhiệm hoàn thiện hồ sơ trong 07 ngày làm việc, nếu quá thời hạn này không bổ sung thì người thực hiện công tác hộ tịch tại Ủy ban nhân dân cấp xã thực hiện thao tác trên Hệ thống đăng ký, quản lý hộ tịch điện tử của Bộ Tư pháp để dừng xử lý do không bổ sung theo quy định. Thông tin về việc dừng xử lý được gửi đến Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để thông báo cho người yêu cầu qua Cổng Dịch vụ công quốc gia hoặc ứng dụng VNeID hoặc gửi tin nhắn điện thoại tự động của Cổng Dịch vụ công quốc gia. Sau khi tiếp nhận hồ sơ đăng ký khai sinh, Chủ tịch Ủy ban nhân dân xã, phường, đặc khu đồng thời xem xét, quyết định việc hỗ trợ tài chính khi sinh con và thực hiện chi trả cho phụ nữ sinh con theo quy định pháp luật dân số",
+              "score": 0.41420352,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "211",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c183_s1",
+              "chunk_type": "step_item",
+              "step_number": 4,
+              "text": "- Bước 4. Giải quyết hồ sơ đăng ký thường trú và cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi Sau khi Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp chuyển bản điện tử Giấy khai sinh sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (bao gồm biểu mẫu, tờ khai người yêu cầu đã kê khai, bản điện tử Giấy khai sinh) đến Hệ thống thông tin quản lý cư trú để thực hiện đăng ký thường trú và Hệ thống thông tin ngành Bảo hiểm xã hội để thực hiện cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi theo quy định pháp luật liên quan. Thời gian giải quyết đăng ký thường trú không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử đối với trường hợp: con về với cha, mẹ và cha, mẹ là chủ hộ, đồng thời là chủ sở hữu chỗ ở hợp pháp; con về với cha, mẹ nhưng cha, mẹ không phải là chủ sở hữu chỗ ở hợp pháp",
+              "score": 0.5605931,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "212",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c183_s2",
+              "chunk_type": "step_item",
+              "step_number": 4,
+              "text": "Đối với các trường hợp khác yêu cầu phải xác minh theo quy định của Luật Cư trú thì thời hạn giải quyết không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử, thông tin xác nhận qua ứng dụng VNeID. Thời gian giải quyết cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi không quá 02 ngày làm việc, kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông",
+              "score": 0.4980756,
+              "metadata": {}
+            },
+            {
+              "collection": "procedures",
+              "point_id": "213",
+              "doc_id": "PROC_3_000722",
+              "chunk_id": "PROC_3_000722_c184_s0",
+              "chunk_type": "step_item",
+              "step_number": 5,
+              "text": "Trình tự thực hiện Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi (Mã: PROC_3_000722) - Bước 5:\n- Bước 5. Giải quyết hồ sơ cấp thẻ căn cước cho trẻ em dưới 6 tuổi (khi người đại diện hợp pháp có đề nghị cấp thẻ căn cước cho trẻ tại bước nộp hồ sơ trực tuyến) Sau khi Hệ thống thông tin quản lý cư trú của Bộ Công an chuyển bản điện tử Thông báo kết quả giải quyết đăng ký thường trú sang Cổng Dịch vụ công quốc gia, sau đó Cổng Dịch vụ công quốc gia phân tách, chuyển hồ sơ điện tử (biểu mẫu, tờ khai người yêu cầu đã kê khai) đến Hệ thống sản xuất, cấp và quản lý căn cước của Bộ Công an để thực hiện cấp thẻ căn cước theo quy định của Luật Căn cước số 26/2023/QH15. Thời gian giải quyết cấp thẻ căn cước không quá 05 ngày làm việc kể từ ngày nhận được hồ sơ điện tử trên hệ thống",
+              "score": 0.55229294,
+              "metadata": {}
+            }
+          ]
+        }
+      ],
+      "benefits": [],
+      "legal_evidence": [],
+      "source_metadata": {
+        "PROC_3_000722": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "version": "7f6120790947820287ece1c62c8a5e6e1166a0ceebacab2a5cd2ef729ba31d74",
+          "effective_date": "2026-08-09",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "ACTIVE",
+          "legal_bases": [
+            "Nghị định số 301/2026/NĐ-CP — Nghị định số 301/2026/NĐ-CP ngày 30 tháng 7 năm 2026 của Chính phủ sửa đổi, bổ sung một số điều của Nghị định số 63/2024/NĐ-CP ngày 10 tháng 6 năm 2024 của Chính phủ quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi; đăng ký khai tử, xóa đăng ký thường trú, giải quyết mai táng phí, tử tuất."
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        }
+      },
+      "required_follow_up_questions": [],
+      "contract": {
+        "procedure_ids": [
+          "PROC_1_014137"
+        ],
+        "requirements": [],
+        "required_follow_up_questions": [],
+        "workflow_id": "PROC_3_000722",
+        "submission_channel": null,
+        "processing_flow": [],
+        "enforce_step_sequence": false,
+        "required_step_numbers": {}
+      },
+      "relation_evidence": [],
+      "response_rules": {
+        "demo_scope": "Demo sự kiện sinh con; trạng thái hiệu lực luật có thể thiếu.",
+        "must_cite_claims": true,
+        "must_not_invent_procedures": true,
+        "must_mark_uncertain_benefits": true
+      }
+    }
+  }
+}

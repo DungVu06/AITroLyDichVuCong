@@ -286,6 +286,14 @@ class AnswerDraft(StrictModel):
     benefit_assessments: list[BenefitAssessmentDraft] = Field(default_factory=list)
 
 
+class AnswerRefinementDraft(StrictModel):
+    """Câu trả lời đã được đối chiếu với context."""
+
+    answer_markdown: str = Field(min_length=1)
+    warnings: list[str] = Field(default_factory=list)
+    follow_up_questions: list[str] = Field(default_factory=list, max_length=3)
+
+
 class AnswerRepairDraft(StrictModel):
     answer_markdown: str = Field(min_length=1)
 

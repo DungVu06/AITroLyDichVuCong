@@ -10,6 +10,7 @@ from rag.core.schemas import (
     AnswerContext,
     AnswerDraft,
     AnswerRepairDraft,
+    AnswerRefinementDraft,
     AnswerValidationResult,
     BenefitEvidence,
     EligibilityStatus,
@@ -162,12 +163,24 @@ def _apply_benefit_assessments(
     return benefits, list(dict.fromkeys(questions))[:3]
 
 
-def filter_sources_to_citations(response: RAGResponse) -> RAGResponse:
-    """The UI shows only source records that the answer actually cites."""
+def filter_sources_to_citations(
+    response: RAGResponse,
+    context: AnswerContext | None = None,
+) -> RAGResponse:
+    """Giữ nguồn đã trích dẫn và metadata của thủ tục chứa chunk được trích."""
     cited = set(CITATION_PATTERN.findall(response.answer_markdown))
-    return response.model_copy(
-        update={"sources": [source for source in response.sources if source.source_id in cited]}
-    )
+    procedure_ids = {
+        procedure.procedure_id
+        for procedure in (context.procedure_evidence if context else [])
+        if any(chunk.chunk_id in cited for chunk in procedure.chunks)
+    }
+    return response.model_copy(update={
+        "sources": [
+            source for source in response.sources
+            if source.source_id in cited
+            or (source.source_type == "procedure" and source.source_id in procedure_ids)
+        ]
+    })
 
 
 def _ensure_procedure_citations(markdown: str, context: AnswerContext) -> str:
@@ -231,8 +244,7 @@ def generate_answer(
     if not interaction.output_text:
         raise RuntimeError("Gemini không trả về câu trả lời.")
     draft = AnswerDraft.model_validate_json(interaction.output_text)
-    answer_markdown = _ensure_procedure_citations(draft.answer_markdown, context)
-    answer_markdown = _normalize_citations(answer_markdown)
+    answer_markdown = _normalize_citations(draft.answer_markdown)
     benefits, follow_up_questions = _apply_benefit_assessments(context, draft)
     return RAGResponse(
         answer_markdown=answer_markdown,
@@ -284,3 +296,53 @@ def repair_answer_with_gemini(
     markdown = _ensure_procedure_citations(draft.answer_markdown, context)
     markdown = _normalize_citations(markdown)
     return response.model_copy(update={"answer_markdown": markdown})
+
+
+def refine_answer(
+    response: RAGResponse,
+    context: AnswerContext,
+    settings: GeminiSettings | None = None,
+) -> RAGResponse:
+    """Đối chiếu và chỉnh nhẹ câu trả lời bằng chính evidence đã truy xuất."""
+    from google import genai
+
+    instructions = (PROMPT_PATH.parent / "answer_refinement.md").read_text(encoding="utf-8").strip()
+    prompt = (
+        f"{instructions}\n\n"
+        f"DRAFT_RESPONSE:\n{response.model_dump_json(indent=2, exclude_none=True)}\n\n"
+        f"ANSWER_CONTEXT:\n{context.model_dump_json(indent=2, exclude_none=True)}"
+    )
+    active_settings = settings or GeminiSettings.from_env()
+    client = genai.Client(api_key=active_settings.api_key)
+    interaction = client.interactions.create(
+        model=active_settings.model,
+        input=prompt,
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": AnswerRefinementDraft.model_json_schema(),
+        },
+    )
+    if not interaction.output_text:
+        raise RuntimeError("Gemini không trả về nội dung đối chiếu.")
+    draft = AnswerRefinementDraft.model_validate_json(interaction.output_text)
+    markdown = _normalize_citations(draft.answer_markdown)
+    available = {source.source_id for source in response.sources}
+    missing_ids = set()
+
+    def resolve_citation(match: re.Match[str]) -> str:
+        source_id = match.group(1).strip()
+        if source_id in available:
+            return f"【{source_id}】"
+        missing_ids.add(source_id)
+        return ""
+
+    markdown = CITATION_PATTERN.sub(resolve_citation, markdown)
+    warnings = list(dict.fromkeys([*response.warnings, *draft.warnings]))
+    if missing_ids:
+        warnings.append("Một số trích dẫn không xác định được trong nguồn đã truy xuất; vui lòng kiểm tra nội dung liên quan.")
+    return response.model_copy(update={
+        "answer_markdown": markdown,
+        "warnings": warnings,
+        "follow_up_questions": list(dict.fromkeys(draft.follow_up_questions))[:3],
+    })

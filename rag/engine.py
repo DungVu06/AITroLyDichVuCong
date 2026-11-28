@@ -7,7 +7,6 @@ import json
 import logging
 import sys
 import socket
-import unicodedata
 from typing import Literal
 
 from neo4j.exceptions import ServiceUnavailable, SessionExpired
@@ -21,8 +20,7 @@ from rag.pipeline.benefits import resolve_benefits
 from rag.pipeline.context import build_answer_context
 from rag.core.conversation import InMemoryConversationStore
 from rag.core.transcript import ConversationTranscriptStore
-from rag.generation.answer import filter_sources_to_citations, generate_answer, repair_answer_with_gemini
-from rag.generation.validator import repair_procedure_citations, validate_answer
+from rag.generation.answer import filter_sources_to_citations, generate_answer, refine_answer
 from rag.pipeline.journey import build_journey, select_workflow, workflow_transfer_evidence
 from rag.pipeline.preprocessing import preprocess_query
 from rag.pipeline.query_understanding import understand_query
@@ -323,179 +321,6 @@ def build_context(
     return context
 
 
-def _graph_linked_filing_decision(context: AnswerContext) -> str | None:
-    """Render the graph-only consequence of a documented workflow transfer.
-
-    The statement is produced from the structured edge, not guessed by the LLM.
-    It applies only where the user's missing item is the intermediate result that
-    the linked workflow itself transfers after submission.
-    """
-    if not (context.contract.workflow_id and context.contract.submission_channel):
-        return None
-    def folded(value: str) -> str:
-        return "".join(
-            character
-            for character in unicodedata.normalize("NFD", value.casefold())
-            if unicodedata.category(character) != "Mn"
-        ).replace("đ", "d")
-
-    question = folded(context.query.text)
-    if not any(marker in question for marker in ("chua", "khong co", "thieu")):
-        return None
-
-    def is_missing_transferred_result(item: RelationEvidence) -> bool:
-        if not item.transferred_result or item.target_id not in context.contract.procedure_ids:
-            return False
-        # Match the stable human-readable core of the transferred result. For
-        # example, a user saying "chưa có giấy khai sinh" matches "Giấy khai
-        # sinh điện tử" but a missing input such as "Giấy chứng sinh" does not.
-        result_core = folded(item.transferred_result).replace("dien tu", "").replace("ban ", "")
-        return " ".join(result_core.split()) in question
-
-    relation = next((item for item in context.relation_evidence if is_missing_transferred_result(item)), None)
-    if not relation or not relation.transferred_result:
-        return None
-    result = relation.transferred_result
-
-    submission_requirement = next(
-        (item for item in context.contract.requirements if item.claim_id == "linked_submission"),
-        None,
-    )
-    if not submission_requirement:
-        return None
-    submission_chunk = next(
-        (
-            chunk
-            for procedure in context.procedure_evidence
-            for chunk in procedure.chunks
-            if chunk.doc_id == submission_requirement.procedure_id
-            and chunk.chunk_type == submission_requirement.chunk_type
-            and chunk.step_number == submission_requirement.step_number
-            and chunk.chunk_id
-        ),
-        None,
-    )
-    if not submission_chunk:
-        return None
-
-    return (
-        f"Bạn có thể nộp hồ sơ liên thông ngay qua VNeID hoặc Cổng Dịch vụ công quốc gia; "
-        f"không cần có sẵn {result}. Sau khi tiếp nhận hồ sơ, hệ thống tự chuyển "
-        f"{result} để xử lý thủ tục đích. 【{submission_chunk.chunk_id}】 "
-        f"【{relation.citation_id}】"
-    )
-
-
-def _with_graph_linked_filing_decision(response: RAGResponse, context: AnswerContext) -> RAGResponse:
-    decision = _graph_linked_filing_decision(context)
-    if not decision or "có thể nộp hồ sơ liên thông ngay" in response.answer_markdown.casefold():
-        return response
-    return response.model_copy(update={"answer_markdown": f"{decision}\n\n{response.answer_markdown}"})
-
-
-def _fallback_response(response: RAGResponse, context: AnswerContext) -> RAGResponse:
-    lines = []
-    decision = _graph_linked_filing_decision(context)
-    if decision:
-        lines.extend([decision, ""])
-    lines.extend(["## Hướng dẫn theo thông tin đã kiểm chứng", "", "### Thứ tự thủ tục"])
-    for item in response.journey:
-        optional = f" ({item.reason})" if item.category == "optional" and item.reason else ""
-        lines.append(f"- Ưu tiên {item.priority}: **{item.name}**{optional} 【{item.procedure_id}】")
-
-    chunk_index = {
-        chunk.chunk_id: chunk
-        for procedure in context.procedure_evidence
-        for chunk in procedure.chunks
-        if chunk.chunk_id
-    }
-    lines.append("\n### Nội dung đã đối chiếu")
-    rendered = set()
-    for requirement in context.contract.requirements:
-        if requirement.relation_type:
-            relation = next((item for item in context.relation_evidence
-                             if item.relationship_type == requirement.relation_type
-                             and item.source_id == requirement.procedure_id
-                             and (requirement.target_procedure_id is None
-                                  or item.target_id == requirement.target_procedure_id)), None)
-            if relation:
-                reference = (
-                    f" (Bước {relation.evidence_step} trong quy trình liên thông)"
-                    if context.contract.workflow_id else ""
-                )
-                lines.append(f"- {relation.text}{reference} 【{relation.citation_id}】")
-                rendered.add(requirement.claim_id)
-            continue
-        candidates = [
-            chunk for chunk in chunk_index.values()
-            if chunk.doc_id == requirement.procedure_id
-            and chunk.chunk_type == requirement.chunk_type
-            and (requirement.step_number is None or chunk.step_number == requirement.step_number)
-            and not any(term.casefold() in chunk.text.casefold() for term in requirement.excluded_terms)
-            and all(term.casefold() in chunk.text.casefold() for term in requirement.required_terms)
-        ]
-        if candidates:
-            chunk = candidates[0]
-            content = (
-                context.contract.submission_channel
-                if requirement.claim_id == "linked_submission"
-                else " ".join(chunk.text.split())
-            )
-            lines.append(f"- **{requirement.label}:** {content} 【{chunk.chunk_id}】")
-            rendered.add(requirement.claim_id)
-
-    for procedure_id, expected_steps in context.contract.required_step_numbers.items():
-        for number in expected_steps:
-            chunk = next((item for item in chunk_index.values()
-                          if item.doc_id == procedure_id and item.chunk_type == "step_item"
-                          and item.step_number == number), None)
-            if chunk and not any(f"【{chunk.chunk_id}】" in line for line in lines):
-                lines.append(f"- {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
-
-    # There may be no formal contract for a normal question. Keep a restrained
-    # answer based on the best retrieved evidence in that case only.
-    if not rendered:
-        for procedure in context.procedure_evidence:
-            selected = [c for c in procedure.chunks if c.chunk_id]
-            if selected:
-                lines.append(f"### {procedure.name} 【{procedure.procedure_id}】")
-                for chunk in selected[:4]:
-                    lines.append(f"- {' '.join(chunk.text.split())} 【{chunk.chunk_id}】")
-    for item in context.legal_evidence:
-        if not item.text:
-            lines.append(f"- {item.heading or item.law_id}: chưa có nội dung đã xác minh để áp dụng. 【{item.section_id}】")
-        else:
-            lines.append(f"- {' '.join(item.text.split())[:800]} 【{item.section_id}】")
-    if len(lines) == 1:
-        lines = ["Chưa có nội dung đã xác minh để hướng dẫn cho tình huống này."]
-
-    if response.benefits:
-        lines.extend(["", "## Quyền lợi có thể liên quan"])
-    for benefit in response.benefits:
-        evidence = benefit.legal_evidence[0] if benefit.legal_evidence else None
-        citation = f" 【{evidence.section_id}】" if evidence else ""
-        if not citation and benefit.related_procedure_id in {s.source_id for s in response.sources}:
-            citation = f" 【{benefit.related_procedure_id}】"
-        lines.append(
-            f"- **{benefit.title}** có thể liên quan, nhưng chưa đủ dữ kiện "
-            f"để kết luận điều kiện hưởng.{citation}"
-        )
-
-    warnings = list(response.warnings)
-    warnings.append("Đã dùng câu trả lời dự phòng vì hậu kiểm bản chi tiết không đạt.")
-    if any("trạng thái hiệu lực" in warning.casefold() for warning in warnings):
-        lines.extend(
-            [
-                "",
-                "> **Lưu ý:** Dữ liệu nguồn chưa cung cấp trạng thái hiệu lực "
-                "của một số văn bản pháp luật.",
-            ]
-        )
-    return response.model_copy(
-        update={"answer_markdown": "\n".join(lines), "warnings": warnings}
-    )
-
-
 def _generate_validated_response(context: AnswerContext) -> RAGResponse:
     if not (context.procedure_evidence or context.legal_evidence or context.benefits):
         questions = [f.question for f in context.query_state.missing_facts if f.question]
@@ -506,30 +331,12 @@ def _generate_validated_response(context: AnswerContext) -> RAGResponse:
             follow_up_questions=[] if outside else questions[:3] or ["Bạn muốn tra cứu thủ tục cụ thể nào?"],
         )
     response = generate_answer(context)
-    validation = validate_answer(response, context)
-
-    if not validation.is_valid:
-        response = repair_procedure_citations(response, validation)
-        validation = validate_answer(response, context)
-
-    if not validation.is_valid:
-        response = repair_answer_with_gemini(response, validation, context)
-        validation = validate_answer(response, context)
-
-    if not validation.is_valid:
-        logging.getLogger(__name__).warning("Answer fallback after repair: %s", [i.code for i in validation.issues])
-        response = _fallback_response(response, context)
-        validation = validate_answer(response, context)
-        if not validation.is_valid:
-            raise RuntimeError("Không thể tạo câu trả lời vượt qua hậu kiểm.")
-    for issue in validation.issues:
-        if issue.severity == "warning":
-            message = issue.message
-            if issue.excerpt:
-                message += f" — {issue.excerpt}"
-            if message not in response.warnings:
-                response.warnings.append(message)
-    return response
+    try:
+        return refine_answer(response, context)
+    except Exception:
+        logging.getLogger(__name__).exception("Không thể đối chiếu câu trả lời bằng LLM")
+        response.warnings.append("Chưa thể đối chiếu câu trả lời với nguồn. Vui lòng kiểm tra lại các thông tin trước khi sử dụng.")
+        return response
 
 
 class RAGEngine:
@@ -576,7 +383,7 @@ class RAGEngine:
             response.warnings.append("Lượt này dùng quan hệ từ bộ dữ liệu cục bộ của dự án.")
         if context.used_local_vector_index:
             response.warnings.append("Không kết nối được Qdrant Cloud. Lượt này dùng chỉ mục Qdrant từ dữ liệu local của dự án.")
-        response = filter_sources_to_citations(response)
+        response = filter_sources_to_citations(response, context)
 
         if conversation_id:
             self.conversation_store.put(

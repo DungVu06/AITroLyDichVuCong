@@ -1,0 +1,283 @@
+{
+  "draft": {
+    "answer_markdown": "Để thực hiện nhóm thủ tục hành chính liên thông (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ dưới 6 tuổi) trên ứng dụng VNeID, hệ thống sẽ xử lý qua các bước tuần tự như sau:\n\n- **Bước 1:** Người yêu cầu truy cập vào ứng dụng VNeID (hoặc Cổng Dịch vụ công quốc gia), lựa chọn dịch vụ công liên thông để nộp hồ sơ trực tuyến và đóng lệ phí theo quy định 【PROC_3_000722_c180_s1】. Thông tin trên tờ khai điện tử sẽ được điền tự động từ các cơ sở dữ liệu quốc gia và chuyên ngành 【PROC_3_000722_c180_s1】.\n- **Bước 2:** Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công, bóc tách thành phần hồ sơ và chuyển sang Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để đồng bộ về Hệ thống đăng ký, quản lý hộ tịch điện tử 【PROC_3_000722_c181_s0】.\n- **Bước 3:** Cán bộ tư pháp tại Ủy ban nhân dân cấp xã giải quyết thủ tục đăng ký khai sinh trong thời gian không quá 24 giờ kể từ khi hệ thống nhận đủ hồ sơ hợp lệ, đồng thời xem xét hỗ trợ kinh phí khi sinh con (nếu có) 【PROC_3_000722_c182_s1】, 【PROC_3_000722_c182_s2】. Trường hợp hồ sơ chưa đầy đủ, người yêu cầu sẽ nhận được thông báo bổ sung trong vòng 24 giờ và có 07 ngày làm việc để hoàn thiện 【PROC_3_000722_c182_s2】, 【PROC_3_000722_c182_s3】.\n- **Bước 4:** Sau khi bản điện tử Giấy khai sinh được chuyển lên Cổng Dịch vụ công quốc gia, hệ thống sẽ tiếp tục chuyển đến Hệ thống thông tin quản lý cư trú để đăng ký thường trú và Hệ thống ngành Bảo hiểm xã hội để cấp thẻ bảo hiểm y tế 【PROC_3_000722_c183_s1】.\n- **Bước 5:** Khi có kết quả đăng ký thường trú, hệ thống sẽ chuyển dữ liệu sang hệ thống của Bộ Công an để thực hiện cấp thẻ căn cước cho trẻ theo đề nghị ban đầu của người đại diện 【PROC_3_000722_c184_s0】.\n\n**Thời gian giải quyết:** \n- Thời gian chung của toàn bộ quy trình: Thông thường là 03 ngày làm việc kể từ khi cơ quan có thẩm quyền nhận đủ hồ sơ hợp lệ; trường hợp phải xác minh thì thời gian không quá 05 ngày làm việc 【PROC_3_000722_c185_s0】.\n- Lưu ý về thời gian nộp: Nếu hồ sơ được tiếp nhận sau 15 giờ, thời gian giải quyết sẽ được tính bắt đầu từ ngày làm việc tiếp theo 【PROC_3_000722_c185_s0】.",
+    "journey": [
+      {
+        "procedure_id": "PROC_3_000722",
+        "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+        "priority": 1,
+        "category": "required",
+        "status": "unknown",
+        "reason": "Khớp trực tiếp với tình huống người dùng.",
+        "depends_on": []
+      }
+    ],
+    "benefits": [],
+    "follow_up_questions": [],
+    "sources": [
+      {
+        "metadata": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "version": "7f6120790947820287ece1c62c8a5e6e1166a0ceebacab2a5cd2ef729ba31d74",
+          "effective_date": "2026-08-09",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "ACTIVE",
+          "legal_bases": [
+            "Nghị định số 301/2026/NĐ-CP — Nghị định số 301/2026/NĐ-CP ngày 30 tháng 7 năm 2026 của Chính phủ sửa đổi, bổ sung một số điều của Nghị định số 63/2024/NĐ-CP ngày 10 tháng 6 năm 2024 của Chính phủ quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi; đăng ký khai tử, xóa đăng ký thường trú, giải quyết mai táng phí, tử tuất."
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        },
+        "source_type": "procedure",
+        "source_id": "PROC_3_000722",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c180_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c181_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s3",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c183_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c184_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s2",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c183_s2",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c185_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – execution_methods",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      }
+    ],
+    "warnings": []
+  },
+  "final": {
+    "answer_markdown": "Để thực hiện nhóm thủ tục hành chính liên thông (đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế và cấp thẻ căn cước cho trẻ dưới 6 tuổi) trên ứng dụng VNeID, hệ thống sẽ xử lý qua các bước tuần tự như sau:\n\n- **Bước 1:** Người yêu cầu truy cập vào ứng dụng VNeID (hoặc Cổng Dịch vụ công quốc gia), lựa chọn dịch vụ công liên thông để nộp hồ sơ trực tuyến và đóng lệ phí theo quy định 【PROC_3_000722_c180_s1】. Thông tin trên tờ khai điện tử sẽ được điền tự động từ các cơ sở dữ liệu quốc gia và chuyên ngành 【PROC_3_000722_c180_s1】.\n- **Bước 2:** Cổng Dịch vụ công quốc gia nhận thông tin thanh toán thành công, bóc tách thành phần hồ sơ và chuyển sang Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để đồng bộ về Hệ thống đăng ký, quản lý hộ tịch điện tử 【PROC_3_000722_c181_s0】.\n- **Bước 3:** Cán bộ tư pháp tại Ủy ban nhân dân cấp xã giải quyết thủ tục đăng ký khai sinh trong thời gian không quá 24 giờ kể từ khi hệ thống nhận đủ hồ sơ hợp lệ, đồng thời xem xét hỗ trợ kinh phí khi sinh con (nếu có) 【PROC_3_000722_c182_s1】, 【PROC_3_000722_c182_s3】. Trường hợp hồ sơ chưa đầy đủ, người yêu cầu sẽ nhận được thông báo bổ sung trong vòng 24 giờ và có 07 ngày làm việc để hoàn thiện 【PROC_3_000722_c182_s2】, 【PROC_3_000722_c182_s3】.\n- **Bước 4:** Sau khi bản điện tử Giấy khai sinh được chuyển lên Cổng Dịch vụ công quốc gia, hệ thống sẽ tiếp tục chuyển đến Hệ thống thông tin quản lý cư trú để đăng ký thường trú (thời gian giải quyết không quá 02 ngày làm việc hoặc không quá 05 ngày làm việc nếu phải xác minh) và Hệ thống ngành Bảo hiểm xã hội để cấp thẻ bảo hiểm y tế (không quá 02 ngày làm việc) 【PROC_3_000722_c183_s1】, 【PROC_3_000722_c183_s2】.\n- **Bước 5:** Khi có thông báo kết quả giải quyết đăng ký thường trú, hệ thống sẽ chuyển dữ liệu sang hệ thống của Bộ Công an để thực hiện cấp thẻ căn cước cho trẻ theo đề nghị ban đầu của người đại diện (thời gian giải quyết không quá 05 ngày làm việc) 【PROC_3_000722_c184_s0】.\n\n**Thời gian giải quyết chung:** \n- Thông thường là 03 ngày làm việc kể từ khi cơ quan có thẩm quyền nhận đủ hồ sơ hợp lệ; trường hợp phải xác minh thì thời gian không quá 05 ngày làm việc 【PROC_3_000722_c185_s0】.\n- Lưu ý về thời gian nộp: Nếu hồ sơ được tiếp nhận sau 15 giờ, thời gian giải quyết sẽ được tính bắt đầu từ ngày làm việc tiếp theo 【PROC_3_000722_c185_s0】.",
+    "journey": [
+      {
+        "procedure_id": "PROC_3_000722",
+        "name": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+        "priority": 1,
+        "category": "required",
+        "status": "unknown",
+        "reason": "Khớp trực tiếp với tình huống người dùng.",
+        "depends_on": []
+      }
+    ],
+    "benefits": [],
+    "follow_up_questions": [],
+    "sources": [
+      {
+        "metadata": {
+          "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2",
+          "version": "7f6120790947820287ece1c62c8a5e6e1166a0ceebacab2a5cd2ef729ba31d74",
+          "effective_date": "2026-08-09",
+          "observed_at": "2026-11-18",
+          "scope": "Cấp xã · Toàn quốc",
+          "validity": "ACTIVE",
+          "legal_bases": [
+            "Nghị định số 301/2026/NĐ-CP — Nghị định số 301/2026/NĐ-CP ngày 30 tháng 7 năm 2026 của Chính phủ sửa đổi, bổ sung một số điều của Nghị định số 63/2024/NĐ-CP ngày 10 tháng 6 năm 2024 của Chính phủ quy định việc thực hiện liên thông điện tử 02 nhóm thủ tục hành chính: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi; đăng ký khai tử, xóa đăng ký thường trú, giải quyết mai táng phí, tử tuất."
+          ],
+          "review": [
+            "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực."
+          ]
+        },
+        "source_type": "procedure",
+        "source_id": "PROC_3_000722",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c180_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c181_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s3",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c183_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c184_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s1",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c182_s2",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c183_s2",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – step_item",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      },
+      {
+        "metadata": null,
+        "source_type": "procedure_chunk",
+        "source_id": "PROC_3_000722_c185_s0",
+        "title": "Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi – execution_methods",
+        "url": "https://dichvucong.gov.vn/thu-tuc-hanh-chinh-lien-thong/019ff40e-c013-704a-be47-cee8794be2e2"
+      }
+    ],
+    "warnings": []
+  },
+  "draft_evaluation": {
+    "score": 92.9,
+    "citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c182_s2",
+      "PROC_3_000722_c182_s3",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c184_s0",
+      "PROC_3_000722_c185_s0"
+    ],
+    "missing_citations": [],
+    "missing_term_groups": [
+      [
+        "theo yêu cầu",
+        "có đề nghị",
+        "đã đề nghị",
+        "nếu đề nghị",
+        "đã yêu cầu"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c184_s0"
+    ],
+    "fallback": false,
+    "passed_checks": 13,
+    "total_checks": 14
+  },
+  "final_evaluation": {
+    "score": 85.7,
+    "citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c182_s2",
+      "PROC_3_000722_c182_s3",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c184_s0",
+      "PROC_3_000722_c185_s0"
+    ],
+    "missing_citations": [],
+    "missing_term_groups": [
+      [
+        "kết quả đăng ký thường trú",
+        "kết quả thường trú"
+      ],
+      [
+        "theo yêu cầu",
+        "có đề nghị",
+        "đã đề nghị",
+        "nếu đề nghị",
+        "đã yêu cầu"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c184_s0"
+    ],
+    "fallback": false,
+    "passed_checks": 12,
+    "total_checks": 14
+  }
+}
