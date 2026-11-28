@@ -326,7 +326,24 @@ def refine_answer(
     if not interaction.output_text:
         raise RuntimeError("Gemini không trả về nội dung đối chiếu.")
     draft = AnswerRefinementDraft.model_validate_json(interaction.output_text)
-    markdown = _normalize_citations(draft.answer_markdown)
+    original = response.answer_markdown
+    changes = []
+    skipped = False
+    for edit in draft.edits:
+        if original.count(edit.original_text) != 1:
+            skipped = True
+            continue
+        start = original.index(edit.original_text)
+        end = start + len(edit.original_text)
+        if any(start < existing_end and end > existing_start for existing_start, existing_end, _ in changes):
+            skipped = True
+            continue
+        changes.append((start, end, edit.replacement_text))
+
+    markdown = original
+    for start, end, replacement in sorted(changes, reverse=True):
+        markdown = markdown[:start] + replacement + markdown[end:]
+    markdown = _normalize_citations(markdown)
     available = {source.source_id for source in response.sources}
     missing_ids = set()
 
@@ -339,10 +356,13 @@ def refine_answer(
 
     markdown = CITATION_PATTERN.sub(resolve_citation, markdown)
     warnings = list(dict.fromkeys([*response.warnings, *draft.warnings]))
+    if skipped:
+        warnings.append("Một số chỉnh sửa không xác định được vị trí trong câu trả lời và chưa được áp dụng.")
     if missing_ids:
         warnings.append("Một số trích dẫn không xác định được trong nguồn đã truy xuất; vui lòng kiểm tra nội dung liên quan.")
     return response.model_copy(update={
         "answer_markdown": markdown,
         "warnings": warnings,
-        "follow_up_questions": list(dict.fromkeys(draft.follow_up_questions))[:3],
+        "follow_up_questions": (list(dict.fromkeys(draft.follow_up_questions))[:3]
+                                if draft.follow_up_questions is not None else response.follow_up_questions),
     })

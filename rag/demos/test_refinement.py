@@ -16,7 +16,7 @@ class RefinementTest(unittest.TestCase):
             sources=[SourceReference(source_type="procedure", source_id="P1", title="Thủ tục")],
             warnings=["Cảnh báo cũ"],
         )
-        interaction = SimpleNamespace(output_text='{"answer_markdown":"Thông tin 【P1】 và 【UNKNOWN】","warnings":["Cần xác minh"],"follow_up_questions":["Bạn có thông tin nào?"]}')
+        interaction = SimpleNamespace(output_text='{"edits":[{"original_text":"Bản nháp","replacement_text":"Thông tin 【P1】 và 【UNKNOWN】"}],"warnings":["Cần xác minh"],"follow_up_questions":["Bạn có thông tin nào?"]}')
         client = SimpleNamespace(interactions=SimpleNamespace(create=lambda **kwargs: interaction))
         with patch("google.genai.Client", return_value=client):
             result = refine_answer(response, context, GeminiSettings(api_key="test"))

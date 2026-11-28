@@ -286,12 +286,19 @@ class AnswerDraft(StrictModel):
     benefit_assessments: list[BenefitAssessmentDraft] = Field(default_factory=list)
 
 
-class AnswerRefinementDraft(StrictModel):
-    """Câu trả lời đã được đối chiếu với context."""
+class AnswerEdit(StrictModel):
+    """Một thay đổi cục bộ, xác định bằng đoạn nguyên văn trong bản nháp."""
 
-    answer_markdown: str = Field(min_length=1)
+    original_text: str = Field(min_length=1)
+    replacement_text: str
+
+
+class AnswerRefinementDraft(StrictModel):
+    """Các thay đổi nhỏ được đề xuất cho bản nháp."""
+
+    edits: list[AnswerEdit] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
-    follow_up_questions: list[str] = Field(default_factory=list, max_length=3)
+    follow_up_questions: list[str] | None = Field(default=None, max_length=3)
 
 
 class AnswerRepairDraft(StrictModel):
