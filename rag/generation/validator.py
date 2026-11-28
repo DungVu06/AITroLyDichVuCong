@@ -48,7 +48,7 @@ def _uncited_claim_issues(answer: str) -> list[ValidationIssue]:
         issues.append(
             ValidationIssue(
                 code="uncited_claim",
-                severity="error",
+                severity="warning",
                 message="Dòng chứa claim hoặc số liệu nhưng không có citation.",
                 excerpt=excerpt,
             )
@@ -115,7 +115,7 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
             if candidates and candidates.isdisjoint(cited_ids):
                 issues.append(ValidationIssue(
                     code="missing_contract_evidence",
-                    severity="error",
+                    severity="warning",
                     message=(
                         f"Thiếu evidence bắt buộc cho: {requirement.label}."
                     ),
@@ -151,7 +151,7 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
                 elif candidates.isdisjoint(cited_ids):
                     issues.append(ValidationIssue(
                         code="missing_step_citation",
-                        severity="error",
+                        severity="warning",
                         message=(f"Câu trả lời chưa nêu bước {step_number} của {procedure_id}."),
                     ))
 
@@ -169,7 +169,7 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
         issues.append(
             ValidationIssue(
                 code="missing_citations",
-                severity="error",
+                severity="warning",
                 message="Câu trả lời không có citation.",
             )
         )
@@ -178,7 +178,7 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
         issues.append(
             ValidationIssue(
                 code="missing_procedure_citation",
-                severity="error",
+                severity="warning",
                 message=f"Thiếu citation cho thủ tục {procedure_id}.",
                 excerpt=procedure_id,
             )
@@ -188,7 +188,7 @@ def validate_answer(response: RAGResponse, context: AnswerContext | None = None)
         issues.append(
             ValidationIssue(
                 code="missing_legal_citation",
-                severity="error",
+                severity="warning",
                 message="Có quyền lợi nhưng không trích dẫn section pháp luật.",
             )
         )

@@ -1,72 +1,20 @@
-﻿"""Demo pipeline đến bước tạo hành trình thủ tục."""
-
-from __future__ import annotations
-
+"""Hiển thị journey và evidence từ chính pipeline ứng dụng."""
 import argparse
 import json
 import sys
 
-from db.neo4j_client import Neo4jClient
-from db.qdrant_client import QdrantVectorClient
-from rag.pipeline.answer_contract import build_answer_contract
-from rag.pipeline.journey import build_journey
-from rag.pipeline.preprocessing import preprocess_query
-from rag.pipeline.query_understanding import understand_query
-from rag.retrieval.graph import GraphRetriever
-from rag.retrieval.vector import VectorRetriever
-from rag.pipeline.routing import route_query
-from rag.core.schemas import UserQuery
+from rag.engine import build_context
 
 
 def main() -> None:
-    if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-
-    parser = argparse.ArgumentParser(description="Demo RAG đến journey builder.")
-    parser.add_argument("text", help="Câu hỏi của người dùng")
+    parser = argparse.ArgumentParser(description="Xem context và journey của pipeline.")
+    parser.add_argument("text", help="Câu hỏi người dùng")
     parser.add_argument("--limit", type=int, default=5)
     args = parser.parse_args()
-
-    user_query = UserQuery(text=args.text)
-    query = preprocess_query(user_query)
-    state = understand_query(query)
-    plan = route_query(query, state)
-    contract = build_answer_contract(user_query, state)
-
-    with QdrantVectorClient.from_env() as qdrant:
-        vector_result = VectorRetriever(qdrant).retrieve_from_plan(
-            plan,
-            procedure_limit=args.limit,
-            law_limit=args.limit,
-        )
-
-    seed_ids = list(
-        dict.fromkeys(chunk.doc_id for chunk in vector_result["procedures"])
-    )
-    if contract.workflow_id:
-        seed_ids = [contract.workflow_id]
-    with Neo4jClient.from_env() as neo4j:
-        graph_result = GraphRetriever(neo4j).retrieve(
-            seed_ids,
-            include_benefits=plan.include_benefits,
-        )
-
-    journey = build_journey(
-        graph_result,
-        seed_ids,
-        workflow_id=contract.workflow_id,
-        identity_card_requested=state.identity_card_requested,
-    )
-    print(
-        json.dumps(
-            {
-                "seed_procedure_ids": seed_ids,
-                "journey": [item.model_dump(mode="json") for item in journey],
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    context = build_context(args.text, limit=args.limit)
+    print(json.dumps(context.model_dump(mode="json"), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

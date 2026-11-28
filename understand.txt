@@ -1,0 +1,37 @@
+Chặng 1: Hiểu luồng tổng quát engine.py
+
+Ký hiệu: (E) = Engineering/code; (L) = LLM
+
+Câu hỏi của người dùng
+│
+├─ 1. Lấy trạng thái hội thoại trước đó, nếu có (E)
+│
+├─ 2. Build context: chuẩn bị thông tin để trả lời
+│   ├─ Preprocess: chuẩn hóa câu hỏi (E)
+│   ├─ Understand query: hiểu ý định và trích xuất dữ kiện (L)
+│   ├─ Route query: chọn cách truy xuất (E)
+│   ├─ Build answer contract: xác định thông tin và bằng chứng cần có (E)
+│   ├─ Truy xuất dữ liệu (E)
+│   │   ├─ Qdrant: tìm các chunk liên quan
+│   │   └─ Neo4j: lấy thủ tục và quan hệ giữa chúng
+│   │
+│   │   Nếu cần dùng local:
+│   │   ├─ Vector: dựng index từ chunk local trong RAM
+│   │   └─ Graph: dựng graph từ data local trong RAM
+│   │
+│   └─ Ghép journey, evidence và metadata nguồn → AnswerContext (E)
+│
+├─ 3. Build response: tạo và kiểm tra câu trả lời
+│   ├─ Generate answer từ context (L)
+│   ├─ Validate: kiểm tra câu trả lời (E)
+│   ├─ Nếu chưa đạt: sửa bằng code → kiểm tra lại (E)
+│   ├─ Nếu vẫn chưa đạt: yêu cầu LLM sửa → kiểm tra lại (L + E)
+│   └─ Nếu vẫn chưa đạt: tạo câu trả lời fallback từ evidence (E)
+│
+├─ 4. Hoàn thiện response (E)
+│   ├─ Thêm cảnh báo nếu đã dùng dữ liệu local
+│   └─ Lọc danh sách nguồn theo citation trong câu trả lời
+│
+├─ 5. Nếu có conversation_id: lưu state và transcript (E)
+│
+└─ 6. Trả response cho UI hoặc CLI

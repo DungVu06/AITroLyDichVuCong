@@ -19,7 +19,6 @@ from db.neo4j_client import Neo4jClient
 from db.qdrant_client import QdrantVectorClient
 from rag.pipeline.benefits import resolve_benefits
 from rag.pipeline.context import build_answer_context
-from rag.pipeline.answer_contract import build_answer_contract
 from rag.core.conversation import InMemoryConversationStore
 from rag.core.transcript import ConversationTranscriptStore
 from rag.generation.answer import filter_sources_to_citations, generate_answer, repair_answer_with_gemini
@@ -34,6 +33,7 @@ from rag.retrieval.vector import VectorRetriever
 from rag.pipeline.routing import route_query
 from rag.core.schemas import (
     AnswerContext,
+    AnswerContract,
     ConversationState,
     GraphRetrievalResult,
     LegalEvidence,
@@ -51,7 +51,7 @@ def build_context(
     text: str,
     *,
     conversation_id: str | None = None,
-    limit: int = 5,
+    limit: int = 20,
     previous_state: QueryState | None = None,
     pending_questions: list[str] | None = None,
     embedder: QueryEmbedder | None = None,
@@ -70,22 +70,13 @@ def build_context(
 
     if plan.strategy in {RetrievalStrategy.OUT_OF_SCOPE, RetrievalStrategy.CLARIFICATION}:
         return AnswerContext(query=user_query, query_state=state)
+    # Retrieval starts from the analyzed request and retrieved records.
+    # The contract is populated from retrieved evidence below.
+    contract = AnswerContract(procedure_ids=list(state.procedure_ids))
     catalog = procedure_catalog()
-    contract = build_answer_contract(user_query, state)
-    # A deterministic contract is derived only from explicit facts in the
-    # current message. When it resolves a procedure, do not let an LLM infer
-    # extra procedures merely because their documents are mentioned (for
-    # example, a birth certificate cited as evidence in a card-correction case).
-    contract_resolved = bool(contract.requirements)
-    requested_candidates = (
-        contract.procedure_ids
-        if contract_resolved
-        else [*state.procedure_ids, *contract.procedure_ids]
-    )
-    requested = list(dict.fromkeys(i for i in requested_candidates if i in catalog))
-    workflow_id = contract.workflow_id
-    if workflow_id and workflow_id in catalog:
-        requested = [workflow_id]
+    requested = [item for item in state.procedure_ids if item in catalog]
+    workflow_id = None
+    contract_resolved = False
     with QdrantVectorClient.from_env() as qdrant:
         retriever = VectorRetriever(qdrant, embedder=embedder)
         vector_result = retriever.retrieve_from_plan(
@@ -93,12 +84,15 @@ def build_context(
             procedure_limit=limit,
             law_limit=limit,
         )
-        seed_ids = list(
-            dict.fromkeys(chunk.doc_id for chunk in vector_result["procedures"])
-        )
-        if requested and plan.use_procedure_vector_search:
+        # Rank procedure candidates by their best chunk rank. Explicitly
+        # identified procedures remain first, followed by vector candidates.
+        ranked_ids = list(dict.fromkeys(
+            chunk.doc_id for chunk in vector_result["procedures"] if chunk.doc_id in catalog
+        ))
+        seed_ids = list(dict.fromkeys([*requested, *ranked_ids]))
+        if requested and not state.asks_about_dependencies:
             seed_ids = requested
-        elif plan.strategy in {RetrievalStrategy.PROCEDURE_DETAIL, RetrievalStrategy.GRAPH_NEXT_STEPS}:
+        elif not state.asks_about_dependencies:
             seed_ids = seed_ids[:1]
 
         def read_graph(client):
@@ -170,6 +164,28 @@ def build_context(
                 graph, legal_evidence = read_graph(SnapshotGraph())
                 used_local_graph = True
 
+        # Rank workflows using graph membership and vector candidate rank.
+        # Expand related workflows only for dependency questions or explicitly
+        # selected workflows, so a simple detail query stays focused.
+        if retrieval_mode == "graph":
+            workflow_members = {}
+            for edge in graph.procedure_relations:
+                if edge.relationship_type == "HAS_SUB_PROCEDURE":
+                    workflow_members.setdefault(edge.source_id, set()).add(edge.target.procedure_id)
+                elif edge.relationship_type == "PART_OF":
+                    workflow_members.setdefault(edge.target.procedure_id, set()).add(edge.source_id)
+            candidates = []
+            for candidate, members in workflow_members.items():
+                explicit = candidate in requested
+                overlap = len(members.intersection(requested))
+                if not explicit and not (state.asks_about_dependencies and overlap):
+                    continue
+                vector_rank = ranked_ids.index(candidate) if candidate in ranked_ids else len(ranked_ids)
+                candidates.append((explicit, overlap, -vector_rank, candidate))
+            if candidates:
+                workflow_id = max(candidates)[-1]
+                contract.workflow_id = workflow_id
+
         if workflow_id and retrieval_mode == "graph":
             workflow = select_workflow(graph, workflow_id, state.identity_card_requested)
             expected = {
@@ -213,24 +229,9 @@ def build_context(
             item.chunk_type for item in contract.requirements if item.chunk_type
         )
         detail_types = list(dict.fromkeys(detail_types))
-        if workflow_id:
-            # A graph edge proves ordering, while documents and time may live
-            # on a component procedure. Relation requirements are already
-            # represented by relation_evidence; loading their source nodes as
-            # full procedure detail would wrongly make every child step an
-            # obligation for a parent-workflow answer.
-            required_detail_ids = {workflow_id}
-            required_detail_ids.update(
-                requirement.procedure_id
-                for requirement in contract.requirements
-                if not requirement.relation_type
-            )
-            detail_procedures = [
-                item for item in graph.procedures
-                if item.procedure_id in required_detail_ids
-            ]
-        else:
-            detail_procedures = list(graph.procedures)
+        contract.enforce_step_sequence = "steps" in state.topics
+
+        detail_procedures = list(graph.procedures)
         procedures = retriever.retrieve_procedure_details(
             detail_procedures,
             query=plan.procedure_query or query.normalized_text,
@@ -318,7 +319,6 @@ def build_context(
             )
             for edge in graph.procedure_relations
             if not edge.workflow_id and edge.evidence_record_id and edge.evidence_step
-            and edge.relationship_type in required_relation_types
         ]
     return context
 
@@ -505,17 +505,15 @@ def _generate_validated_response(context: AnswerContext) -> RAGResponse:
                              if outside else "Chưa xác định được thủ tục từ thông tin hiện có."),
             follow_up_questions=[] if outside else questions[:3] or ["Bạn muốn tra cứu thủ tục cụ thể nào?"],
         )
-    response = _with_graph_linked_filing_decision(generate_answer(context), context)
+    response = generate_answer(context)
     validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_procedure_citations(response, validation)
-        response = _with_graph_linked_filing_decision(response, context)
         validation = validate_answer(response, context)
 
     if not validation.is_valid:
         response = repair_answer_with_gemini(response, validation, context)
-        response = _with_graph_linked_filing_decision(response, context)
         validation = validate_answer(response, context)
 
     if not validation.is_valid:
@@ -524,6 +522,13 @@ def _generate_validated_response(context: AnswerContext) -> RAGResponse:
         validation = validate_answer(response, context)
         if not validation.is_valid:
             raise RuntimeError("Không thể tạo câu trả lời vượt qua hậu kiểm.")
+    for issue in validation.issues:
+        if issue.severity == "warning":
+            message = issue.message
+            if issue.excerpt:
+                message += f" — {issue.excerpt}"
+            if message not in response.warnings:
+                response.warnings.append(message)
     return response
 
 
@@ -550,7 +555,7 @@ class RAGEngine:
         text: str,
         *,
         conversation_id: str | None = None,
-        limit: int = 5,
+        limit: int = 20,
     ) -> RAGResponse:
         previous = (
             self.conversation_store.get(conversation_id)
@@ -598,7 +603,7 @@ def run_rag(
     text: str,
     *,
     conversation_id: str | None = None,
-    limit: int = 5,
+    limit: int = 20,
 ) -> RAGResponse:
     return _DEFAULT_ENGINE.run(
         text,
@@ -624,7 +629,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Chạy RAG engine hoàn chỉnh.")
     parser.add_argument("text", nargs="?", help="Câu hỏi hoặc tình huống của người dùng")
     parser.add_argument("--conversation-id", default=None)
-    parser.add_argument("--limit", type=int, default=5)
+    parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--json", action="store_true", help="In payload JSON cho UI")
     parser.add_argument("--interactive", action="store_true", help="Hội thoại nhiều lượt")
     args = parser.parse_args()
