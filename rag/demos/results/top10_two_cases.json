@@ -1,0 +1,89 @@
+{
+  "TC01": {
+    "status": "ok",
+    "latency_seconds": 25.358,
+    "answer": "Trường hợp sinh con tại nhà và không có Giấy chứng sinh của bệnh viện, bạn vẫn có thể thực hiện **Thủ tục đăng ký khai sinh 【PROC_1_001193】 (Mã: PROC_1_001193)**. \n\n### Thứ tự nên làm và Giấy tờ cần chuẩn bị\n- **Hồ sơ thay thế cho Giấy chứng sinh:** Bạn cần nộp văn bản của người làm chứng xác nhận về việc sinh; nếu không có người làm chứng thì phải có giấy cam đoan về việc sinh 【PROC_1_001193_c5_s0】.\n- **Cách thức nộp hồ sơ:** Bạn có thể nộp theo hình thức trực tiếp, trực tuyến hoặc thông qua dịch vụ bưu chính 【PROC_1_001193_c48_s0】.\n- **Cơ quan tiếp nhận và giải quyết:** Ủy ban nhân dân cấp xã 【PROC_1_001193_c48_s0】 (trong trường hợp của bạn là Ủy ban nhân dân xã An Phú).\n- **Thời gian giải quyết:** 1 ngày 【PROC_1_001193_c48_s0】.\n- **Lệ phí:** Miễn phí 【PROC_1_001193_c48_s0】.",
+    "warnings": [],
+    "sources": [
+      "PROC_1_001193",
+      "PROC_1_001193_c5_s0",
+      "PROC_1_001193_c48_s0"
+    ],
+    "score": 100.0,
+    "citations": [
+      "PROC_1_001193",
+      "PROC_1_001193_c48_s0",
+      "PROC_1_001193_c5_s0"
+    ],
+    "missing_citations": [],
+    "missing_term_groups": [],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [],
+    "fallback": false,
+    "passed_checks": 7,
+    "total_checks": 7,
+    "usage": {
+      "api_calls": 2,
+      "api_elapsed_seconds": 7.453,
+      "input_tokens": 6051,
+      "output_tokens": 533,
+      "total_tokens": 6584
+    }
+  },
+  "TC05": {
+    "status": "ok",
+    "latency_seconds": 16.252,
+    "answer": "Bạn không thể đến trực tiếp cơ quan Bảo hiểm xã hội để xin cấp thẻ BHYT trước cho trẻ 1 tháng tuổi chưa có giấy khai sinh. Theo quy định hiện hành, việc cấp thẻ BHYT cho trẻ em dưới 6 tuổi được thực hiện thông qua nhóm thủ tục liên thông điện tử 【PROC_3_000722_c183_s1】.\n\n### Thứ tự nên làm\nBạn cần thực hiện thủ tục **Liên thông điện tử: đăng ký khai sinh, đăng ký thường trú, cấp thẻ bảo hiểm y tế, cấp thẻ căn cước cho trẻ em dưới 6 tuổi 【PROC_3_000722】** (Mã: PROC_3_000722). Cơ quan tiếp nhận và giải quyết là **Công an cấp Xã** 【PROC_3_000722_c185_s0】.\n\n### Giấy tờ và cách thực hiện\n- **Hình thức thực hiện:** Nộp hồ sơ trực tuyến qua Cổng Dịch vụ công quốc gia (dichvucong.gov.vn) hoặc ứng dụng VNeID 【PROC_3_000722_c180_s1】.\n- **Trình tự thực hiện:**\n  1. Truy cập Cổng Dịch vụ công quốc gia hoặc VNeID, lựa chọn dịch vụ công liên thông và kê khai thông tin theo tờ khai điện tử 【PROC_3_000722_c180_s1】.\n  2. Hệ thống tự động chuyển dữ liệu sang Hệ thống thông tin giải quyết thủ tục hành chính của Bộ Tư pháp để thực hiện đăng ký khai sinh 【PROC_3_000722_c181_s0】【PROC_3_000722_c182_s1】.\n  3. Sau khi có bản điện tử Giấy khai sinh, hệ thống sẽ tự động chuyển dữ liệu đến Hệ thống thông tin ngành Bảo hiểm xã hội để thực hiện cấp thẻ bảo hiểm y tế cho trẻ em dưới 6 tuổi 【PROC_3_000722_c183_s1】.\n- **Thời gian giải quyết:** \n  - Cấp thẻ bảo hiểm y tế không quá 02 ngày làm việc kể từ ngày nhận được hồ sơ điện tử từ Phần mềm dịch vụ công liên thông 【PROC_3_000722_c183_s2】.\n  - Tổng thời gian giải quyết toàn trình liên thông là 03 ngày làm việc (trường hợp phải xác minh thì không quá 05 ngày làm việc) 【PROC_3_000722_c185_s0】.\n- **Lệ phí:** Miễn phí (phí, lệ phí khác theo quy định của các thủ tục hành chính tương ứng nếu có) 【PROC_3_000722_c185_s0】.",
+    "warnings": [],
+    "sources": [
+      "PROC_3_000722",
+      "PROC_3_000722_c185_s0",
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c183_s2"
+    ],
+    "score": 81.2,
+    "citations": [
+      "PROC_3_000722",
+      "PROC_3_000722_c180_s1",
+      "PROC_3_000722_c181_s0",
+      "PROC_3_000722_c182_s1",
+      "PROC_3_000722_c183_s1",
+      "PROC_3_000722_c183_s2",
+      "PROC_3_000722_c185_s0"
+    ],
+    "missing_citations": [
+      "PROC_3_000722_c176_s0"
+    ],
+    "missing_term_groups": [
+      [
+        "có thể nộp hồ sơ liên thông ngay",
+        "có thể nộp ngay qua vneid",
+        "có thể nộp ngay qua cổng dịch vụ công quốc gia"
+      ],
+      [
+        "mẫu số 01",
+        "mẫu số 1",
+        "mẫu 01"
+      ]
+    ],
+    "forbidden_citations": [],
+    "forbidden_terms": [],
+    "step_order_ok": true,
+    "ordered_step_citations": [],
+    "fallback": false,
+    "passed_checks": 13,
+    "total_checks": 16,
+    "usage": {
+      "api_calls": 2,
+      "api_elapsed_seconds": 7.28,
+      "input_tokens": 7201,
+      "output_tokens": 849,
+      "total_tokens": 8050
+    }
+  }
+}

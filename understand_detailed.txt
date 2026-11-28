@@ -1,0 +1,77 @@
+1. Lấy trạng thái hội thoại trước đó
+
+- Vị trí: RAGEngine.run() trong rag/engine.py, đoạn self.conversation_store.get(conversation_id).
+- InMemoryConversationStore (rag/core/conversation.py) lưu state theo conversation_id trong RAM; cung cấp get(), put(), clear().
+- ConversationState (rag/core/schemas.py) gồm conversation_id, query_state, pending_questions và turn_count.
+- pending_questions: câu hỏi bổ sung hệ thống đang chờ người dùng trả lời. turn_count: số lượt hỏi đáp.
+- Mỗi câu tạo QueryState mới. Lượt tiếp theo nhận state và pending_questions của lượt trước; nếu phù hợp, một số thông tin cũ được hợp nhất vào state mới.
+- Sau mỗi lượt, put() ghi đè ConversationState cũ của cùng conversation_id. Store chỉ giữ state mới nhất, không giữ riêng từng QueryState.
+- Transcript lưu riêng câu hỏi và câu trả lời; state trong RAM mất khi tiến trình kết thúc.
+
+2. Preprocess
+
+- engine.py tạo UserQuery rồi gọi preprocess_query() trong rag/pipeline/preprocessing.py.
+- Chuẩn hóa Unicode, xóa ký tự vô hình và khoảng trắng thừa; câu rỗng thì báo lỗi.
+- Trả PreprocessedQuery gồm câu gốc, câu đã chuẩn hóa và conversation_id.
+
+3. Understand query
+
+- engine.py gọi understand_query() trong rag/pipeline/query_understanding.py.
+- Nhận PreprocessedQuery, QueryState trước đó và pending_questions nếu có.
+- procedure_catalog() đọc data/procedure/records/ tạo danh mục ID + tên; danh mục được ghép vào prompt cùng câu hỏi và state trước.
+- Gemini phân tích intent, thủ tục và facts, chọn procedure_ids từ danh mục rồi trả JSON theo schema QueryState. Pydantic kiểm tra output; code hợp nhất một số thông tin cũ khi phù hợp.
+- Trả QueryState cho route_query. Bước này chưa truy vấn Qdrant/Neo4j.
+
+4. Route query và truy xuất
+
+- route_query() trong rag/pipeline/routing.py nhận PreprocessedQuery + QueryState, dùng quy tắc Python tạo RetrievalPlan; không gọi LLM/database.
+- Strategy: OUT_OF_SCOPE, CLARIFICATION, JOURNEY_FIRST, PROCEDURE_DETAIL, GRAPH_NEXT_STEPS, BENEFIT_FIRST, LAW_SEARCH. Hai strategy đầu trả sớm; các strategy còn lại lập kế hoạch truy xuất.
+- needs_clarification được gán trong plan nhưng hiện không được đọc ở bước sau. Strategy CLARIFICATION mới được engine dùng để dừng retrieval; missing_facts được dùng riêng khi tạo câu hỏi bổ sung.
+- Trong chế độ graph: Python gọi Qdrant tìm chunk → chọn ID thủ tục làm seed → dùng ID truy vấn Neo4j lấy node/quan hệ → ghép evidence vào context. LLM không tự gọi database hay viết truy vấn.
+- use_graph_traversal=False không đồng nghĩa không dùng Neo4j: vẫn có thể lấy node mà không mở rộng quan hệ. vector_only là nhánh không dùng Neo4j.
+
+5. Build answer contract
+
+- build_answer_contract() trong rag/pipeline/answer_contract.py nhận UserQuery + QueryState và trả AnswerContract, mô tả thủ tục, evidence, workflow, câu hỏi bổ sung và yêu cầu thứ tự.
+- Cách hiện tại là heuristic: Python dò các cụm từ trong câu hỏi và một số trường QueryState, sau đó thêm requirement đã viết sẵn. Retrieval dùng requirement để ưu tiên evidence; validator dùng chúng khi hậu kiểm.
+- Phạm vi các quy tắc đặc biệt gắn với demo sinh con và một số tình huống cụ thể; không tự mở rộng sang thủ tục/sự kiện mới.
+- Chỉ nhận diện một số cách diễn đạt cố định: cách nói tương đương có thể không kích hoạt nhánh, còn cụm từ khớp nhưng khác ngữ cảnh có thể kích hoạt sai.
+- ID thủ tục, từ khóa evidence, số bước và một số nội dung được hard-code. Khi data, cách viết hoặc thứ tự bước đổi, contract có thể chọn sai hoặc không tìm được evidence phù hợp và cần bảo trì code.
+- Nhiều nhánh có thể cùng kích hoạt và thêm requirement; requirement không phù hợp có thể khiến retrieval/validation chịu ràng buộc thừa. Nếu không nhánh nào khớp, không có requirement đặc biệt cho tình huống đó.
+- Định hướng thảo luận: dùng QueryState cùng danh mục/schema để LLM đề xuất contract, sau đó Python kiểm tra; có thể gộp vào lần query understanding để tránh thêm API call. Đây là phương án đề xuất, chưa được triển khai hoặc chứng minh tốt hơn.
+
+6. Retrieval: Qdrant và Neo4j
+
+- Input: RetrievalPlan, QueryState và AnswerContract. Qdrant tìm chunk theo vector; với limit=5 mặc định, lấy tối đa 50 chunk, duyệt theo thứ tự tương đồng và giữ tối đa 5 chunk khớp metadata/loại. Có thể trả ít hơn 5 hoặc không có chunk.
+- Kết nối: doc_id của chunk thủ tục trong Qdrant tương ứng id của node Procedure trong Neo4j. Engine chọn ID làm seed; có thể ưu tiên ID từ QueryState/contract.
+- Graph lấy node theo seed; khi cần mở rộng, lấy quan hệ đi ra thuộc REQUIRES, NEXT_STEP, PART_OF, HAS_SUB_PROCEDURE, lặp tối đa 4 vòng. Sau đó chọn/lọc workflow và lấy thêm chunk chi tiết theo thủ tục/evidence.
+- Output retrieval: thủ tục và chunk chi tiết, quan hệ, evidence luật/quyền lợi nếu có; được dùng để dựng journey và AnswerContext.
+
+7. Dựng journey và AnswerContext
+
+- Input: câu hỏi, QueryState, thủ tục/chunk, graph, AnswerContract và metadata nguồn.
+- build_journey() trong rag/pipeline/journey.py sắp thủ tục theo quan hệ phụ thuộc và trạng thái.
+- build_answer_context() trong rag/pipeline/context.py rút gọn và sắp evidence, ghép journey, contract và câu hỏi bổ sung. Engine bổ sung metadata và relation evidence.
+- Output: AnswerContext để chuyển sang bước tạo và kiểm tra response.
+
+8. Generate answer từ context
+
+- _generate_validated_response(context) trong rag/engine.py: nếu không có evidence thì trả thông báo/câu hỏi bổ sung; nếu có thì gọi generate_answer(context) để Gemini tạo response.
+- Code có thể bổ sung kết luận từ graph khi đủ điều kiện, rồi chuyển response cùng context cho validator.
+
+9. Validate, sửa và fallback
+
+- validate_answer(response, context) trong rag/generation/validator.py kiểm citation, evidence theo contract, bước bắt buộc và một số cảnh báo. Mức error/warning do code quy định; có error thì không đạt, chỉ warning thì vẫn đạt.
+- Một số warning: không tìm được evidence theo contract, hoặc lộ thuật ngữ kỹ thuật. Một số error: citation không tồn tại, claim/số liệu thiếu citation, có evidence bắt buộc nhưng không trích dẫn. Warning nội bộ không tự động thành warning hiển thị.
+- Nếu không đạt: Python thử thêm citation ID thủ tục cho dòng lỗi khi tìm được ID trong tiêu đề, hoặc bổ sung cảnh báo hiệu lực; validate lại. Nếu vẫn lỗi thì Gemini repair một lần, validate lại; nếu vẫn lỗi thì Python dựng fallback từ chunk/quan hệ đã truy xuất, validate lần cuối; vẫn lỗi thì báo lỗi.
+- Nhược điểm đã thấy trong code: kiểm theo mẫu từ/citation, không xác minh claim có thực sự được nguồn chứng minh; thêm ID thủ tục dựa trên tiêu đề không chứng minh đúng claim. Không truy xuất được evidence contract chỉ là warning; có evidence nhưng thiếu cite là error.
+- Suspect cần kiểm chứng: heuristic và contract sai/thiếu có thể gây bỏ lọt lỗi hoặc sửa/fallback không cần thiết; fallback ghép chunk có thể thiếu ngữ cảnh hoặc khó đọc. Chưa thể kết luận tần suất khi chưa thử nghiệm.
+- Gemini repair là thêm một API call và có thể vẫn không sửa đúng; validation pass không bảo đảm chính xác pháp lý.
+
+10. Hoàn thiện response, lưu và trả kết quả
+
+- Engine thêm warning nếu lượt này dùng local graph/vector, rồi filter_sources_to_citations() chỉ giữ source có ID xuất hiện theo dạng citation trong answer_markdown.
+- Nếu có conversation_id: put() ghi state mới vào RAM; transcript.append() ghi câu hỏi, answer, câu hỏi bổ sung, warning và nguồn vào file Markdown theo hội thoại. Lỗi OSError khi ghi transcript được log, response vẫn được trả.
+- Engine trả RAGResponse cho nơi gọi; UI render answer, câu hỏi bổ sung, warning và sources. Nếu engine phát sinh exception, UI hiển thị thông báo lỗi chung.
+- Nhược điểm: lọc nguồn dựa trên ID xuất hiện, không kiểm tra nguồn có chứng minh claim cạnh citation. State chỉ ở RAM; transcript lỗi có thể không lưu được dù đã trả lời thành công.
+- Suspect cần kiểm chứng: citation sai định dạng hoặc nguồn liên quan không được cite sẽ bị lọc khỏi danh sách; thông báo lỗi chung của UI có thể khiến khó phân biệt nguyên nhân thực tế. Chưa đánh giá tần suất xảy ra.

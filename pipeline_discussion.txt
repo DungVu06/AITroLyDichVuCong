@@ -1,0 +1,68 @@
+TÀI LIỆU THẢO LUẬN THIẾT KẾ PIPELINE YORHA
+
+Mục đích: cung cấp ngữ cảnh code cho ChatGPT để thảo luận cách xử lý AnswerContract. Đây là mô tả hệ thống hiện tại, không phải thiết kế đã thống nhất cho phiên bản tiếp theo. Dự án demo hướng dẫn thủ tục liên quan đến sinh con, kết hợp Python, Gemini, Qdrant và Neo4j. Hãy ưu tiên phân tích luồng, schema, các điểm phụ thuộc và tác động của thay đổi. Không đề xuất hard-code theo riêng các câu benchmark.
+
+1. CẤU TRÚC VÀ ĐẦU VÀO
+
+- ui/streamlit_app.py là giao diện, nhận câu hỏi và gọi RAGEngine.run(). CLI nằm trong rag/__main__.py và rag/engine.py. Luồng chính được điều phối tại rag/engine.py.
+- rag/core/schemas.py chứa các model Pydantic trao đổi giữa các bước. rag/core/config.py đọc cấu hình, rag/core/conversation.py lưu trạng thái hội thoại trong bộ nhớ, rag/core/transcript.py ghi hội thoại.
+- rag/pipeline/ chứa preprocessing, query understanding, routing, answer contract, journey, context và benefits. rag/retrieval/ chứa vector, graph, embedding, catalog và các phương án dữ liệu local. rag/generation/ chứa sinh câu trả lời và validation. rag/prompts/ chứa prompt tương ứng.
+- Dữ liệu gồm record thủ tục, văn bản luật, chunk tìm kiếm và quan hệ đã xây dựng. Qdrant lưu vector cùng payload chunk. Neo4j lưu các node, quan hệ thủ tục và luật. Catalog local cung cấp ID, tên và metadata record. Database được dựng từ dữ liệu nguồn bởi phần db/.
+
+2. LUỒNG TỔNG QUÁT
+
+Câu hỏi -> trạng thái hội thoại trước -> preprocess -> LLM hiểu câu hỏi -> Python route -> Python build AnswerContract -> Qdrant -> Neo4j hoặc nhánh vector-only -> chi tiết thủ tục và journey -> AnswerContext -> LLM sinh -> validation/repair/fallback -> lọc nguồn, lưu trạng thái và transcript -> response.
+
+Các nhánh clarification/out-of-scope có thể kết thúc build_context sớm. Có thể dùng graph/vector local khi một số lỗi kết nối hoặc dữ liệu graph thiếu quan hệ dự kiến. Local được dựng từ dữ liệu dự án, không phải bản sao tự đồng bộ liên tục với cloud.
+
+3. CHI TIẾT CÁC CHẶNG
+
+3.1 Hội thoại và tiền xử lý
+RAGEngine.run() lấy ConversationState theo conversation_id nếu có. QueryState trước và pending_questions được truyền vào build_context. InMemoryConversationStore giữ state mới nhất theo conversation_id, không lưu một QueryState riêng cho mỗi lượt. Transcript là cơ chế khác, ghi các lượt hỏi đáp ra file. preprocess_query() trong rag/pipeline/preprocessing.py chuẩn hóa câu hỏi, tạo PreprocessedQuery.
+
+3.2 Hiểu câu hỏi
+understand_query() tại rag/pipeline/query_understanding.py gọi Gemini với prompt rag/prompts/query_understanding.md, câu hỏi chuẩn hóa, danh mục ID-tên thủ tục và state/câu hỏi đang chờ nếu có. LLM trả JSON theo QueryState, được Pydantic kiểm tra. Các thông tin gồm intent, topics, target, procedure_ids, facts, completed_ids, câu hỏi phụ thuộc và dữ kiện còn thiếu. LLM ở bước này không trực tiếp truy vấn Qdrant hoặc Neo4j và không được đưa toàn bộ record JSON. Khi có câu hỏi đang chờ và chủ đề thủ tục không đổi, code có thể gộp facts và một số field từ state trước.
+
+3.3 Route
+route_query() trong rag/pipeline/routing.py dùng quy tắc Python trên PreprocessedQuery và QueryState để tạo RetrievalPlan. Plan quyết định strategy, câu query tìm thủ tục/luật, có tìm vector, mở rộng graph, lấy benefits hay không, metadata filters và loại chunk. Topics được map sang loại chunk phục vụ truy xuất chi tiết. Vector query được tạo từ câu hỏi chuẩn hóa và thông tin trong state, không cần đợi AnswerContract sinh ra câu query.
+
+3.4 AnswerContract trước retrieval
+build_answer_contract() trong rag/pipeline/answer_contract.py nhận UserQuery và QueryState, tạo AnswerContract bằng các quy tắc từ khóa và điều kiện Python. Schema liên quan trong rag/core/schemas.py gồm AnswerContract và EvidenceRequirement. Contract có thể chứa procedure_ids, workflow_id, requirements, thông tin kênh nộp, yêu cầu trình tự, câu hỏi bổ sung và các field hỗ trợ sinh/kiểm tra. EvidenceRequirement có thể mô tả procedure_id, loại chunk, required_terms, excluded_terms, step_number hoặc relation_type/target_procedure_id.
+
+Contract được xây trước khi nhìn thấy kết quả database. Nó chứa các điều kiện gắn với demo sinh con, tên/mã thủ tục, cụm từ và bước cụ thể. Khi contract có requirements, engine coi nó đã resolve và ưu tiên procedure_ids của contract so với danh sách LLM. Workflow_id có thể thay tập seed bằng thủ tục liên thông. Vì vậy contract không chỉ mô tả câu trả lời mà còn thay đổi dữ liệu được truy xuất.
+
+3.5 Qdrant và Neo4j
+VectorRetriever.retrieve_from_plan() tại rag/retrieval/vector.py tìm chunk thủ tục và/hoặc luật theo plan. QueryEmbedder mã hóa query. Với limit mặc định engine là 5, search lấy tối đa max(limit*10, 50) ứng viên rồi lọc payload ở client, dừng khi đạt limit hoặc hết ứng viên. Số chunk cuối có thể ít hơn 5. Đây là top-k theo tìm kiếm vector, không phải top-p.
+
+Chunk có doc_id là ID thủ tục. Engine gom doc_id làm seed_ids, nhưng requested IDs do state/contract quyết định có thể ghi đè seed. GraphRetriever tại rag/retrieval/graph.py dùng các ID này tìm node và, tùy plan/contract, mở rộng quan hệ. Liên kết giữa hai hệ là ID chung, không phải LLM tự chọn trực tiếp một quan hệ từ từng chunk. Quan hệ thủ tục bao gồm REQUIRES, NEXT_STEP, PART_OF, HAS_SUB_PROCEDURE. Law evidence có thể được liên kết qua ID và section tương ứng. Graph retrieval có giới hạn mở rộng, không mặc định lấy toàn bộ graph.
+
+Nhánh retrieval_mode=vector_only không khởi tạo Neo4j hay SnapshotGraph. Nó dùng chunk Qdrant và record local để lấy thông tin thủ tục theo seed/contract, không có traversal quan hệ. Hai nhánh vẫn dùng chung nhiều thành phần, gồm contract, generation và validation. Vì còn record cha và metadata nên vector-only không đồng nghĩa chỉ có chunk rời rạc.
+
+Nếu Neo4j gặp một số lỗi kết nối được xử lý, engine dùng SnapshotGraph từ dữ liệu local. Nếu workflow kỳ vọng có quan hệ mà graph cloud thiếu, code có thể thử lại bằng snapshot. VectorRetriever có thể tạo local index từ chunk local khi gặp lỗi mạng hoặc collection không tồn tại thuộc các trường hợp code xử lý. Response thêm warning khi dùng local.
+
+3.6 Chi tiết, journey và context
+build_journey() và select_workflow() trong rag/pipeline/journey.py xử lý danh sách thủ tục, thứ tự và quan hệ dựa trên graph, seed, completed_ids và workflow. Engine chọn chunk types từ plan, bổ sung theo yêu cầu dependency và contract. retrieve_procedure_details() tìm thêm chunk theo procedure ID và loại chunk, lấy tối đa 1000 ứng viên mỗi loại rồi xếp hạng. Contract có thể buộc giữ chunk khớp required_terms/excluded_terms/step_number. Nếu yêu cầu trình tự, code giữ đại diện cho các bước có số. Việc khớp terms là kiểm tra chuỗi casefold, không phải so nghĩa.
+
+build_answer_context() trong rag/pipeline/context.py gom query, QueryState, journey, procedure evidence/chunks, legal evidence, benefits, contract, response rules và câu hỏi bổ sung. Có bước rút gọn chunk và giới hạn số lượng để đưa vào prompt. Engine bổ sung source_metadata và relation_evidence. Metadata được lấy từ catalog local; nguồn có thể có URL, ngày hiệu lực, phạm vi hoặc thông tin trạng thái tùy record. Không có cơ chế tự lên mạng xác minh nguồn ở mỗi lượt.
+
+3.7 Sinh và kiểm tra
+rag/generation/answer.py cùng prompt rag/prompts/answer_generation.md tạo RAGResponse từ AnswerContext. LLM được yêu cầu dựa trên evidence và gắn citation theo ID. Engine còn có _graph_linked_filing_decision() tạo một đoạn bằng code trong tình huống workflow liên thông có điều kiện phù hợp, dựa vào contract, relation và chunk. Đây là một điểm phụ thuộc cần xét khi thay contract.
+
+validate_answer() trong rag/generation/validator.py kiểm tra citation, nguồn được phép, một số điều kiện dựa trên contract, yêu cầu bước và evidence. Hệ thống hiện phân loại warning/error theo quy tắc code. Thiếu citation hiện có thể thành error. Sau lỗi, code có repair_procedure_citations() bổ sung citation theo cấu trúc câu trả lời, kiểm tra lại, rồi có thể gọi LLM sửa với rag/prompts/answer_repair.md. Nếu vẫn không đạt, _fallback_response() trong engine dựng đáp án bằng code từ journey/evidence/contract và kiểm tra lại. Fallback là nhánh dự phòng thay câu sinh khi validation không đạt, không phải truy vấn database mới.
+
+Hướng validation đã thống nhất cho lần sửa tiếp theo: thiếu citation là warning hiển thị gắn với nội dung liên quan và không tự kích hoạt fallback; mã citation không tồn tại hoặc không thuộc tập nguồn được phép là error cần xử lý trước khi xuất. Kiểm tra mã hợp lệ không tự chứng minh nội dung nguồn hỗ trợ câu khẳng định. Đây là hướng đã bàn, code hiện tại chưa được sửa theo hướng này.
+
+3.8 Hoàn tất
+filter_sources_to_citations() giữ nguồn tương ứng citation trong câu trả lời. Nếu có conversation_id, engine cập nhật state, pending_questions, số lượt và ghi transcript. Response chuyển cho UI/CLI. UI có thể hiển thị câu trả lời, nguồn và warning.
+
+4. VẤN ĐỀ CHƯA CHỐT: ANSWERCONTRACT
+
+Contract hiện overfit demo và cách diễn đạt cụ thể. Một số thủ tục, từ khóa, số bước, loại quan hệ và nội dung bắt buộc được định nghĩa trước khi biết dữ liệu thực tế truy xuất. Rủi ro là diễn đạt khác nhưng cùng ý không khớp, chọn sai hoặc thiếu yêu cầu, làm lệch seed, chọn chunk và validation, hoặc tạo lỗi thiếu bằng chứng giả. Những rủi ro này là nhận định kiến trúc, không khẳng định mọi câu hỏi đều mắc lỗi.
+
+Không thể đánh giá việc bỏ chỉ bằng xóa lời gọi build_answer_contract(). Cần xem lại ít nhất: chọn requested/seed và workflow trong engine; điều kiện traversal, select_workflow và snapshot; detail_types và required_evidence trong vector.py; bảo toàn bước và rút gọn trong context.py; relation_evidence; câu quyết định liên thông trong engine; prompt generation/repair; kiểm tra và fallback trong validator/engine; schema và tests/demos đang dùng contract. Thay đổi cần bảo toàn khả năng trả lời có trình tự, quan hệ, giấy tờ và nguồn theo dữ liệu thực tế.
+
+Các hướng đang mở để thảo luận gồm bỏ hoàn toàn contract và để QueryState + retrieval/context đảm nhận; hoặc thay bằng cấu trúc yêu cầu tổng quát hơn, có thể xác định sau retrieval dựa trên câu hỏi và evidence; có thể cân nhắc LLM tạo cấu trúc nhưng phải phân biệt thông tin người dùng yêu cầu với dữ liệu đã truy xuất, kiểm tra các ID và không coi suy đoán của LLM là chứng cứ. Chưa chọn hướng nào.
+
+5. ĐỀ BÀI CHO CHATGPT
+
+Hãy phân tích cách thay AnswerContract trong kiến trúc trên để giảm heuristic theo từng use case, vẫn tìm đủ evidence và bảo toàn quan hệ/thứ tự. Đề xuất đầu vào, đầu ra, schema tối thiểu nếu cần, trình tự xử lý, cách kết hợp vector và graph, cách xử lý thiếu evidence, và những file/hàm cần sửa. So sánh các phương án theo độ tổng quát, độ phức tạp, số lần gọi LLM và nguy cơ mất thông tin. Tách rõ điều gì có thể xác định trước retrieval và điều gì cần dựa trên kết quả database. Validation theo quy ước warning/error ở mục 3.7. Nếu cần xác quyết hành vi cụ thể, yêu cầu xem mã tương ứng thay vì giả định tài liệu này chứa toàn bộ chi tiết.

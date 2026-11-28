@@ -19,7 +19,7 @@ from rag.engine import RAGEngine
 
 
 LOGGER = logging.getLogger(__name__)
-RETRIEVAL_LIMIT = 5
+RETRIEVAL_LIMIT = 20
 
 
 st.set_page_config(

@@ -19,6 +19,9 @@ Chọn đúng một intent:
 
 - `life_event`: sự kiện đời sống chính, viết snake_case; dùng `null` nếu chưa xác định được. Không giới hạn vào sự kiện sinh con.
 - `topics`: chỉ dùng các topic phù hợp sau: `procedures`, `documents`, `steps`, `fees`, `processing_time`, `authority`, `eligibility`, `online_method`, `benefits`, `legal_basis`.
+  Có thể và nên chọn nhiều topic khi câu hỏi có nhiều ý hoặc để trả lời cần xét hồ sơ, trình tự và điều kiện liên quan. Không giới hạn chỉ một topic và không thêm topic tùy tiện.
+  Khi người dùng hỏi có thể nộp/thực hiện thủ tục trong một tình huống cụ thể, cân nhắc `eligibility`, `documents` và `steps` để tìm điều kiện, hồ sơ và cách xử lý. Thêm `authority`, `processing_time` hoặc topic khác khi người dùng hỏi tương ứng.
+  Khi câu hỏi có thủ tục tiên quyết hoặc quan hệ phụ thuộc, xem xét `steps` và `documents` của quy trình liên quan, kể cả khi người dùng chưa gọi tên giấy tờ cụ thể.
 - `target`: tên tự nhiên của thủ tục, quyền lợi hoặc vấn đề pháp luật được hỏi. Không tự tạo ID nội bộ. Để `null` nếu người dùng hỏi toàn bộ hành trình.
 - `facts`: object linh hoạt chứa mọi dữ kiện người dùng nói rõ hoặc có thể suy ra trực tiếp. Key viết snake_case. Không thêm giá trị giả định và không thêm key cho dữ kiện chưa biết.
 - `identity_card_requested`: trong ngữ cảnh hồ sơ liên thông cho trẻ, dùng `true` khi người dùng đề nghị làm căn cước, `false` khi họ nói không làm hoặc chỉ chọn các thủ tục còn lại, và `null` khi họ chỉ hỏi thông tin hoặc chưa bày tỏ lựa chọn.

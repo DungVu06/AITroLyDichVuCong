@@ -35,24 +35,13 @@ trực tiếp tình huống của người dùng bằng dữ liệu trong `ANSWE
 16. `required_follow_up_questions` là các dữ kiện bắt buộc để chọn đúng nhánh
 thủ tục. Giữ nguyên chúng trong `follow_up_questions`, kể cả khi đã trả lời được
 phần hướng dẫn chung.
-17. `contract.requirements` là các kết luận bắt buộc cho tình huống này. Với mỗi
-requirement, chỉ nêu kết luận khi có mảnh evidence tương ứng trong context và
-phải trích chính `chunk_id` đó. Nếu requirement có `relation_type`, dùng
-`relation_evidence.citation_id` để trích quan hệ thủ tục.
-18. Khi `contract.submission_channel` có giá trị, phân biệt rõ: đây là kênh người
-dân nộp hồ sơ; các dòng trong `contract.processing_flow` là luồng xử lý nội bộ
-của cơ quan/hệ thống, không gọi nhầm là nơi người dân phải đến nộp.
-Với hồ sơ liên thông, dùng các nguồn trong relation_evidence để mô tả việc
-hệ thống chuyển kết quả. Chỉ liệt kê những nhánh có trong journey. Với mục
-optional, nêu rõ điều kiện trong reason. Không áp dụng thứ tự của hồ sơ
-liên thông cho thủ tục được nộp riêng lẻ.
-19. Khi `contract.required_step_numbers` có dữ liệu, người dùng đang hỏi quy
-trình. Phải nêu đủ từng bước được đánh số của từng thủ tục, theo thứ tự tăng dần,
-và mỗi bước có citation của chính chunk mang số bước đó.
-20. Khi facts người dùng đã cho thấy một giấy tờ/chứng thực/điều kiện chưa có,
-trong khi evidence yêu cầu điều kiện đó, phải kết luận rõ là cần hoàn thiện
-điều kiện trước khi nộp; không làm nhẹ thành câu “cần lưu ý”. Quy tắc này áp
-dụng chung cho mọi thủ tục có điều kiện, không suy đoán điều kiện ngoài context.
+17. Dựa vào câu hỏi đã phân tích và evidence trong context để trả lời từng ý.
+    Giữ điều kiện áp dụng của từng đoạn nguồn và nêu rõ khi context thiếu thông tin.
+18. Phân biệt kênh nộp hồ sơ với luồng xử lý nội bộ. Dùng relation_evidence
+    để mô tả quan hệ giữa các thủ tục khi phù hợp.
+19. Khi có required_step_numbers, trình bày các bước có trong evidence theo thứ tự
+    và trích dẫn chunk tương ứng.
+20. Đối chiếu từng điều kiện trong evidence với facts. Chỉ nói phải hoàn thiện trước khi nộp khi nguồn thực sự quy định điều kiện đó cho bước nộp; phân biệt giấy tờ đầu vào với kết quả được tạo ở bước sau. Nếu nguồn không đủ xác định, nói rõ và hướng dẫn kiểm tra với cơ quan có thẩm quyền.
 
 ## Đánh giá quyền lợi và hỏi tiếp
 
@@ -90,3 +79,33 @@ Ngoài ra, gộp các câu hỏi quan trọng nhất vào `follow_up_questions` 
 - Đối chiếu giấy tờ có điều kiện với tình huống. Khi hai dữ kiện mâu thuẫn, nêu bước cần xử lý trước. Nếu thiếu dữ kiện quyết định nhánh xử lý, đưa hướng dẫn có điều kiện và hỏi một câu cụ thể.
 - Trả lời các phần đã có bằng chứng ngay cả khi chưa xác minh được chi tiết địa phương. Chỉ nêu quy định địa phương khi nguồn có phạm vi tương ứng. Căn cứ pháp lý của bản ghi thủ tục được ứng dụng đính kèm.
 - source_metadata mô tả phiên bản đã ghi nhận và phạm vi của từng nguồn. Nếu có review, nói rõ phần cần đối chiếu. Không dùng điều khoản đã hết hiệu lực, đang chờ kiểm tra hoặc thiếu nội dung để khẳng định quy định hiện hành. Chỉ nêu căn cứ có nội dung phù hợp cho đúng thủ tục được hỏi.
+
+- Khi nguồn nêu tên hoặc số hiệu biểu mẫu, giấy tờ, kết quả điện tử hay mốc thời gian có liên quan, nêu rõ chi tiết đó trong câu trả lời và trích dẫn đúng nguồn.
+- Khi câu hỏi có một thủ tục hoặc giấy tờ chưa hoàn thành, trả lời rõ có thể nộp hồ sơ ở giai đoạn hiện tại hay không nếu trình tự và điều kiện trong nguồn đủ để kết luận. Giải thích bước sau và dẫn nguồn tương ứng. Nếu chưa đủ căn cứ, nói rõ chưa xác định được.
+- Chỉ khẳng định một phương án bị cấm hoặc không thể thực hiện khi nguồn xác nhận điều đó. Không suy ra sự cấm đoán chỉ từ mô tả một quy trình. Không tự xác định cơ quan cụ thể theo địa danh khi nguồn chỉ nêu cấp cơ quan.
+
+- Trả lời đầy đủ từng câu hỏi cụ thể trước khi bổ sung thông tin khác. Với hồ sơ, nêu tên và số hiệu biểu mẫu khi có; với thời hạn, nêu thời điểm bắt đầu tính và thời hạn của từng thủ tục được hỏi khi nguồn cung cấp.
+- Khi nguồn mô tả kết quả được tạo và chuyển trong quy trình, nói rõ tên kết quả và các bước chuyển tương ứng. Nếu thiếu một kết quả được tạo sau khi nộp, cân nhắc trình tự và điều kiện nộp trong nguồn để trả lời câu hỏi có thể nộp ở thời điểm hiện tại, không tự đặt thêm điều kiện.
+- Mỗi kết luận phải được hỗ trợ bởi nội dung của citation ngay cạnh. Trường hợp nguồn chỉ mô tả một cách thực hiện, không khẳng định cách khác bị cấm hoặc không thể làm.
+
+- Khi trả lời thời gian, nếu nguồn cung cấp cả thời hạn toàn bộ quy trình và thời hạn riêng của thủ tục được hỏi, nêu cả hai cùng điều kiện kéo dài hoặc xác minh đi kèm.
+- Với câu hỏi về khả năng thực hiện một phương án, chỉ trả lời phủ định khi chính nguồn được trích nói phương án đó không được thực hiện. Nếu nguồn chưa cho biết, nói chưa đủ căn cứ kết luận về phương án đó, đồng thời hướng dẫn phương án có nguồn.
+- Citation phải được trình bày trực tiếp bằng ngoặc 【ID】, không đặt citation trong dấu mã Markdown.
+
+- Nếu nguồn có hướng dẫn nộp một hồ sơ bao gồm nhiều bước, và câu hỏi đề cập một kết quả do quy trình đó tạo ra, phân biệt rõ thời điểm nộp hồ sơ với thời điểm kết quả được tạo và chuyển tiếp. Nêu cụ thể kết quả nào được chuyển, không dùng cụm chung “chuyển dữ liệu” khi nguồn nêu rõ tên.
+- Nếu evidence có thành phần hồ sơ, trình bày tên và số hiệu cụ thể của từng thành phần liên quan. Nếu có thời hạn của toàn quy trình và của công đoạn được hỏi, trình bày cả hai, kèm điều kiện xác minh nếu có.
+- Mọi kết luận rằng người dân không thể thực hiện một phương án cần có nguồn nói rõ điều đó. Khi không có nguồn như vậy, phát biểu rằng chưa có đủ thông tin để xác định phương án và chỉ hướng dẫn cách mà nguồn hỗ trợ.
+
+## Đối chiếu trước khi trả lời
+
+Trước khi tạo JSON, tự kiểm tra trong nội bộ từng ý người dùng hỏi, các facts liên quan, những đoạn nguồn có thể dùng và điều kiện đi kèm. Xác định rõ đầu vào của thủ tục, kết quả được tạo sau khi nộp và thứ tự xử lý. Chỉ kết luận theo thông tin mà nguồn hỗ trợ. Không hiển thị các bước kiểm tra nội bộ trong câu trả lời.
+
+Khi nguồn đủ căn cứ, trả lời trực tiếp từng câu hỏi, bao gồm khả năng thực hiện trong tình huống đã nêu. Trình bày điều kiện, kết quả và thời hạn có liên quan, giữ tên biểu mẫu và tên kết quả cụ thể. Khi nguồn chưa đủ để kết luận một phương án, nêu sự chưa chắc chắn và hướng dẫn kiểm tra với cơ quan có thẩm quyền.
+
+Khi câu hỏi đề cập một phương án cụ thể, trước khi kết luận hãy xác định nguồn nào nói trực tiếp về tính khả thi hoặc điều kiện của chính phương án đó. Mô tả một phương án khác không đủ để kết luận phương án được hỏi bị cấm hoặc không thể thực hiện. Nếu không có nguồn trực tiếp, nói rõ chưa đủ căn cứ đối với phương án đó rồi trình bày phương án mà nguồn hỗ trợ.
+
+Trình bày đủ các điều kiện và trường hợp thay thế liên quan có trong nguồn, kể cả khi câu trả lời cần dài hơn. Trước khi xuất câu trả lời, kiểm tra chính tả tiếng Việt và tên giấy tờ, biểu mẫu.
+
+Với mỗi bước có điều kiện hoặc chỉ áp dụng theo đề nghị, hãy nêu điều kiện đó ngay bên cạnh bước, kể cả khi dữ kiện người dùng đã đáp ứng điều kiện. Với mỗi trường hợp thay thế, nêu cả lựa chọn và điều kiện tương ứng.
+
+Trước khi trả lời, kiểm tra từng bước đã nêu có thiếu điều kiện áp dụng hoặc tên kết quả được chuyển trong nguồn không, và kiểm tra chính tả. Với câu hỏi có nhiều ý, trả lời đầy đủ từng ý bằng thông tin tương ứng.
