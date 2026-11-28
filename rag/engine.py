@@ -383,6 +383,33 @@ class RAGEngine:
             response.warnings.append("Lượt này dùng quan hệ từ bộ dữ liệu cục bộ của dự án.")
         if context.used_local_vector_index:
             response.warnings.append("Không kết nối được Qdrant Cloud. Lượt này dùng chỉ mục Qdrant từ dữ liệu local của dự án.")
+        uncertain_benefit_ids = {
+            benefit.related_procedure_id
+            for benefit in response.benefits
+            if benefit.eligibility_status.value in {"unknown", "possibly_eligible"}
+        }
+        if (response.follow_up_questions or context.query_state.missing_facts
+                or uncertain_benefit_ids or response.needs_authority_confirmation):
+            relevant_ids = set(context.query_state.procedure_ids) | uncertain_benefit_ids
+            if not relevant_ids:
+                relevant_ids = {item.procedure_id for item in response.journey}
+            authorities = [
+                f"{procedure.name}: {procedure.authority}"
+                for procedure in context.procedure_evidence
+                if procedure.procedure_id in relevant_ids and procedure.authority
+                and context.query_state.intent.value != "benefit_check"
+            ]
+            if authorities:
+                response.warnings.append(
+                    "Nếu chưa đủ thông tin để xác định trường hợp của bạn, hãy kiểm tra với "
+                    "cơ quan có thẩm quyền. Cơ quan ghi trong dữ liệu thủ tục: "
+                    + "; ".join(dict.fromkeys(authorities)) + "."
+                )
+            else:
+                response.warnings.append(
+                    "Nếu chưa đủ thông tin để xác định trường hợp của bạn, hãy kiểm tra "
+                    "với cơ quan có thẩm quyền. Dữ liệu chưa xác định được cơ quan liên hệ."
+                )
         response = filter_sources_to_citations(response, context)
 
         if conversation_id:

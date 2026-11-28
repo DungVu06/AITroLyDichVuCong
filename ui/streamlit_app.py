@@ -65,10 +65,22 @@ def render_metadata(message: dict[str, Any]) -> None:
             for source in sources:
                 title = source["title"]
                 source_id = source["source_id"]
+                meta = source.get("metadata") or {}
                 if source.get("url"):
                     st.markdown(f"- [{title}]({source['url']}) — `{source_id}`")
                 else:
                     st.markdown(f"- **{title}** — `{source_id}`")
+                date_label = (
+                    "Hiệu lực nguồn thủ tục"
+                    if source.get("source_type") == "procedure_chunk"
+                    else "Hiệu lực từ"
+                )
+                details = [f"{date_label}: {meta.get('effective_date') or 'chưa có thông tin'}"]
+                if not source.get("url"):
+                    details.append("Chưa có đường dẫn nguồn")
+                if meta.get("scope"):
+                    details.append(f"Phạm vi: {meta['scope']}")
+                st.caption(" · ".join(details))
 
     procedure_sources = [
         source for source in sources
@@ -82,14 +94,29 @@ def render_metadata(message: dict[str, Any]) -> None:
                 st.markdown(f"**{source['title']}** · {len(meta['legal_bases'])} văn bản")
                 st.caption(" · ".join(filter(None, (
                     meta.get("scope"),
-                    "Hiệu lực từ " + (meta.get("effective_date") or "chưa rõ"),
+                    "Hiệu lực thủ tục từ " + (meta.get("effective_date") or "chưa rõ"),
                     "Ghi nhận " + (meta.get("observed_at") or "chưa rõ"),
                     "Phiên bản " + meta["version"][:12],
                 ))))
+                basis_metadata = meta.get("legal_basis_metadata") or {}
                 for basis in meta["legal_bases"]:
-                    st.markdown(f"- {basis}")
+                    detail = basis_metadata.get(basis) or {}
+                    if detail.get("url"):
+                        st.markdown(f"- [{basis}]({detail['url']})")
+                    else:
+                        st.markdown(f"- {basis}")
+                    information = [
+                        "Hiệu lực từ: " + (detail.get("effective_date") or "chưa có thông tin"),
+                        "Trạng thái trong dữ liệu: " + (detail.get("validity") or "chưa đối chiếu"),
+                    ]
+                    if not detail.get("url"):
+                        information.append("Chưa có đường dẫn văn bản")
+                    st.caption(" · ".join(information))
+                    for notice in detail.get("review", []):
+                        st.caption(notice)
                 for notice in meta.get("review", []):
-                    st.caption(notice)
+                    if notice != "Một số căn cứ do thủ tục liệt kê chưa được đối chiếu hiệu lực.":
+                        st.caption(notice)
 
 
 def render_message(message: dict[str, Any]) -> None:

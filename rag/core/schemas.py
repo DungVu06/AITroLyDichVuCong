@@ -197,6 +197,13 @@ class ResponseRules(StrictModel):
     must_mark_uncertain_benefits: bool = True
 
 
+class LegalBasisMetadata(StrictModel):
+    url: str | None = None
+    effective_date: str | None = None
+    validity: str | None = None
+    review: list[str] = Field(default_factory=list)
+
+
 class SourceMetadata(StrictModel):
     url: str | None = None
     version: str
@@ -205,6 +212,7 @@ class SourceMetadata(StrictModel):
     scope: str | None = None
     validity: str | None = None
     legal_bases: list[str] = Field(default_factory=list)
+    legal_basis_metadata: dict[str, LegalBasisMetadata] = Field(default_factory=dict)
     review: list[str] = Field(default_factory=list)
 
 
@@ -299,6 +307,7 @@ class AnswerRefinementDraft(StrictModel):
     edits: list[AnswerEdit] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     follow_up_questions: list[str] | None = Field(default=None, max_length=3)
+    needs_authority_confirmation: bool = False
 
 
 class AnswerRepairDraft(StrictModel):
@@ -307,6 +316,7 @@ class AnswerRepairDraft(StrictModel):
 
 class RAGResponse(StrictModel):
     answer_markdown: str
+    needs_authority_confirmation: bool = False
     journey: list[JourneyItem] = Field(default_factory=list)
     benefits: list[BenefitEvidence] = Field(default_factory=list)
     follow_up_questions: list[str] = Field(default_factory=list)

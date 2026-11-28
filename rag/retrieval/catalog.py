@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 from rag.core.config import PROJECT_ROOT
-from rag.core.schemas import SourceMetadata
+from rag.core.schemas import LegalBasisMetadata, SourceMetadata
 
 DATA = PROJECT_ROOT / "data"
 BASELINE = Path(__file__).with_name("source_versions.json")
@@ -64,9 +64,16 @@ def inspect_versions(laws, procedures, versions):
                 related = record.get("relations", {})
                 for base in related.get("legal_bases", []):
                     code = base.get("code", "").strip()
-                    meta.legal_bases.append((code + " — " + base.get("name", "")).strip(" —"))
+                    label = (code + " — " + base.get("name", "")).strip(" —")
+                    meta.legal_bases.append(label)
                     law = result.get(law_codes.get(number_key(code)))
                     if law:
+                        meta.legal_basis_metadata[label] = LegalBasisMetadata(
+                            url=law.url,
+                            effective_date=law.effective_date,
+                            validity=law.validity,
+                            review=list(law.review),
+                        )
                         meta.review.extend(law.review)
                 for benefit in related.get("related_benefits", []):
                     law_id = benefit["law_section_id"].partition("/")[0]

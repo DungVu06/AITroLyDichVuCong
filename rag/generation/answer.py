@@ -40,11 +40,16 @@ def _collect_sources(context: AnswerContext) -> list[SourceReference]:
             title=procedure.name,
             url=procedure.source_url,
         )
+        procedure_metadata = context.source_metadata.get(procedure.procedure_id)
+        chunk_metadata = procedure_metadata.model_copy(update={
+            "legal_bases": [], "legal_basis_metadata": {}, "review": [],
+        }) if procedure_metadata else None
         for chunk in procedure.chunks:
             if not chunk.chunk_id:
                 continue
             chunk_key = ("procedure_chunk", chunk.chunk_id)
             sources[chunk_key] = SourceReference(
+                metadata=chunk_metadata,
                 source_type="procedure_chunk",
                 source_id=chunk.chunk_id,
                 title=f"{procedure.name} – {chunk.chunk_type or 'chi tiết'}",
@@ -374,6 +379,7 @@ def refine_answer(
     return response.model_copy(update={
         "answer_markdown": markdown,
         "warnings": warnings,
+        "needs_authority_confirmation": draft.needs_authority_confirmation,
         "follow_up_questions": (list(dict.fromkeys(draft.follow_up_questions))[:3]
                                 if draft.follow_up_questions is not None else response.follow_up_questions),
     })
