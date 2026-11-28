@@ -232,7 +232,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT_DIR / "data" / "relations" / "related_benefit_relations.json",
+        default=ROOT_DIR / "data" / "benefit_relation" / "related_benefit_relations.json",
     )
     parser.add_argument(
         "--report",

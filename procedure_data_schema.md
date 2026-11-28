@@ -30,7 +30,7 @@ Ví dụ dưới đây minh họa bản ghi đầu vào. Các ID trong `relation
   "life_event": ["sinh_con"],
   "target_audience": ["Công dân Việt Nam", "Người Việt Nam định cư ở nước ngoài"],
   "domain": "Hộ tịch",
-  "procedure_type": "TTHC được luật giao quy định chi tiết",
+  "procedure_type": "ASSIGNED_REGULATION",
 
   "procedure": {
     "name": "Thủ tục đăng ký khai sinh",
@@ -118,7 +118,7 @@ Ví dụ dưới đây minh họa bản ghi đầu vào. Các ID trong `relation
 | `life_event` | Array[String] | Có | Sự kiện đời sống kích hoạt thủ tục, ví dụ: `["sinh_con"]`, `["thuong_tru"]`. Dùng đồng bộ từ điển với schema Law. |
 | `target_audience` | Array[String] | Có | Đối tượng thực hiện (ví dụ: `["Công dân Việt Nam"]`, `["Người nước ngoài"]`). |
 | `domain` | String | Có | Lĩnh vực chuyên môn, ví dụ: `Hộ tịch`, `Đăng ký, quản lý cư trú`, `Bảo hiểm y tế`. |
-| `procedure_type` | String | Không | Phân loại TTHC theo quy định (ví dụ: `TTHC được luật giao quy định chi tiết`). |
+| `procedure_type` | String | Không | Mã phân loại bản ghi lấy từ trường `formalityType` của nguồn. Trong bộ dữ liệu hiện tại, bốn bản ghi thủ tục riêng lẻ có `ASSIGNED_REGULATION`, còn gói liên thông `PROC_3_000722` có `OTHER`. Repo chưa có định nghĩa chính thức của API về các mã này. |
 | `normalization_version` | String | Có trong bản chuẩn hóa | Phiên bản bộ chuẩn hóa ghi vào `normalized_records/`. Giá trị hiện tại là `procedure-normalize-v2`. |
 
 ---
@@ -184,8 +184,10 @@ Phục vụ trực tiếp việc kiểm soát phiên bản và cảnh báo khi c
 | `source.effective_date`| String (Date) | Ngày văn bản/quyết định công bố bắt đầu có hiệu lực (`YYYY-MM-DD`). |
 | `source.last_updated` | String (Date) | Ngày hệ thống crawler quét và cập nhật bản ghi (`YYYY-MM-DD`). |
 | `version_control.proposal_number` | String | Số quyết định công bố TTHC của Bộ/Ngành (VD: `5860/QĐ-BCA-C06`, `QĐ/0001-BTP`). |
-| `version_control.state` | String | Trạng thái hiệu lực trên cổng: `ACTIVE` (đang có hiệu lực), `UPDATED` (đã cập nhật phiên bản mới). |
+| `version_control.state` | String | Trạng thái bản ghi theo trường `state` của nguồn, ví dụ `ACTIVE` hoặc `UPDATED`. Crawler dùng `ACTIVE` làm mặc định khi phản hồi thiếu trường này. |
 | `version_control.raw_id` | String | UUID nội bộ của thủ tục trên database Cổng DVCQG. |
+
+Repo chưa có định nghĩa chính thức của API cho các giá trị này. Dữ liệu hiện có chưa đủ căn cứ để dùng riêng `state` kết luận hiệu lực pháp lý. Knowledge graph không dùng `state` để tạo cạnh hay xếp thứ tự thủ tục. RAG hiện dùng trường này làm giá trị dự phòng cho `source_metadata.validity` khi thiếu `validity_raw`. Trường này cũng nằm trong dữ liệu tính mã băm đối chiếu phiên bản.
 
 ---
 
